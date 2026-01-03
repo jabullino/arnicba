@@ -24,9 +24,9 @@ use App\Models\User;
 use App\Models\Vacacion;
 use App\Models\Municipio;
 use App\Http\Controllers\AlumnosController;
+use App\Http\Controllers\UserAdminSisController;
 
-
-
+Route::post('AdminSis.RegistraAdminSis',[UserAdminSisController::class,'saveadminsis'])->name('AdminSis.RegistraAdminSis');
 Route::get('/provincias/{ciudad_id}', function($ciudad_id) {
    $provincias = \App\Models\Provincia::where('ciudad_id', $ciudad_id)->get();
    return response()->json($provincias);

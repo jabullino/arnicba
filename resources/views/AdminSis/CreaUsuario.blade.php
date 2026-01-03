@@ -94,6 +94,18 @@
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Ubicación del domicilio</label>
+                        <div id="map" style="height: 350px; border-radius:8px;"></div>
+
+                        <input type="hidden" name="latitud" id="latitud">
+                        <input type="hidden" name="longitud" id="longitud">
+
+                        @error('latitud')
+                            <div class="error-message">{{ $message }}</div>
+                        @enderror
+                    </div>
+
 
                     <div class="form-group">
                         <label for="telefono">Teléfono</label>
@@ -117,14 +129,15 @@
                         @error('password')
                             <div class="error-message">{{ $message }}</div>
                         @enderror
-                        <ul id="password-rules" style="font-size:13px; margin-top:5px; list-style:none; padding-left:0;background-color:#0f172a">
-                        <li id="rule-length" style="color:white;">• Mínimo 8 caracteres</li>
-                        <li id="rule-mayus" style="color:white;">• Al menos 1 letra mayúscula</li>
-                        <li id="rule-number" style="color:white;">• Al menos 1 número</li>
-                        <li id="rule-symbol" style="color:white;">• Al menos 1 símbolo (* - _ @ ! etc.)</li>
-                    </ul>
+                        <ul id="password-rules"
+                            style="font-size:13px; margin-top:5px; list-style:none; padding-left:0;background-color:#0f172a">
+                            <li id="rule-length" style="color:white;">• Mínimo 8 caracteres</li>
+                            <li id="rule-mayus" style="color:white;">• Al menos 1 letra mayúscula</li>
+                            <li id="rule-number" style="color:white;">• Al menos 1 número</li>
+                            <li id="rule-symbol" style="color:white;">• Al menos 1 símbolo (* - _ @ ! etc.)</li>
+                        </ul>
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="password_confirmation">Confirmar password</label>
                         <input type="password" name="password_confirmation" class="form-control">
@@ -363,4 +376,31 @@
 
         });
     </script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    const map = L.map('map').setView([-16.5, -68.15], 13); // Bolivia por defecto
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    let marker;
+
+    map.on('click', function (e) {
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+
+        document.getElementById('latitud').value = lat;
+        document.getElementById('longitud').value = lng;
+
+        if (marker) {
+            marker.setLatLng(e.latlng);
+        } else {
+            marker = L.marker(e.latlng).addTo(map);
+        }
+    });
+</script>
+
 @endsection

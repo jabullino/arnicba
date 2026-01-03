@@ -68,7 +68,7 @@ class DatabaseSeeder extends Seeder
         //$this->call(SalarioMinimoSeeder::class);
         $this->call(TipoCuentaSeeder::class);
         $this->call(TipoMonedaSeeder::class);
-        $this->call(UsuariosSeeder::class);
+        //$this->call(UsuariosSeeder::class);
         // $this->call(HaberBasicoSeeder::class);
         $this->call(GeneroSeeder::class);
         $this->call(TipologiaSeeder::class);

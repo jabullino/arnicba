@@ -65,6 +65,8 @@ class UsuariosController extends Controller
             'provincia' => 'required',
             'direccion' => 'required|string|max:100',
             'referencias' => 'required|string|max:100',
+            'latitud' => 'required|numeric',
+            'longitud' => 'required|numeric',
             'telefono' => 'required|string|max:20',
             'email' => 'required|email|max:255|unique:users',
 
@@ -117,6 +119,9 @@ class UsuariosController extends Controller
                 'fec_ingreso' => $request->fecingreso,
                 'fec_egreso' => Carbon::today()->toDateString(),
                 'rutafoto' => $ruta,
+                'latitud' => $request->latitud,
+                'longitud' => $request->longitud,
+
             ]);
             $cargos = new Cargo();
             $usuarios = User::all();

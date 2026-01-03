@@ -74,7 +74,7 @@
                     <label for="referencias">Referencias</label>
                     <input type="text" name='referencias' value="{{ $usr->referencias }}" readonly class='form-control'>
                 </div>
-
+                <div id="mapShow" style="height:350px;"></div>
                 <div class='mb-2 form-group'>
                     <label for="telefono">Teléfono</label>
                     <input type="text" name='telefono' value="{{ $usr->telefono }}" readonly class='form-control'>
@@ -166,4 +166,22 @@
     .card-body { padding: 1rem; }
 }
 </style>
+@endsection
+@section('js')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    const mapShow = L.map('mapShow').setView(
+        [{{ $usr->latitud }}, {{ $usr->longitud }}], 
+        16
+    );
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mapShow);
+
+    L.marker([{{ $usr->latitud }}, {{ $usr->longitud }}])
+        .addTo(mapShow)
+        .bindPopup("Domicilio del usuario")
+        .openPopup();
+</script>
 @endsection

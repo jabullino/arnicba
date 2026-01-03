@@ -17,44 +17,48 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create()
     {
+        if (User::count() === 0) {
+            return redirect()->route('CreaAdminSis');
+        }
+
         return view('auth.login');
     }
 
     /**
      * Handle an incoming authentication request.
      */
-   public function store(Request $request)
-{
+    public function store(Request $request)
+    {
 
-    if(User::count() === 0){
-        // Redirigir al primer registro
-        return redirect()->route('primerRegistro'); 
-        // Asegúrate de tener definida esta ruta apuntando a:
-        // resources/views/AdminSis/UserAdminSis/register.blade.php
+        if (User::count() === 0) {
+            // Redirigir al primer registro
+            return redirect()->route('primerRegistro');
+            // Asegúrate de tener definida esta ruta apuntando a:
+            // resources/views/AdminSis/UserAdminSis/register.blade.php
+        }
+
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string']
+        ]);
+
+        if (!Auth::attempt($credentials, $request->boolean('remember'))) {
+            return back()->withErrors(['email' => 'Credenciales inválidas']);
+        }
+
+        $request->session()->regenerate();
+        $user = Auth::user();
+
+        // Si NO tiene 2FA → QR
+        if (empty($user->two_factor_secret)) {
+            return redirect()->route('two-factor.setup');
+        }
+
+        // Si tiene 2FA → pedir código
+        return redirect()->route('two-factor.verify');
     }
-
-    $credentials = $request->validate([
-        'email' => ['required','email'],
-        'password' => ['required','string']
-    ]);
-
-    if(!Auth::attempt($credentials, $request->boolean('remember'))){
-        return back()->withErrors(['email'=>'Credenciales inválidas']);
-    }
-
-    $request->session()->regenerate();
-    $user = Auth::user();
-
-    // Si NO tiene 2FA → QR
-    if(empty($user->two_factor_secret)){
-        return redirect()->route('two-factor.setup');
-    }
-
-    // Si tiene 2FA → pedir código
-    return redirect()->route('two-factor.verify');
-}
     /**
      * Destroy an authenticated session.
      */

@@ -31,7 +31,8 @@ Route::middleware(['auth', 'IsAdminSis'])->group(function () {
 
     // Usuarios
     Route::resource('Usuarios', UsuariosController::class)->names('Usuarios');
-    Route::post('RegistraAdminSis', [UserAdminSisController::class, 'saveadminsis'])->name('RegistraAdminSis');
+   
+
 
     // Provincias por ciudad
     Route::get('/provincias/{ciudad_id}', function ($ciudad_id) {

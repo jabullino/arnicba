@@ -49,6 +49,9 @@ class User extends Authenticatable
         'fec_ingreso',
         'fec_egreso',
         'foto',
+        'latitud',
+        'longitud',
+
        
     ];
 

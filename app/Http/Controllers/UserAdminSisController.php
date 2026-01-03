@@ -19,7 +19,7 @@ class UserAdminSisController extends Controller
     }//fin funcion index
 
     public function saveadminsis(Request $request){
-      
+
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|alpha_spaces|max:255',
             'apellido' => 'required|alpha_spaces|max:255',
@@ -35,6 +35,8 @@ class UserAdminSisController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'password_confirmation'=>'required|same:password|min:6|max:20',
             'cargo' => 'required',
+            'latitud'  => 'nullable|numeric',
+            'longitud' => 'nullable|numeric',
             
         ]);
 
