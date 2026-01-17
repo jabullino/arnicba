@@ -108,7 +108,7 @@ class Gestion extends Model
         $gestion = self::create([]); // dispara creating pero no created
         
             $cargoIds = Cargo::where('id', '!=', 1)->pluck('id')->toArray();
-            $haberes = [0.00, 1780.25, 3597.42,0.00,4133.88, 3933.84, 3133.75, 3042.48, 2362.00, 2362.00, 0.00];
+            $haberes = [0.00, 2219.74, 3705.34,0.00,4257.90, 4051.86, 3227.76, 3133.75, 2500.00, 2500.00, 0.00];
             $smn = 2362.00;
 
             SalarioMinimo::create([
