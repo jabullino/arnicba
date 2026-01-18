@@ -40,11 +40,7 @@ class SalarioMinimo extends Model
             'monto'=>$salmin,
          ]);
         
-         
-      
-         
-       
-    }
+}
 
     protected static function booted()
     {
