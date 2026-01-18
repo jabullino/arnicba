@@ -15,8 +15,6 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('gestion_id');
             $table->unsignedBigInteger('cargo_id');
-            $table->string('mes_inicio',3);
-            $table->string('mes_fin',3);
             $table->decimal('monto',10,2);
             $table->softDeletes();
             $table->timestamps();

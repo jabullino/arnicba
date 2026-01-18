@@ -29,28 +29,31 @@ class ImprimeBoletasPagoController extends Controller
      
     // 1️⃣ Usuarios con haber básico
     $usuarios = DB::table('users')
-        ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
-        ->leftJoin('extensiones', 'users.extension_id', '=', 'extensiones.id')
-        ->leftJoin('haber_basicos', function ($join) use ($gestion_id, $mesId) {
-            $join->on('cargos.id', '=', 'haber_basicos.cargo_id')
-                 ->where('haber_basicos.gestion_id', '=', $gestion_id)
-                 ->where('haber_basicos.mes_inicio', '<=', $mesId)
-                 ->where('haber_basicos.mes_fin', '>=', $mesId);
-        })
-        ->whereNull('users.deleted_at')
-        ->where('users.id', '!=', 1)
-        ->select(
-            'users.id as user_id',
-            'users.nombre',
-            'users.apellido',
-            'users.ci',
-            'users.fec_ingreso',
-            'cargos.nombre as cargo',
-            'extensiones.nombre as extension',
-            'haber_basicos.monto as haber_basico'
-        )
-        ->get()
-        ->keyBy('user_id');
+    ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
+    ->leftJoin('extensiones', 'users.extension_id', '=', 'extensiones.id')
+    ->leftJoin('haber_basicos', function ($join) {
+        $join->on('cargos.id', '=', 'haber_basicos.cargo_id')
+             ->whereRaw('haber_basicos.id = (
+                 SELECT MAX(hb.id)
+                 FROM haber_basicos hb
+                 WHERE hb.cargo_id = cargos.id
+             )');
+    })
+    ->whereNull('users.deleted_at')
+    ->where('users.id', '!=', 1)
+    ->select(
+        'users.id as user_id',
+        'users.nombre',
+        'users.apellido',
+        'users.ci',
+        'users.fec_ingreso',
+        'cargos.nombre as cargo',
+        'extensiones.nombre as extension',
+        'haber_basicos.monto as haber_basico'
+    )
+    ->get()
+    ->keyBy('user_id');
+
 
     $userIds = $usuarios->keys();
 

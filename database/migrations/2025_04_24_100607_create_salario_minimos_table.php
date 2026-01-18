@@ -14,8 +14,6 @@ return new class extends Migration
         Schema::create('salario_minimos', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('gestion_id');
-            $table->string('mes_inicio',3);
-            $table->string('mes_fin');
             $table->decimal('monto',10,2);
             $table->softDeletes();
             $table->foreign('gestion_id')->references('id')->on('gestiones')->onDelete('cascade');

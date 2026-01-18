@@ -70,7 +70,7 @@ class Gestion extends Model
             $ultimaGestion = self::withTrashed()->orderBy('id', 'desc')->first();
 
             if (!$ultimaGestion) {
-                $gestion->nombre = 2024;
+                $gestion->nombre = 2025;
             } else {
                 $gestion->nombre = $ultimaGestion->nombre + 1;
             }
@@ -109,12 +109,10 @@ class Gestion extends Model
         
             $cargoIds = Cargo::where('id', '!=', 1)->pluck('id')->toArray();
             $haberes = [0.00, 2219.74, 3705.34,0.00,4257.90, 4051.86, 3227.76, 3133.75, 2500.00, 2500.00, 0.00];
-            $smn = 2362.00;
+            $smn = 2500.00;
 
             SalarioMinimo::create([
                 'gestion_id' => $gestion->id,
-                'mes_inicio' => '01',
-                'mes_fin'   => '05',
                 'monto'     => $smn,
             ]);
 
@@ -122,8 +120,6 @@ class Gestion extends Model
                 HaberBasico::create([
                     'gestion_id' => $gestion->id,
                     'cargo_id'   => $cargoId,
-                    'mes_inicio' => '01',
-                    'mes_fin'   => '05',
                     'monto'      => $haberes[$index] ?? 0,
                 ]);
             }
@@ -151,20 +147,18 @@ class Gestion extends Model
             
         $cargoIds = Cargo::where('id', '!=', 1)->pluck('id')->toArray();
         $haberes = DB::table('haber_basicos')
-        ->where('gestion_id', $gestion_id)
-        ->whereIn('cargo_id', $cargoIds)
-        ->where('mes_inicio', '06')
-        ->where('mes_fin', '12')
-        ->pluck('monto') // clave => valor
-        ->toArray();
+                   ->where('gestion_id', $gestion_id)
+                   ->whereIn('cargo_id', $cargoIds)
+                   ->orderBy('created_at', 'desc')
+                   ->pluck('monto')
+                   ->toArray();
+
             
 
                 foreach ($cargoIds as $index => $cargoId) {
                  HaberBasico::create([
                 'gestion_id' => $gestion->id,
                 'cargo_id'   => $cargoId,
-                'mes_inicio' => '01',
-                'mes_fin'   => '05',
                 'monto'      => $haberes[$index],
             ]);
                 
@@ -200,15 +194,11 @@ class Gestion extends Model
 
         $cargoIds = Cargo::where('id', '!=', 1)->pluck('id');
         $haberes = HaberBasico::where('gestion_id', $ultimaGestion->id)
-            ->whereRaw("CAST(mes_inicio AS UNSIGNED) = 1")
-            ->whereRaw("CAST(mes_fin AS UNSIGNED) = 5")
             ->pluck('monto', 'cargo_id')
             ->map(fn($item) => (float) $item);
 
         SalarioMinimo::create([
             'gestion_id' => $ultimaGestion->id,
-            'mes_inicio' => '06',
-            'mes_fin'   => '12',
             'monto'     => $salarioMinimo,
         ]);
 
@@ -226,8 +216,6 @@ class Gestion extends Model
             HaberBasico::create([
                 'gestion_id' => $ultimaGestion->id,
                 'cargo_id'   => $cargoId,
-                'mes_inicio' => '06',
-                'mes_fin'   => '12',
                 'monto'      => $incremento,
             ]);
         }
@@ -240,4 +228,6 @@ class Gestion extends Model
             $query->whereNull('deleted_at');
         });
     }
+
+   
 }

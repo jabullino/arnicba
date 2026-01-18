@@ -55,6 +55,7 @@ class UsuariosController extends Controller
      */
     public function store(Request $request)
     {
+        
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|alpha_spaces|max:255',
             'apellido' => 'required|alpha_spaces|max:255',

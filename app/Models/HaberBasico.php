@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class HaberBasico extends Model
 {
-    protected $fillable = ['gestion_id', 'cargo_id', 'mes_inicio', 'mes_fin', 'monto'];
+    protected $fillable = ['gestion_id', 'cargo_id', 'monto'];
     /** @use HasFactory<\Database\Factories\HaberBasicoFactory> */
     use HasFactory,SoftDeletes;
 
