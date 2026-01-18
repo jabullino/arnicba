@@ -186,13 +186,53 @@ class Gestion extends Model
     // CREAR SEGUNDO SEMESTRE
     public static function creaSegundoSemestre($salarioMinimo, $haberBasico)
     {
-        $ultimaGestion = self::latest('id')->first();
+       
+         $mes = Carbon::now()->format('m');
+          $mes='06'; 
+         if($mes==='01'){
+             $gestion=self::orderBy('id', 'desc')
+                       ->value('nombre');
+            $nuevaGestion=(string) ((int) $gestion + 1);
+            Self::create([
+                'nombre'=>$nuevaGestion,
+                'estado_id'=>'1',
+            ]);
+            $ultimaGestion = self::latest('id')->first();
 
-        if (!$ultimaGestion) {
-            throw new \Exception("No existe ninguna gestión creada para aplicar el segundo semestre.");
+             $cargoIds = Cargo::where('id', '!=', 1)->pluck('id');
+        $haberes = HaberBasico::where('gestion_id', $ultimaGestion->id-1)
+            ->pluck('monto', 'cargo_id')
+            ->map(fn($item) => (float) $item);
+
+        SalarioMinimo::create([
+            'gestion_id' => $ultimaGestion->id,
+            'monto'     => $salarioMinimo,
+        ]);
+
+        foreach ($cargoIds as $cargoId) {
+            $haberAnterior = $haberes->get($cargoId, 0);
+
+            if ($cargoId == 10 || $cargoId == 11) {
+                $incremento = $salarioMinimo;
+            } elseif ($cargoId == 12) {
+                $incremento = $haberAnterior;
+            } else {
+                $incremento = $haberAnterior + ($haberAnterior * $haberBasico);
+            }
+
+            HaberBasico::create([
+                'gestion_id' => $ultimaGestion->id,
+                'cargo_id'   => $cargoId,
+                'monto'      => $incremento,
+            ]);
         }
 
-        $cargoIds = Cargo::where('id', '!=', 1)->pluck('id');
+         }else{
+             $ultimaGestion = self::latest('id')->first();
+             if (!$ultimaGestion) {
+            throw new \Exception("No existe ninguna gestión creada para aplicar el segundo semestre.");
+        }
+              $cargoIds = Cargo::where('id', '!=', 1)->pluck('id');
         $haberes = HaberBasico::where('gestion_id', $ultimaGestion->id)
             ->pluck('monto', 'cargo_id')
             ->map(fn($item) => (float) $item);
@@ -219,6 +259,9 @@ class Gestion extends Model
                 'monto'      => $incremento,
             ]);
         }
+         }
+    
+       
     }
 
     protected static function booted()

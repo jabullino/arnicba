@@ -27,7 +27,7 @@
                     <form action="{{ route('PanelGestiones.store') }}" method="POST">
                         @csrf
                         <input type="hidden" name="tipo" value="primer">
-                        <button type="submit" class="semestre-btn bg-sky-900">Primer Semestre</button>
+                        <button type="submit" class="semestre-btn bg-sky-900">Crear Nueva Gestion</button>
                     </form>
                 </div>
 
@@ -39,7 +39,7 @@
                         <div id='boton'>
                             <button id='btnSegundoSemestre' type="submit"
                                 class="semestre-btn bg-green-500"
-                                disabled>Segundo Semestre</button>
+                                disabled>Registrar Incremento Salarial</button>
                         </div>
                         <div id='cajas' class='form-group'>
                             <label for="salarioMinimo">Salario Minimo</label>
