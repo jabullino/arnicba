@@ -65,6 +65,7 @@ class PagaSueldosController extends Controller
    }
    public function pagaSueldos(Request $request)
    {
+      
       // Validación
       $validator = Validator::make($request->all(), [
          'fechapago' => 'required|date|before_or_equal:today',
@@ -77,12 +78,14 @@ class PagaSueldosController extends Controller
       if ($validator->fails()) {
          return redirect()->back()->withErrors($validator)->withInput();
       }
+
+      
       try{
          dB::beginTransaction();
       $fechapago = Carbon::parse($request->fechapago)->format('Y-m-d');
       $escogidos = $request->input('escogidos', []);
       $cargoIds = $request->input('cargos', []);
-
+     
       // Tipos de cambio
       $valortipocambiocompra = (float) str_replace(',', '', TipoCambioCompra::latest('id')->value('tc'));
       $tipocambiocompra_id = TipoCambioCompra::latest('id')->value('id');
@@ -109,7 +112,7 @@ class PagaSueldosController extends Controller
             10, 11 => 13,
             default => 14,
          };
-
+          
          // Crear asiento
          Asiento::create([
             'gestion_id' => $gestion_id,
@@ -129,25 +132,25 @@ class PagaSueldosController extends Controller
          ]);
 
          $mes = Carbon::parse($fechapago)->subMonth()->format('m');
-
+       
          $sueldo = Sueldo::create([
             'mes' => $mes,
             'total' => $sueldoBs,
             'gestion_id' => $gestion_id,
             'user_id' => $userId,
          ]);
-
+             
          $fechadeingreso = User::where('id', $userId)->value('fec_ingreso');
          $haberbasico = $this->devuelvemontohaberbasico($userId, $request->fechapago);
          $montoantiguedad = $this->devuelvemontoantiguedad($request->fechapago, $fechadeingreso, $userId);
-
+          
          DB::table('bono_sueldo')->insert([
-            'bono_id' => 10,
+            'bono_id' => '10',
             'sueldo_id' => $sueldo->id,
             'user_id' => $userId,
             'monto' => $montoantiguedad,
          ]);
-
+          //dd($fechadeingreso,$haberbasico,$sueldo->id,$userId,$montoantiguedad);
          //AQUI SE HACE LA DIFERENCIA PARA QUE NO SE HAGAN DESCUENTO NI A SUBDIRECTOR NI ADMINISTRADOR
          if (($cargoId != 2) && ($cargoId != 3)) {
             $descuentogestora = $this->devuelvemontogestora($fechapago, $fechadeingreso, $userId);
@@ -155,6 +158,7 @@ class PagaSueldosController extends Controller
          if (($cargoId == 3) || ($cargoId == 3)) {
             $descuentogestora = 0.00;
          }
+         
          DB::table('descuento_sueldo')->insert([
             'descuento_id' => 5,
             'sueldo_id' => $sueldo->id,
@@ -224,19 +228,9 @@ class PagaSueldosController extends Controller
       $anio = $fechapago->format('Y');
       $gestion = $anio;
       $gestion_id = Gestion::where('nombre', $gestion)->value('id');
-      if ($mes >= 1 && $mes < 5) {
-         $smn = DB::table('salario_minimos')
-            ->where('gestion_id', $gestion_id)
-            ->where('mes_inicio', '<=', '05')
-            ->where('mes_fin', '>=', '01')
-            ->value('monto');
-      } else {
-         $smn = DB::table('salario_minimos')
-            ->where('gestion_id', $gestion_id)
-            ->where('mes_inicio', '<=', '12')
-            ->where('mes_fin', '>=', '06')
-            ->value('monto');
-      }
+      $smn = DB::table('salario_minimos')
+             ->orderByDesc('id')
+              ->value('monto');
 
       $haberbasico = DB::table('haber_basicos as hb')
          ->join('users as u', 'u.cargo_id', '=', 'hb.cargo_id')
@@ -358,9 +352,7 @@ class PagaSueldosController extends Controller
          ->join('haber_basicos as h', 'c.id', '=', 'h.cargo_id')
          ->where('h.gestion_id', $gestionId)
          ->where(function ($q) use ($mes) {
-            $q->where('h.mes_inicio', '<=', $mes)
-               ->where('h.mes_fin', '>=', $mes)
-               ->where('u.id', '!=', '1');
+            $q->where('u.id', '!=', '1');
          })
          ->select(
             'u.id',
@@ -373,11 +365,9 @@ class PagaSueldosController extends Controller
          )
          ->get();
 
-      $smn = DB::table('salario_minimos')
-         ->where('gestion_id', $gestionId)
-         ->where('mes_inicio', '<=', $mes)
-         ->where('mes_fin', '>=', $mes)
-         ->value('monto');
+     $smn = DB::table('salario_minimos')
+             ->orderByDesc('id')
+              ->value('monto');
 
       foreach ($datos as $dat) {
          $ant = $this->calculaAntiguedad($fecha, $dat->fec_ingreso);
@@ -468,21 +458,10 @@ class PagaSueldosController extends Controller
          return null; // El usuario no tiene cargo asignado
       }
 
-      // 2️⃣ Determinar el rango de meses según el valor del parámetro $mes
-      if ($mes >= 1 && $mes <= 5) {
-         $mesInicio = '01';
-         $mesFin = '05';
-      } else {
-         $mesInicio = '06';
-         $mesFin = '12';
-      }
-
       // 3️⃣ Buscar el monto correspondiente en la tabla haber_basicos
       $haberbasico = DB::table('haber_basicos')
          ->where('cargo_id', $cargoId)
          ->where('gestion_id', $gestionId)
-         ->where('mes_inicio', $mesInicio)
-         ->where('mes_fin', $mesFin)
          ->orderByDesc('id')
          ->value('monto');
 
@@ -498,19 +477,10 @@ class PagaSueldosController extends Controller
       $anio = $fechapago->format('Y');
       $gestion = $anio;
       $gestion_id = Gestion::where('nombre', $gestion)->value('id');
-      if ($mes >= 1 && $mes <= 5) {
-         $smn = DB::table('salario_minimos')
-            ->where('gestion_id', $gestion_id)
-            ->where('mes_inicio', '<=', '05')
-            ->where('mes_fin', '>=', '01')
-            ->value('monto');
-      } else {
-         $smn = DB::table('salario_minimos')
-            ->where('gestion_id', $gestion_id)
-            ->where('mes_inicio', '<=', '12')
-            ->where('mes_fin', '>=', '06')
-            ->value('monto');
-      }
+      $smn = DB::table('salario_minimos')
+             ->orderByDesc('id')
+              ->value('monto');
+
 
       $ant = $this->calculaAntiguedad($fechapago, $fec_ingreso, $userId);
 
@@ -549,20 +519,11 @@ class PagaSueldosController extends Controller
       $anio = $fechapago->format('Y');
       $gestion = $anio;
       $gestion_id = Gestion::where('nombre', $gestion)->value('id');
-      if ($mes >= 1 && $mes <= 5) {
-         $smn = DB::table('salario_minimos')
-            ->where('gestion_id', $gestion_id)
-            ->where('mes_inicio', '<=', '05')
-            ->where('mes_fin', '>=', '01')
-            ->value('monto');
-      } else {
-         $smn = DB::table('salario_minimos')
-            ->where('gestion_id', $gestion_id)
-            ->where('mes_inicio', '<=', '12')
-            ->where('mes_fin', '>=', '06')
-            ->value('monto');
-      }
-
+     
+      $smn=DB::table('salario_minimos')
+               ->orderByDesc('id')
+               ->value('monto');
+      
       $ant = $this->calculaAntiguedad($fechapago, $fec_ingreso, $userId);
 
       $haberbasico = $this->devuelvemontohaberbasico($userId, $fechapago);
