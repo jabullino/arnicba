@@ -67,7 +67,7 @@ class PagaSueldoIndividualController extends Controller
       $valortipocambiocompra = TipoCambioCompra::where('id', $tipocambiocompra_id)->value('tc');
       $valortipocambiocompra = str_replace(',', '', $valortipocambiocompra);
       $valortipocambiocompra = (float)$valortipocambiocompra;
-      $valortipocambiocompra = number_format($valortipocambiocompra, 2, '.', '');
+      $valortipocambiocompra = round($valortipocambiocompra, 2);
       $tipocambioventa_id = TipoCambioVenta::latest('id')->value('id');
 
      
@@ -98,10 +98,10 @@ class PagaSueldoIndividualController extends Controller
       $sueldoBs = $request->total;
       $sueldoBs = str_replace(',', '', $sueldoBs);
       $sueldoBs = (float)$sueldoBs;
-      $sueldoBs = number_format($sueldoBs, 2, '.', '');
-      $bonoantiguedad=number_format($request->bonoantiguedad, 2, '.', '');
+      $sueldoBs = round($sueldoBs, 2);
+      $bonoantiguedad=round($request->bonoantiguedad, 2);
       $sueldototalbs=$sueldoBs+$bonoantiguedad; 
-      $sueldoSus = $sueldoBs / number_format($valortipocambiocompra, 2, '.', '');
+      $sueldoSus = $sueldoBs / round($valortipocambiocompra, 2);
 
       if ($cargoId == 2 || $cargoId == 3) {
          $subcuenta = 11;
@@ -285,19 +285,10 @@ class PagaSueldoIndividualController extends Controller
       $anio = $fechapago->format('Y');
       $gestion = $anio;
       $gestion_id = Gestion::where('nombre', $gestion)->value('id');
-      if ($mes >= 1 && $mes < 4) {
+      
          $smn = DB::table('salario_minimos')
             ->where('gestion_id', $gestion_id)
-            ->where('mes_inicio', '<=', '05')
-            ->where('mes_fin', '>=', '01')
             ->value('monto');
-      } else {
-         $smn = DB::table('salario_minimos')
-            ->where('gestion_id', $gestion_id)
-            ->where('mes_inicio', '<=', '12')
-            ->where('mes_fin', '>=', '06')
-            ->value('monto');
-      }
 
       $haberbasico = DB::table('haber_basicos as hb')
          ->join('users as u', 'u.cargo_id', '=', 'hb.cargo_id')
@@ -315,48 +306,48 @@ class PagaSueldoIndividualController extends Controller
          $haberbasico += $bonoant;
          $descuento = $haberbasico * 0.1271;
          $haberbasico -= $descuento;
-         $haberbasico = number_format($haberbasico, 2, '.', ',');
+         $haberbasico = round($haberbasico, 2);
       } elseif ($ant >= 5 && $ant < 8) {
          $bonoant = $smn * 0.11;
          $haberbasico += $bonoant;
          $descuento = $haberbasico * 0.1271;
          $haberbasico -= $descuento;
-         $haberbasico = number_format($haberbasico, 2, '.', ',');
+         $haberbasico = round($haberbasico, 2);
       } elseif ($ant >= 8 && $ant < 11) {
          $bonoant = $smn * 0.18;
          $haberbasico += $bonoant;
          $descuento = $haberbasico * 0.1271;
          $haberbasico -= $descuento;
-         $haberbasico = number_format($haberbasico, 2, '.', ',');
+         $haberbasico = round($haberbasico, 2);
       } elseif ($ant >= 11 && $ant < 15) {
 
          $bonoant = $smn * 0.26;
          $haberbasico += $bonoant;
          $descuento = $haberbasico * 0.1271;
          $haberbasico -= $descuento;
-         $haberbasico = number_format($haberbasico, 2, '.', ',');
+         $haberbasico = round($haberbasico, 2);
       } elseif ($ant >= 15 && $ant < 20) {
          $bonoant = $smn * 0.34;
          $haberbasico += $bonoant;
          $descuento = $haberbasico * 0.1271;
          $haberbasico -= $descuento;
-         $haberbasico = number_format($haberbasico, 2, '.', ',');
+         $haberbasico = round($haberbasico, 2);
       } elseif ($ant >= 20 && $ant < 25) {
          $bonoant = $smn * 0.42;
          $haberbasico += $bonoant;
          $descuento = $haberbasico * 0.1271;
          $haberbasico -= $descuento;
-         $haberbasico = number_format($haberbasico, 2, '.', ',');
+         $haberbasico = round($haberbasico, 2);
       } elseif ($ant >= 25) {
          $bonoant = $smn * 0.50;
          $haberbasico += $bonoant;
          $descuento = $haberbasico * 0.1271;
          $haberbasico -= $descuento;
-         $haberbasico = number_format($haberbasico, 2, '.', ',');
+         $haberbasico = round($haberbasico, 2);
       } else {
          $descuento = $haberbasico * 0.1271;
          $haberbasico -= $descuento;
-         $haberbasico = number_format($haberbasico, 2, '.', ',');
+         $haberbasico = round($haberbasico, 2);
       }
       return $haberbasico;
    }
@@ -388,9 +379,7 @@ class PagaSueldoIndividualController extends Controller
          ->join('haber_basicos as h', 'c.id', '=', 'h.cargo_id')
          ->where('h.gestion_id', $gestionId)
          ->where(function ($q) use ($mes) {
-            $q->where('h.mes_inicio', '<=', $mes)
-               ->where('h.mes_fin', '>=', $mes)
-               ->where('u.id', '!=', '1');
+            $q->where('u.id', '!=', '1');
          })
          ->select(
             'u.id',
@@ -405,8 +394,6 @@ class PagaSueldoIndividualController extends Controller
 
       $smn = DB::table('salario_minimos')
          ->where('gestion_id', $gestionId)
-         ->where('mes_inicio', '<=', $mes)
-         ->where('mes_fin', '>=', $mes)
          ->value('monto');
 
       foreach ($datos as $dat) {
@@ -417,48 +404,48 @@ class PagaSueldoIndividualController extends Controller
             $dat->monto += $bonoant;
             $descuento = $dat->monto * 0.1271;
             $dat->monto -= $descuento;
-            $dat->monto = number_format($dat->monto, 2, '.', ',');
+            $dat->monto = round($dat->monto, 2);
          } elseif ($ant >= 5 && $ant < 8) {
             $bonoant = $smn * 0.11;
             $dat->monto += $bonoant;
             $descuento = $dat->monto * 0.1271;
             $dat->monto -= $descuento;
-            $dat->monto = number_format($dat->monto, 2, '.', ',');
+            $dat->monto = round($dat->monto, 2);
          } elseif ($ant >= 8 && $ant < 11) {
             $bonoant = $smn * 0.18;
             $dat->monto += $bonoant;
             $descuento = $dat->monto * 0.1271;
             $dat->monto -= $descuento;
-            $dat->monto = number_format($dat->monto, 2, '.', ',');
+            $dat->monto = round($dat->monto, 2);
          } elseif ($ant >= 11 && $ant < 15) {
 
             $bonoant = $smn * 0.26;
             $dat->monto += $bonoant;
             $descuento = $dat->monto * 0.1271;
             $dat->monto -= $descuento;
-            $dat->monto = number_format($dat->monto, 2, '.', ',');
+            $dat->monto = round($dat->monto, 2);
          } elseif ($ant >= 15 && $ant < 20) {
             $bonoant = $smn * 0.34;
             $dat->monto += $bonoant;
             $descuento = $dat->monto * 0.1271;
             $dat->monto -= $descuento;
-            $dat->monto = number_format($dat->monto, 2, '.', ',');
+            $dat->monto = round($dat->monto, 2);
          } elseif ($ant >= 20 && $ant < 25) {
             $bonoant = $smn * 0.42;
             $dat->monto += $bonoant;
             $descuento = $dat->monto * 0.1271;
             $dat->monto -= $descuento;
-            $dat->monto = number_format($dat->monto, 2, '.', ',');
+            $dat->monto = round($dat->monto, 2);
          } elseif ($ant >= 25) {
             $bonoant = $smn * 0.50;
             $dat->monto += $bonoant;
             $descuento = $dat->monto * 0.1271;
             $dat->monto -= $descuento;
-            $dat->monto = number_format($dat->monto, 2, '.', ',');
+            $dat->monto = round($dat->monto, 2);
          } else {
             $descuento = $dat->monto * 0.1271;
             $dat->monto -= $descuento;
-            $dat->monto = number_format($dat->monto, 2, '.', ',');
+            $dat->monto = round($dat->monto, 2);
          }
       }
       $cont = 1;
