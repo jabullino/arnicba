@@ -72,6 +72,12 @@
                     @error('direccion')<div class="error-text">{{ $message }}</div>@enderror
                 </div>
 
+                 <div class="mb-2 form-group">
+                    <label for="referencias">Referencias</label>
+                    <input type="text" name='referencias' value="{{ $usr->referencias }}" class='form-control'>
+                    @error('referencias')<div class="error-text">{{ $message }}</div>@enderror
+                </div>
+
                 <div class="mb-2 form-group">
                     <label for="telefono">Teléfono</label>
                     <input type="text" name='telefono' value="{{ $usr->telefono }}" class='form-control'>

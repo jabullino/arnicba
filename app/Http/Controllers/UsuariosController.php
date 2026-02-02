@@ -179,6 +179,7 @@ class UsuariosController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|alpha_spaces|max:255',
             'apellido' => 'required|alpha_spaces|max:255',
@@ -206,13 +207,14 @@ class UsuariosController extends Controller
             'fecingreso' => 'required|date',
             'foto' => 'image|mimes:jpeg,png,jpg,gif|max:1000'
         ]);
-
+        DB::beginTransaction();
         // Si la validación falla, redirige con los errores
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
+       
         try {
-            DB::beginTransaction();
+            
             $user = User::find($id);
             $user->nombre = $request->nombre;
             $user->apellido = $request->apellido;
