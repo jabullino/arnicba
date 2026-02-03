@@ -21,6 +21,10 @@ class OrigenFondos extends Model
         return $this->hasMany(Asiento::class);
 
     }
+     public function lotes(): HasMany
+    {
+        return $this->hasMany(Lote::class);
+    }
 
     public function getOrigenfondos($id){
 

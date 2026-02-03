@@ -76,6 +76,14 @@ class DatabaseSeeder extends Seeder
         $this->call(UnidadEducativaSeeder::class);
         $this->call(GradoSeeder::class);
         $this->call(CursoSeeder::class);
+        $this->call(CategoriaSeeder::class);
+        $this->call(ColorSeeder::class);
+        $this->call(TallaSeeder::class);
+        $this->call(TallazapatoSeeder::class);
+        $this->call(PresentacionSeeder::class);
+        $this->call(UnidadSeeder::class);
+        $this->call(CapacidadSeeder::class);
+        $this->call(DestinatarioSeeder::class);
 
         
 
