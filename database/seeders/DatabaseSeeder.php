@@ -37,6 +37,9 @@ use Database\Seeders\MunicipioSeeder;
 use Database\Seeders\UnidadEducativaSeeder;
 use Database\Seeders\GradoSeeder;
 use Database\Seeders\CursoSeeder;
+use App\Models\Vestimenta;
+use App\Models\Tela;
+use App\Models\Zapato;
 
 
 
@@ -84,6 +87,9 @@ class DatabaseSeeder extends Seeder
         $this->call(UnidadSeeder::class);
         $this->call(CapacidadSeeder::class);
         $this->call(DestinatarioSeeder::class);
+        Vestimenta::factory()->count(10)->create();
+        Tela::factory()->count(5)->create();
+        Zapato::factory()->count(8)->create();
 
         
 

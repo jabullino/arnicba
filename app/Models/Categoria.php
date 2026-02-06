@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 
 class Categoria extends Model
 {
+    use HasFactory;
     protected $fillable=['nombre'];
     public $timestamps = false;
 
@@ -16,11 +19,5 @@ class Categoria extends Model
         return $this->hasMany(Producto::class);
     }
 
-     protected static function booted()
-    {
-        // Siempre excluir registros eliminados (deleted_at no nulo)
-        static::addGlobalScope('not_deleted', function ($query) {
-            $query->whereNull('deleted_at');
-        });
-    }
+    
 }

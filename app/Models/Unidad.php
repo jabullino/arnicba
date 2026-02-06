@@ -18,11 +18,5 @@ class Unidad extends Model
         return $this->belongsToMany(Producto::class);
     }
 
-   protected static function booted()
-    {
-       // Siempre excluir registros eliminados (deleted_at no nulo)
-        static::addGlobalScope('not_deleted', function ($query) {
-            $query->whereNull('deleted_at');
-        });
-    }
+  
 }

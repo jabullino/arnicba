@@ -8,4 +8,5 @@ INSERT INTO unidades (ID,NOMBRE) VALUES('8','Metro');
 INSERT INTO unidades (ID,NOMBRE) VALUES('9','mg');
 INSERT INTO unidades (ID,NOMBRE) VALUES('10','ml');
 INSERT INTO unidades (ID,NOMBRE) VALUES('11','Unidad');
+INSERT INTO unidades (ID,NOMBRE) VALUES('12','NO UNI');
 

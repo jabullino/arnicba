@@ -41,6 +41,8 @@ class LoginController extends Controller
                 return redirect()->route('PanelAdminSis'); // Redirigir a vista de admin
             }elseif ($cargo_id == 4) {
                 return redirect()->route('PanelAdministrador'); // Redirigir a vista de usuario
+            }elseif ($cargo_id == 10) {
+                return redirect()->route('PanelAlmacen'); // Redirigir a vista de usuario
             }else{ 
                 session()->flash('CredencialesNoValidas', 'Sus credenciales no corresponden a un usuario habilitado'); 
                 return redirect()->route('inicio');

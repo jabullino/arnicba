@@ -29,3 +29,4 @@ INSERT INTO presentaciones (ID,NOMBRE) VALUES('23','Media docena');
 INSERT INTO presentaciones (ID,NOMBRE) VALUES('24','Sobre');
 INSERT INTO presentaciones (ID,NOMBRE) VALUES('25','Tubo');
 INSERT INTO presentaciones (ID,NOMBRE) VALUES('26','Ampolla');
+INSERT INTO presentaciones (ID,NOMBRE) VALUES('27','NO PRE');

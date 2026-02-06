@@ -628,7 +628,38 @@ return [
                    ],
             ],
 
-        ],
+        ], 
+        [
+            'text' => 'Almacen',
+            'icon' => 'fas fa-boxes',
+            'can' => 'is_almacen',
+            
+               'submenu' => [
+                                 [
+                                    'text' => 'Panel Almacen',
+                                    'icon' => 'fa fa-th',
+                                    'url'  => 'Almacen/PanelAlmacen', // corregido
+                                ],
+                                [
+                                    'text' => 'Productos',
+                                    'icon' => 'fa fa-th',
+                                    'url'  => 'Almacen/Producto', // corregido
+                                ],
+                                [
+                                    'text' => 'Ingresos',
+                                    'icon' => 'fa fa-arrow-left',
+                                    'url'  => '', // corregido
+                                ],
+                                 [
+                                    'text' => 'Egresos',
+                                    'icon' => 'fa fa-arrow-right',
+                                    'url'  => '', // corregido
+                                ],
+                                
+                            ],
+
+         ],
+
 
     ],
 

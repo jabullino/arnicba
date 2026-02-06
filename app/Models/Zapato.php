@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Zapato extends Model
 {
+    use HasFactory;
     protected $fillable=['producto_id','color_id','talla_id'];
 
      public function producto()

@@ -3,6 +3,7 @@
 use App\Http\Middleware\Administrador\IsAdministradorMiddleware;
 use App\Http\Middleware\Adminsis\IsAdminSisMiddleware;
 use App\Http\Middleware\Tsocial\IsTsocialMiddleware;
+use App\Http\Middleware\Almacen\IsAlmacenMiddleware;
 use App\Http\Middleware\Adminsis\OcultaRutaMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -33,6 +34,10 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware(['web', 'auth'])
                 ->prefix('TSocial')
                 ->group(base_path('routes/tsocial.php'));
+             
+            Route::middleware(['web', 'auth'])
+                ->prefix('Almacen')
+                ->group(base_path('routes/almacen.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware) {
@@ -40,6 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'IsAdminSis' => IsAdminSisMiddleware::class,
             'IsAdministrador' => IsAdministradorMiddleware::class,
             'IsTsocial' => IsTsocialMiddleware::class,
+            'IsAlmacen' => IsAlmacenMiddleware::class,
             'twofactor' => \App\Http\Middleware\CheckTwoFactor::class,
             
         ]);

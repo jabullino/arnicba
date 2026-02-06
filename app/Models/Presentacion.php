@@ -18,12 +18,4 @@ class Presentacion extends Model
 
      
    
-   protected static function booted()
-    {
-       
-    // Siempre excluir registros eliminados (deleted_at no nulo)
-        static::addGlobalScope('not_deleted', function ($query) {
-            $query->whereNull('deleted_at');
-        });
-    }
 }

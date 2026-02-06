@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('tallas', function (Blueprint $table) {
             $table->id();
             $table->string('nombre',10);
+            $table->softDeletes();
             
         });
     }

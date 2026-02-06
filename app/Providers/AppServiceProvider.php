@@ -32,5 +32,9 @@ class AppServiceProvider extends ServiceProvider
        return $user->cargo_id === 7;
     });
 
+     Gate::define('is_almacen', function ($user) {
+       return $user->cargo_id === 10;
+    });
+
     }
 }
