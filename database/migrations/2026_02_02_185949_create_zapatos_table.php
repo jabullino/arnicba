@@ -16,10 +16,11 @@ return new class extends Migration
             $table->unsignedBigInteger('producto_id');
             $table->unsignedBigInteger('color_id');
             $table->unsignedBigInteger('talla_id');
-             $table->foreign('producto_id')->references('id')->on('productos')->onDelete('cascade');
+            $table->timestamps();
+            $table->foreign('producto_id')->references('id')->on('productos')->onDelete('cascade');
             $table->foreign('color_id')->references('id')->on('colores')->onDelete('cascade');
             $table->foreign('talla_id')->references('id')->on('tallazapatos')->onDelete('cascade');
-            $table->timestamps();
+            
         });
     }
 

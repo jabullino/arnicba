@@ -336,7 +336,7 @@ return [
                     'url' => '',
                     'icon' => 'far fa-calendar',
 
-                     'submenu' => [
+                    'submenu' => [
                         [
                             'text' => 'Crear Gestión',
                             'icon' => 'fa fa-calendar-plus',
@@ -347,7 +347,7 @@ return [
                             'icon' => 'fa fa-calendar-minus',
                             'url' => 'AdminSis/Gestiones',
                         ],
-                         [
+                        [
                             'text' => 'Reabrir Gestión',
                             'icon' => 'fa fa-door-open',
                             'url' => 'AdminSis/FormReabreGestion',
@@ -392,7 +392,7 @@ return [
                             'icon' => 'fas fa-plus-circle',
                             'url'  => 'AdminSis/entregascajachicas/create',
                         ],
-                         [
+                        [
                             'text' => 'Consolidar Pagos',
                             'icon' => 'fas fa-plus-circle',
                             'url'  => 'AdminSis/consolidarcajachica',
@@ -535,130 +535,143 @@ return [
             'icon' => 'fa fa-id-badge',
             'can' => 'is_tsocial',
             'submenu' => [
-                  [
-                     'text' => 'Panel Area Social',
-                     'icon' => 'fa fa-tachometer',
-                     'url' => 'TSocial/PanelTSocial',
-                   ], 
-                  [
-                     'text' => 'Municipios',
-                     'icon' => 'fa fa-globe',
-                     'url' => '',
-                     'submenu' => [
-                                [
-                                    'text' => 'Registrar Municipio',
-                                    'icon' => 'fa fa-registered',
-                                    'url'  => 'TSocial/Municipios/create', // corregido
-                                ],
-                                [
-                                    'text' => 'Editar Municipio',
-                                    'icon' => 'far fa-edit',
-                                    'url'  => 'TSocial/Municipios', // corregido
-                                ],
-                                
-                            ],
-                   ],
+                [
+                    'text' => 'Panel Area Social',
+                    'icon' => 'fa fa-tachometer',
+                    'url' => 'TSocial/PanelTSocial',
+                ],
+                [
+                    'text' => 'Municipios',
+                    'icon' => 'fa fa-globe',
+                    'url' => '',
+                    'submenu' => [
+                        [
+                            'text' => 'Registrar Municipio',
+                            'icon' => 'fa fa-registered',
+                            'url'  => 'TSocial/Municipios/create', // corregido
+                        ],
+                        [
+                            'text' => 'Editar Municipio',
+                            'icon' => 'far fa-edit',
+                            'url'  => 'TSocial/Municipios', // corregido
+                        ],
 
-                   [
-                     'text' => 'Residentes',
-                     'icon' => 'fa fa-child',
-                     'url' => 'TSocial/residentes',
-                     'submenu' => [
-                                [
-                                    'text' => 'Lista Residentes',
-                                    'icon' => 'fa fa-children',
-                                    'url'  => 'TSocial/residentes', // corregido
-                                ],
-                                [
-                                    'text' => 'Registrar Residente',
-                                    'icon' => 'fa fa-registered',
-                                    'url'  => 'TSocial/residentes/create', // corregido
-                                ],
-                                
-                                
-                            ],
-                   ],
-                   [
-                     'text' => 'Derivaciones',
-                     'icon' => 'far fa-sticky-note',
-                     'url' => '',
-                     'submenu' => [
-                                [
-                                    'text' => 'Lista Derivaciones',
-                                    'icon' => 'fas fa-list',
-                                    'url'  => 'TSocial/derivaciones', // corregido
-                                ],
-                                [
-                                    'text' => 'Registrar Derivacion',
-                                    'icon' => 'fa fa-registered',
-                                    'url'  => 'TSocial/derivaciones/create', // corregido
-                                ],
-                               
-                                
-                            ],
-                   ],
-                   [
-                     'text' => 'Escolaridad',
-                     'icon' => 'fas fa-graduation-cap',
-                     'url' => '',
-                     'submenu' => [
-                                [
-                                    'text' => 'Lista Alumnos',
-                                    'icon' => 'fas fa-list',
-                                    'url'  => 'TSocial/escolaridad', // corregido
-                                ],
-                                [
-                                    'text' => 'Registrar Alumno',
-                                    'icon' => 'fa fa-registered',
-                                    'url'  => 'TSocial/escolaridad/create', // corregido
-                                ],
-                                [
-                                    'text' => 'Nueva Gestión Escolar',
-                                    'icon' => 'fa fa-calendar',
-                                    'url'  => 'TSocial/gestionescolar', // corregido
-                                ],
-                                [
-                                    'text' => 'Unidades Educativas',
-                                    'icon' => 'fa fa-school',
-                                    'url'  => 'TSocial/UEducativa', // corregido
-                                ],
-                               
-                                
-                            ],
-                   ],
+                    ],
+                ],
+
+                [
+                    'text' => 'Residentes',
+                    'icon' => 'fa fa-child',
+                    'url' => 'TSocial/residentes',
+                    'submenu' => [
+                        [
+                            'text' => 'Lista Residentes',
+                            'icon' => 'fa fa-children',
+                            'url'  => 'TSocial/residentes', // corregido
+                        ],
+                        [
+                            'text' => 'Registrar Residente',
+                            'icon' => 'fa fa-registered',
+                            'url'  => 'TSocial/residentes/create', // corregido
+                        ],
+
+
+                    ],
+                ],
+                [
+                    'text' => 'Derivaciones',
+                    'icon' => 'far fa-sticky-note',
+                    'url' => '',
+                    'submenu' => [
+                        [
+                            'text' => 'Lista Derivaciones',
+                            'icon' => 'fas fa-list',
+                            'url'  => 'TSocial/derivaciones', // corregido
+                        ],
+                        [
+                            'text' => 'Registrar Derivacion',
+                            'icon' => 'fa fa-registered',
+                            'url'  => 'TSocial/derivaciones/create', // corregido
+                        ],
+
+
+                    ],
+                ],
+                [
+                    'text' => 'Escolaridad',
+                    'icon' => 'fas fa-graduation-cap',
+                    'url' => '',
+                    'submenu' => [
+                        [
+                            'text' => 'Lista Alumnos',
+                            'icon' => 'fas fa-list',
+                            'url'  => 'TSocial/escolaridad', // corregido
+                        ],
+                        [
+                            'text' => 'Registrar Alumno',
+                            'icon' => 'fa fa-registered',
+                            'url'  => 'TSocial/escolaridad/create', // corregido
+                        ],
+                        [
+                            'text' => 'Nueva Gestión Escolar',
+                            'icon' => 'fa fa-calendar',
+                            'url'  => 'TSocial/gestionescolar', // corregido
+                        ],
+                        [
+                            'text' => 'Unidades Educativas',
+                            'icon' => 'fa fa-school',
+                            'url'  => 'TSocial/UEducativa', // corregido
+                        ],
+
+
+                    ],
+                ],
             ],
 
-        ], 
+        ],
         [
             'text' => 'Almacen',
             'icon' => 'fas fa-boxes',
             'can' => 'is_almacen',
-            
-               'submenu' => [
-                                 [
-                                    'text' => 'Panel Almacen',
-                                    'icon' => 'fa fa-th',
-                                    'url'  => 'Almacen/PanelAlmacen', // corregido
-                                ],
-                                [
-                                    'text' => 'Productos',
-                                    'icon' => 'fa fa-th',
-                                    'url'  => 'Almacen/Producto', // corregido
-                                ],
-                                [
-                                    'text' => 'Ingresos',
-                                    'icon' => 'fa fa-arrow-left',
-                                    'url'  => '', // corregido
-                                ],
-                                 [
-                                    'text' => 'Egresos',
-                                    'icon' => 'fa fa-arrow-right',
-                                    'url'  => '', // corregido
-                                ],
-                                
-                            ],
 
-         ],
+            'submenu' => [
+                [
+                    'text' => 'Panel Almacen',
+                    'icon' => 'fa fa-th',
+                    'url'  => 'Almacen/PanelAlmacen', // corregido
+                ],
+                [
+                    'text' => 'Productos',
+                    'icon' => 'fa fa-th',
+                    'url'  => 'Almacen/Producto', // corregido
+                    'submenu' => [
+                        [
+                            'text' => 'Lista de Productos',
+                            'icon' => 'fas fa-list',
+                            'url'  => 'Almacen/Producto', // corregido
+                        ],
+                        [
+                            'text' => 'Registrar Producto',
+                            'icon' => 'fas fa-plus',
+                            'url'  => 'Almacen/Producto/create', // corregido
+                        ],
+                        
+                    ],
+                ],
+                [
+                    'text' => 'Ingresos',
+                    'icon' => 'fa fa-arrow-left',
+                    'url'  => '', // corregido
+                ],
+                [
+                    'text' => 'Egresos',
+                    'icon' => 'fa fa-arrow-right',
+                    'url'  => '', // corregido
+                ],
+
+            ],
+
+        ],
 
 
     ],

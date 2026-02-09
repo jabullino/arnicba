@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,6 +36,8 @@ class AppServiceProvider extends ServiceProvider
      Gate::define('is_almacen', function ($user) {
        return $user->cargo_id === 10;
     });
-
+           Paginator::useBootstrap();
     }
+
+    
 }

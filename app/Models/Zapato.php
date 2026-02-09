@@ -10,6 +10,7 @@ class Zapato extends Model
 {
     use HasFactory;
     protected $fillable=['producto_id','color_id','talla_id'];
+    public $timestamps=true;
 
      public function producto()
     {

@@ -8,6 +8,7 @@ class Tela extends Model
 {
     use HasFactory;
     protected $fillable=['ancho','largo','producto_id','color_id'];
+    public $timestamps = true;
 
     public function producto()
     {
