@@ -22,9 +22,10 @@ return new class extends Migration
             $table->unsignedBigInteger('producto_id');
             $table->unsignedBigInteger('origen_id');
             $table->softdeletes();
+             $table->timestamps();
             $table->foreign('producto_id')->references('id')->on('productos')->onDelete('cascade');
             $table->foreign('origen_id')->references('id')->on('origen_fondos')->onDelete('cascade');
-            $table->timestamps();
+           
         });
     }
 

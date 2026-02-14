@@ -357,7 +357,7 @@ return [
 
                 [
                     'text' => 'Bancos',
-                    'url' => '/AdminSis/Bancos ',
+                    'url' => '/AdminSis/Bancos',
                     'icon' => 'fas fa-money-check',
 
                     'submenu' => [
@@ -657,11 +657,27 @@ return [
                         ],
                         
                     ],
+                    
                 ],
+               
                 [
                     'text' => 'Ingresos',
                     'icon' => 'fa fa-arrow-left',
                     'url'  => '', // corregido
+
+                    'submenu' => [
+                         [
+                            'text' => 'Lotes',
+                            'icon' => 'fas fa-list',
+                             'url' => 'Almacen/Lote', // corregido
+                        ],
+                        [
+                            'text' => 'Registro de Lotes',
+                            'icon' => 'fas fa-edit',
+                             'url' => 'Almacen/Lote/create', // corregido
+                        ],
+                        
+                    ],
                 ],
                 [
                     'text' => 'Egresos',

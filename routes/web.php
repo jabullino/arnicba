@@ -25,6 +25,7 @@ use App\Models\Vacacion;
 use App\Models\Municipio;
 use App\Http\Controllers\AlumnosController;
 use App\Http\Controllers\UserAdminSisController;
+use App\Http\Controllers\ProductoController;
 
 Route::post('AdminSis.RegistraAdminSis',[UserAdminSisController::class,'saveadminsis'])->name('AdminSis.RegistraAdminSis');
 Route::get('/provincias/{ciudad_id}', function($ciudad_id) {
@@ -258,3 +259,9 @@ Route::get('/datosusuariovacacion/{user_id}', function($user_id) {
 
 Route::get('TSocial/escolaridad/alumnos', [AlumnosController::class, 'alumnos'])
      ->name('escolaridad.alumnos'); // <- nombre limpio sin slashes
+
+
+     //RUTAS DE ALMACEN
+
+     Route::get('/Almacen/buscar-producto', [ProductoController::class, 'buscar'])
+     ->name('productos.buscar');

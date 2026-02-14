@@ -336,4 +336,176 @@ public function store(Request $request)
     }
 }
 
+ public function buscar(Request $request)
+    {
+        $q = trim($request->q);
+
+        if (!$q) {
+            return response()->json([]);
+        }
+
+        $productos = DB::table('productos')
+            ->where(function ($query) use ($q) {
+                $query->where('nombre', 'like', "{$q}%")
+                      ->orWhere('codigo', 'like', "{$q}%")
+                      ->orWhere('marca', 'like', "{$q}%");
+            })
+            ->limit(10)
+            ->get();
+
+        $resultado = [];
+
+        foreach ($productos as $producto) {
+
+            $info = $this->obtenerNombreProducto(
+                $producto->id,
+                $producto->categoria_id
+            );
+
+            $resultado[] = $info;
+        }
+
+        return response()->json($resultado);
+    }
+
+    public function obtenerNombreProducto($id, $categoria)
+{
+    // ================= PRODUCTO BASE =================
+    $producto = DB::table('productos')->where('id', $id)->first();
+
+    if (!$producto) {
+        return [
+            'id'     => $id,
+            'nombre' => '',
+            'saldo'  => 0
+        ];
+    }
+
+    // Nombre base SIEMPRE
+    $nombre = trim($producto->codigo . ' ' . $producto->nombre . ' ' . $producto->marca);
+
+    /*
+    |------------------------------------------------------------------
+    | CATEGORÍAS 1, 2 y 3 (PRODUCTO NORMAL)
+    |------------------------------------------------------------------
+    */
+    if (in_array($categoria, [1, 2, 3])) {
+
+        $presentacion = DB::table('presentacion_producto')
+            ->join('presentaciones', 'presentaciones.id', '=', 'presentacion_producto.presentacion_id')
+            ->where('presentacion_producto.producto_id', $id)
+            ->value('presentaciones.nombre');
+
+        $capacidad = DB::table('capacidad_producto')
+            ->join('capacidades', 'capacidades.id', '=', 'capacidad_producto.capacidad_id')
+            ->where('capacidad_producto.producto_id', $id)
+            ->value('capacidades.nombre');
+
+        $unidad = DB::table('producto_unidad')
+            ->join('unidades', 'unidades.id', '=', 'producto_unidad.unidad_id')
+            ->where('producto_unidad.producto_id', $id)
+            ->value('unidades.nombre');
+
+        $nombre = trim(
+            $nombre . ' ' .
+            ($presentacion ?? '') . ' ' .
+            ($capacidad ?? '') . ' ' .
+            ($unidad ?? '')
+        );
+    }
+
+    /*
+    |------------------------------------------------------------------
+    | CATEGORÍA 4 (TELAS)
+    |------------------------------------------------------------------
+    */
+    elseif ($categoria == 4) {
+
+        $tela = DB::table('telas')->where('producto_id', $id)->first();
+
+        if ($tela) {
+
+            $color = DB::table('colores')
+                ->where('id', $tela->color_id)
+                ->value('nombre');
+
+            $nombre = trim(
+                $nombre . ' ' .
+                ($tela->ancho ?? '') . ' ' .
+                ($tela->largo ?? '') . ' ' .
+                ($color ?? '')
+            );
+        }
+    }
+
+    /*
+    |------------------------------------------------------------------
+    | CATEGORÍA 5 (VESTIMENTA)
+    |------------------------------------------------------------------
+    */
+    elseif ($categoria == 5) {
+
+        $vestimenta = DB::table('vestimentas')->where('producto_id', $id)->first();
+
+        if ($vestimenta) {
+
+            $talla = DB::table('tallas')
+                ->where('id', $vestimenta->talla_id)
+                ->value('nombre');
+
+            $color = DB::table('colores')
+                ->where('id', $vestimenta->color_id)
+                ->value('nombre');
+
+            $nombre = trim(
+                $nombre . ' ' .
+                ($talla ?? '') . ' ' .
+                ($color ?? '')
+            );
+        }
+    }
+
+    /*
+    |------------------------------------------------------------------
+    | CATEGORÍA 6 (ZAPATOS)
+    |------------------------------------------------------------------
+    */
+    elseif ($categoria == 6) {
+
+        $zapato = DB::table('zapatos')->where('producto_id', $id)->first();
+
+        if ($zapato) {
+
+            $tallaZapato = DB::table('tallazapatos')
+                ->where('id', $zapato->talla_id)
+                ->value('nombre');
+
+            $color = DB::table('colores')
+                ->where('id', $zapato->color_id)
+                ->value('nombre');
+
+            $nombre = trim(
+                $nombre . ' ' .
+                ($tallaZapato ?? '') . ' ' .
+                ($color ?? '')
+            );
+        }
+    }
+
+    /*
+    |------------------------------------------------------------------
+    | SALDO (TODAS LAS CATEGORÍAS)
+    |------------------------------------------------------------------
+    */
+    $saldo = DB::table('lotes')
+        ->where('producto_id', $id)
+        ->where('saldo', '>', 0)
+        ->sum('saldo');
+
+    return [
+        'id'     => $id,
+        'nombre' => trim($nombre),
+        'saldo'  => $saldo
+    ];
+}
 }

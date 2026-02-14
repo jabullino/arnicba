@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Lote extends Model
 {
     use SoftDeletes;
+
     protected $fillable=['codigo','fec_ingre','cantidad','fec_venc','precio','saldo','producto_id','origenfondos'];
-    
+    public $timestamps = true;
+
     public function producto(): BelongsTo
     {
         return $this->belongsTo(Producto::class);
