@@ -14,6 +14,10 @@ Route::get('PanelAlmacen',[PanelAlmacenController::class,'index'])->name('PanelA
 Route::resource('Producto',ProductoController::class)->names('Producto');
 Route::resource('Lote',LoteController::class)->names('Lote');
 Route::resource('Egresos',EgresosController::class)->names('Egresos');
+Route::get('/egresos/{id}/print', [EgresosController::class, 'print'])
+    ->name('egresos.print');
+Route::get('/egresos/{id}/pdf', [EgresosController::class, 'pdf'])
+    ->name('egresos.pdf');
 
   
 });

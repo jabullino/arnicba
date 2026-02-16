@@ -9,6 +9,7 @@ use App\Models\Egreso;
 use App\Models\EgresoDetalle;
 use App\Models\Lote;
 use App\Models\Destinatario;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class EgresosController extends Controller
@@ -118,8 +119,7 @@ public function store(Request $request)
 
         DB::commit();
 
-        return redirect()->route('Egresos.index')
-            ->with('success','Egreso registrado correctamente.');
+       return redirect()->route('egresos.pdf', $egreso->id);
 
     } catch (\Throwable $e) {
 
@@ -128,7 +128,51 @@ public function store(Request $request)
         dd($e->getMessage()); // TEMPORAL PARA VER ERROR REAL
     }
 }
-    /**
+
+
+public function pdf($id)
+{
+    $egreso = Egreso::with(['destinatario', 'detalles.producto'])
+        ->findOrFail($id);
+
+    $productosFormateados = [];
+
+    foreach ($egreso->detalles as $detalle) {
+
+        $info = app(\App\Http\Controllers\ProductoController::class)
+            ->obtenerNombreProducto(
+                $detalle->producto_id,
+                $detalle->producto->categoria_id
+            );
+
+        $productosFormateados[] = [
+            'nombre'   => $info['nombre'],
+            'cantidad' => $detalle->cantidad
+        ];
+    }
+
+    // Convertir logo a base64
+    $path = public_path('imagenes/Logo.png');
+
+    if (!file_exists($path)) {
+        dd('No existe el logo en: '.$path);
+    }
+
+    $type = pathinfo($path, PATHINFO_EXTENSION);
+    $data = file_get_contents($path);
+    $logo = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+    return Pdf::loadView('Almacen.Egresos.pdf', [
+            'egreso' => $egreso,
+            'productosFormateados' => $productosFormateados,
+            'logo' => $logo
+        ])
+        ->setPaper('letter')
+        ->setOptions([
+            'defaultFont' => 'DejaVu Sans'
+        ])
+        ->stream('Egreso_'.$egreso->id.'.pdf', ['Attachment' => false]);
+} /**
      * Display the specified resource.
      */
     public function show(string $id)
@@ -159,4 +203,14 @@ public function store(Request $request)
     {
         //
     }
+
+    public function print($id)
+{
+    $egreso = Egreso::with(['destinatario', 'detalles.producto'])
+        ->findOrFail($id);
+
+    return view('egresos.print', compact('egreso'));
+}
+
+    
 }
