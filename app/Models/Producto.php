@@ -200,6 +200,11 @@ class Producto extends Model
         ];
     }
 
+    public function egresoDetalles()
+{
+    return $this->hasMany(EgresoDetalle::class);
+}
+
     protected static function booted()
     {
         // Siempre excluir registros eliminados (deleted_at no nulo)

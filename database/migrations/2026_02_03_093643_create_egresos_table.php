@@ -13,13 +13,11 @@ return new class extends Migration
     {
         Schema::create('egresos', function (Blueprint $table) {
             $table->id();
-            $table->date('fec_egre');
-            $table->decimal('cantidad',7,2);
-            $table->decimal('precio',7,2);
+            $table->date('fecha');
             $table->unsignedBigInteger('destinatario_id');
-            $table->foreign('destinatario_id')->references('id')->on('destinatarios')->OnDelete('cascade');
-            $table->timestamps();
             $table->softdeletes();
+            $table->timestamps();
+            $table->foreign('destinatario_id')->references('id')->on('destinatarios')->onDelete('cascade');
         });
     }
 
