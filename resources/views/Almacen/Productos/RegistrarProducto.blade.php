@@ -67,6 +67,7 @@
                         </div>
 
                         {{-- CAMPOS CONDICIONALES --}}
+
                         <div class="col-12 col-md-6 mb-2 form-group">
                             <label>Color</label>
                             <select name="color_id" id="color" disabled class="form-control">
@@ -187,4 +188,47 @@
             });
         </script>
     @endif
+    <script>
+    // MAYÚSCULAS AUTOMÁTICAS
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const nombre = document.querySelector('input[name="nombre"]');
+        const marca = document.querySelector('input[name="marca"]');
+        const codigo = document.querySelector('input[name="codigo"]');
+
+        if (nombre) {
+            nombre.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        }
+
+        if (marca) {
+            marca.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        }
+
+        if (codigo) {
+            codigo.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        }
+
+        // SOLO NÚMEROS Y PUNTO DECIMAL
+        function soloNumerosConDecimal(input) {
+            if (!input) return;
+
+            input.addEventListener('input', function() {
+                this.value = this.value
+                    .replace(/[^0-9.]/g, '')
+                    .replace(/(\..*)\./g, '$1');
+            });
+        }
+
+        soloNumerosConDecimal(document.getElementById('largo'));
+        soloNumerosConDecimal(document.getElementById('ancho'));
+        soloNumerosConDecimal(document.getElementById('saldo'));
+
+    });
+</script>
 @endsection

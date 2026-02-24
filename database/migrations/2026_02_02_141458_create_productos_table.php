@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nombre',30);
             $table->string('marca',50);
             $table->string('codigo',50);
+            $table->decimal('saldo', 10, 2)->default(0);
             $table->integer('lineas');
             $table->unsignedBigInteger('categoria_id');
             $table->softdeletes();

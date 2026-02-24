@@ -109,11 +109,13 @@ public function store(Request $request)
                     $lote->save();
                 }
             }
-
+             
+                         
             EgresoDetalle::create([
                 'egreso_id' => $egreso->id,
                 'producto_id' => $productoId,
-                'cantidad' => $cantidadSolicitada
+                'cantidad' => $cantidadSolicitada,
+                
             ]);
         }
 

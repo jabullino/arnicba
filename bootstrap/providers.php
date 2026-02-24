@@ -6,4 +6,5 @@ return [
     App\Providers\CustomValidationRulesProvider::class,
     Laraveles\Spanish\SpanishServiceProvider::class,
     
+    
 ];

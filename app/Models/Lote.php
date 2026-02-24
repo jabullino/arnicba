@@ -10,7 +10,9 @@ class Lote extends Model
 {
     use SoftDeletes;
 
-    protected $fillable=['codigo','fec_ingre','cantidad','fec_venc','precio','saldo','producto_id','origenfondos'];
+    protected $fillable=['producto_id','codigo','fec_ingre','cantidad','fec_venc','precio','saldo','producto_id','origen_id'];
+    
+   
     public $timestamps = true;
 
     public function producto(): BelongsTo

@@ -188,7 +188,7 @@ class Gestion extends Model
     {
        
          $mes = Carbon::now()->format('m');
-          $mes='06'; 
+         
          if($mes==='01'){
              $gestion=self::orderBy('id', 'desc')
                        ->value('nombre');

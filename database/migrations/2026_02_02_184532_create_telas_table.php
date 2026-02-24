@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('largo',10);
             $table->unsignedBigInteger('producto_id');
             $table->unsignedBigInteger('color_id');
+            $table->softDeletes();
             $table->foreign('producto_id')->references('id')->on('productos')->onDelete('cascade');
             $table->foreign('color_id')->references('id')->on('colores')->onDelete('cascade');
             $table->timestamps();

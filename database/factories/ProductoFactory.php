@@ -16,7 +16,8 @@ class ProductoFactory extends Factory
             'nombre'       => $this->faker->word(),
             'marca'        => $this->faker->company(),
             'codigo'       => $this->faker->unique()->bothify('PROD-#####'),
-            'lineas'       => $this->faker->numberBetween(1, 10),
+            'saldo'        => $this->faker->randomFloat(2, 0, 1000),
+            'lineas'       => 0,
             'categoria_id' => Categoria::query()->inRandomOrder()->value('id'),
         ];
     }

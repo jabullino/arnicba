@@ -71,9 +71,13 @@
         <h2>COMPROBANTE DE EGRESO</h2>
     </div>
 
+   <h2 style="text-align: right;">
+    Retiro N°: {{ $egreso->id }}
+</h2>
     <div class="info">
         <strong>Fecha:</strong> {{ \Carbon\Carbon::parse($egreso->fecha)->format('d/m/Y') }}
-        <strong>Destinatario:</strong> {{ $egreso->destinatario->nombre }}
+        <strong class='ml-2'>Hora:</strong> {{ $egreso->created_at->format('H:i:s') }}
+        <strong class='ml-6'>Destinatario:</strong> {{ $egreso->destinatario->nombre }}
     </div>
 
     <table>

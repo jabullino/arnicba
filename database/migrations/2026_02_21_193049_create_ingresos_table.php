@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vestimentas', function (Blueprint $table) {
+        Schema::create('ingresos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('producto_id');
-            $table->unsignedBigInteger('talla_id');
-            $table->unsignedBigInteger('color_id');
+            $table->date('fecha');
+            $table->string('factura',20)->nullable();
+            $table->string('recibo',20)->nullable();
+            $table->unsignedBigInteger('origen_id');
             $table->softDeletes();
+            $table->foreign('origen_id')->references('id')->on('origen_fondos')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vestimentas');
+        Schema::dropIfExists('ingresos');
     }
 };

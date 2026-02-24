@@ -11,7 +11,7 @@ class EgresoDetalle extends Model
    protected $fillable = [
         'egreso_id',
         'producto_id',
-        'cantidad'
+        'cantidad',
     ];
 
     public function egreso()

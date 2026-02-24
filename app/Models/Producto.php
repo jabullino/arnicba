@@ -15,7 +15,10 @@ use Illuminate\Support\Facades\DB;
 class Producto extends Model
 {
     use SoftDeletes, HasFactory;
-    protected $fillable = ['nombre', 'marca', 'codigo', 'lineas'];
+    protected $fillable = ['nombre', 'marca', 'codigo', 'saldo', 'lineas'];
+    protected $attributes = [
+        'saldo' => 0,
+    ];
 
     public function categoria(): BelongsTo
     {
@@ -62,6 +65,40 @@ class Producto extends Model
         return $this->belongsToMany(Egreso::class);
     }
 
+    public function detallesIngreso()
+    {
+        return $this->hasMany(DetalleIngreso::class);
+    }
+
+    public function presentacion()
+    {
+        return $this->belongsToMany(Presentacion::class, 'presentacion_producto');
+    }
+
+    public function capacidad()
+    {
+        return $this->belongsToMany(Capacidad::class, 'capacidad_producto');
+    }
+
+    public function unidad()
+    {
+        return $this->belongsToMany(Unidad::class, 'producto_unidad');
+    }
+
+    public function tela()
+    {
+        return $this->hasOne(Tela::class);
+    }
+
+    public function vestimenta()
+    {
+        return $this->hasOne(Vestimenta::class);
+    }
+
+    public function zapato()
+    {
+        return $this->hasOne(Zapato::class);
+    }
 
 
     public function obtenerNombreProducto($id, $categoria)
@@ -77,8 +114,8 @@ class Producto extends Model
             ];
         }
 
-        // Nombre base SIEMPRE
-        $nombre = trim($producto->codigo . ' ' . $producto->nombre . ' ' . $producto->marca);
+        // ✅ Nombre base SIN código
+        $nombre = trim($producto->nombre . ' ' . $producto->marca);
 
         /*
     |------------------------------------------------------------------
@@ -138,7 +175,6 @@ class Producto extends Model
     |------------------------------------------------------------------
     */ elseif ($categoria == 5) {
 
-            // ❗ TABLA CORREGIDA: vestimenta (singular)
             $vestimenta = DB::table('vestimentas')->where('producto_id', $id)->first();
 
             if ($vestimenta) {
@@ -189,7 +225,7 @@ class Producto extends Model
     |------------------------------------------------------------------
     */
         $saldo = DB::table('lotes')
-            ->where('producto_id', $id) // ✅ CORREGIDO
+            ->where('producto_id', $id)
             ->where('saldo', '>', 0)
             ->sum('saldo');
 
@@ -201,10 +237,40 @@ class Producto extends Model
     }
 
     public function egresoDetalles()
-{
-    return $this->hasMany(EgresoDetalle::class);
-}
+    {
+        return $this->hasMany(EgresoDetalle::class);
+    }
 
+    public function devuelveUnidades()
+    {
+        return $this->belongsToMany(
+            Unidad::class,
+            'producto_unidad',
+            'producto_id',
+            'unidad_id'
+        );
+    }
+
+    public function productos()
+    {
+        return $this->belongsToMany(
+            Producto::class,
+            'producto_unidad',
+            'unidad_id',
+            'producto_id'
+        );
+    }
+
+    public static function obtenerUnidadNombre($productoId)
+    {
+        $producto = self::with('devuelveUnidades')->find($productoId);
+
+        if (!$producto || $producto->devuelveUnidades->isEmpty()) {
+            return null;
+        }
+
+        return $producto->devuelveUnidades->first()->nombre;
+    }
     protected static function booted()
     {
         // Siempre excluir registros eliminados (deleted_at no nulo)

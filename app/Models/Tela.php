@@ -4,9 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 class Tela extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
     protected $fillable=['ancho','largo','producto_id','color_id'];
     public $timestamps = true;
 

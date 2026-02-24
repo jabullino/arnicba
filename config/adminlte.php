@@ -655,28 +655,28 @@ return [
                             'icon' => 'fas fa-plus',
                             'url'  => 'Almacen/Producto/create', // corregido
                         ],
-                        
+
                     ],
-                    
+
                 ],
-               
+
                 [
                     'text' => 'Ingresos',
                     'icon' => 'fa fa-arrow-left',
                     'url'  => '', // corregido
 
                     'submenu' => [
-                         [
-                            'text' => 'Lotes',
-                            'icon' => 'fas fa-list',
-                             'url' => 'Almacen/Lote', // corregido
+                        [
+                            'text' => 'Registro de Ingresos',
+                            'icon' => 'fas fa-edit',
+                            'url'  => 'Almacen/Ingresos/create', // corregido
                         ],
                         [
-                            'text' => 'Registro de Lotes',
-                            'icon' => 'fas fa-edit',
-                             'url' => 'Almacen/Lote/create', // corregido
+                            'text' => 'Editar Ingresos',
+                            'icon' => 'fas fa-eraser',
+                            'url' => 'Almacen/Ingresos', // corregido
                         ],
-                        
+
                     ],
                 ],
                 [
@@ -684,13 +684,32 @@ return [
                     'icon' => 'fa fa-arrow-right',
                     'url'  => '', // corregido
 
-                     'submenu' => [
-                         [
+                    'submenu' => [
+                        [
                             'text' => 'Registrar Egreso',
                             'icon' => 'fas fa-arrow-right',
-                             'url' => 'Almacen/Egresos', // corregido
+                            'url' => 'Almacen/Egresos', // corregido
                         ],
-                        
+
+                    ],
+                ],
+                [
+                    'text' => 'Impresión de Kardex',
+                    'icon' => 'fa fa-print',
+                    'url'  => '', // corregido
+
+                    'submenu' => [
+                        [
+                            'text' => 'Impresión de Ingresos',
+                            'icon' => 'fas fa-print',
+                            'url'  => 'Almacen/kardex/prueba', // corregido
+                        ],
+                        [
+                            'text' => 'Impresión de Egresos',
+                            'icon' => 'fas fa-arrow-right',
+                            'url' => 'Almacen/Lote', // corregido
+                        ],
+
                     ],
                 ],
 

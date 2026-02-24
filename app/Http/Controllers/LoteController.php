@@ -14,22 +14,22 @@ class LoteController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-{
-    $lotes = DB::table('lotes')
-        ->join('productos', 'productos.id', '=', 'lotes.producto_id')
-        ->select(
-            'lotes.*',
-            'productos.nombre as producto_nombre',
-            'productos.codigo as producto_codigo',
-            'productos.marca as producto_marca'
-        )
-        ->where('lotes.saldo', '>', 0)
-        ->orderBy('lotes.producto_id', 'asc')      // Agrupa por producto
-        ->orderBy('lotes.created_at', 'asc')       // Más antiguo primero
-        ->paginate(10);
+    {
+        $lotes = DB::table('lotes')
+            ->join('productos', 'productos.id', '=', 'lotes.producto_id')
+            ->select(
+                'lotes.*',
+                'productos.nombre as producto_nombre',
+                'productos.codigo as producto_codigo',
+                'productos.marca as producto_marca'
+            )
+            ->where('lotes.saldo', '>', 0)
+            ->orderBy('lotes.producto_id', 'asc')      // Agrupa por producto
+            ->orderBy('lotes.created_at', 'asc')       // Más antiguo primero
+            ->paginate(10);
 
-    return view('Almacen.Lotes.index', compact('lotes'));
-}
+        return view('Almacen.Lotes.index', compact('lotes'));
+    }
 
 
 
@@ -61,19 +61,16 @@ class LoteController extends Controller
 
         try {
 
-            DB::table('lotes')->insert([
+            Lote::create([
                 'producto_id' => $request->producto_id,
                 'codigo'      => $request->codigo,
                 'cantidad'    => $request->cantidad,
                 'saldo'       => $request->cantidad,
                 'precio'      => $request->precio,
                 'fec_venc'    => $request->fec_venc,
-                'fec_ingre'   => now(), // 👈 AGREGA ESTO
+                'fec_ingre'   => now(),
                 'origen_id'   => $request->origen_id,
-                'created_at'  => now(),
-                'updated_at'  => now(),
             ]);
-
             DB::commit();
 
             return redirect()->back()->with('success', 'Lote registrado correctamente');
@@ -99,7 +96,7 @@ class LoteController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-     public function edit($id)
+    public function edit($id)
     {
         $lote = DB::table('lotes')
             ->join('productos', 'productos.id', '=', 'lotes.producto_id')
@@ -125,7 +122,7 @@ class LoteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-     public function update(Request $request, $id)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'codigo'    => 'required|string|max:50',
@@ -161,7 +158,6 @@ class LoteController extends Controller
 
             return redirect()->route('Lote.index')
                 ->with('success', 'Lote actualizado correctamente');
-
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -174,7 +170,7 @@ class LoteController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-        public function destroy($id)
+    public function destroy($id)
     {
         DB::beginTransaction();
 
@@ -186,7 +182,6 @@ class LoteController extends Controller
 
             return redirect()->route('Lote.index')
                 ->with('success', 'Lote eliminado correctamente');
-
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -196,4 +191,3 @@ class LoteController extends Controller
         }
     }
 }
-

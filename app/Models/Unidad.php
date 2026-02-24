@@ -18,5 +18,15 @@ class Unidad extends Model
         return $this->belongsToMany(Producto::class);
     }
 
+    public function productos()
+{
+    return $this->belongsToMany(
+        Producto::class,
+        'producto_unidad',
+        'unidad_id',
+        'producto_id'
+    );
+}
+
   
 }
