@@ -686,10 +686,16 @@ return [
 
                     'submenu' => [
                         [
+                            'text' => ' Lista de Egresos',
+                            'icon' => 'fas fa-list',
+                            'url' => 'Almacen/Egresos', // corregido
+                        ],
+                        [
                             'text' => 'Registrar Egreso',
                             'icon' => 'fas fa-arrow-right',
                             'url' => 'Almacen/Egresos', // corregido
                         ],
+                         
 
                     ],
                 ],

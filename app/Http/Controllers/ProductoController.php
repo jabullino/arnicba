@@ -405,37 +405,42 @@ class ProductoController extends Controller
         }
     }
 
-    public function buscar(Request $request)
-    {
-        $q = trim($request->q);
 
-        if (!$q) {
-            return response()->json([]);
-        }
+public function buscar(Request $request)
+{
+    $q = trim($request->q);
 
-        $productos = DB::table('productos')
-            ->where(function ($query) use ($q) {
-                $query->where('nombre', 'like', "{$q}%")
-                    ->orWhere('codigo', 'like', "{$q}%")
-                    ->orWhere('marca', 'like', "{$q}%");
-            })
-            ->limit(10)
-            ->get();
-
-        $resultado = [];
-
-        foreach ($productos as $producto) {
-
-            $info = $this->obtenerNombreProducto(
-                $producto->id,
-                $producto->categoria_id
-            );
-
-            $resultado[] = $info;
-        }
-
-        return response()->json($resultado);
+    if (!$q) {
+        return response()->json([]);
     }
+
+    $productos = DB::table('productos')
+        ->where(function ($query) use ($q) {
+            $query->where('nombre', 'like', "{$q}%")
+                ->orWhere('codigo', 'like', "{$q}%")
+                ->orWhere('marca', 'like', "{$q}%");
+        })
+        ->limit(10)
+        ->get();
+
+    $resultado = [];
+
+    foreach ($productos as $producto) {
+
+        $info = $this->obtenerNombreProducto(
+            $producto->id,
+            $producto->categoria_id
+        );
+
+        $resultado[] = [
+            'id'     => $producto->id,
+            'nombre' => $info['nombre'],
+            'saldo'  => $producto->saldo, // 👈 AQUÍ ESTABA EL PROBLEMA
+        ];
+    }
+
+    return response()->json($resultado);
+}
 
     public function obtenerNombreProducto($id, $categoria)
     {
