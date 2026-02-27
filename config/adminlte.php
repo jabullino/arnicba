@@ -578,6 +578,25 @@ return [
 
                     ],
                 ],
+                 [
+                    'text' => 'Historial Residentes',
+                    'icon' => 'fa fa-child',
+                    'url' => '',
+                    'submenu' => [
+                        [
+                            'text' => 'Registrar Historial',
+                            'icon' => 'fa fa-pencil',
+                            'url'  => 'TSocial/historiales/create', // corregido
+                        ],
+                        [
+                            'text' => 'Editar Historial',
+                            'icon' => 'fa fa-edit',
+                            'url'  => 'TSocial/historiales', // corregido
+                        ],
+
+
+                    ],
+                ],
                 [
                     'text' => 'Derivaciones',
                     'icon' => 'far fa-sticky-note',

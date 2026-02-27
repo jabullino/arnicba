@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Extension;
+use Carbon\Carbon;
 
 
 
@@ -15,6 +16,10 @@ class Residente extends Model
     use SoftDeletes;
     
     protected $fillable=['nombre','apellido','fecnac','ci','ext','ciudad','provincia','fec_ingreso','fec_egreso','foto'];
+     protected $casts = [
+    'fecnac' => 'date',
+];
+   
     public function acogida(): HasOne
     {
         return $this->hasOne(AcogidaCircunstancial::class);
@@ -39,6 +44,11 @@ class Residente extends Model
     function provincia(): BelongsTo
     {
         return $this->belongsTo(Provincia::class);
+    }
+
+    public function historial(): HasOne
+    {
+        return $this->hasOne(Historial::class);
     }
 
     

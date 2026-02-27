@@ -10,8 +10,8 @@ use App\Http\Controllers\ReporteResidentesController;
 use App\Http\Controllers\EscolaridadController;
 use App\Http\Controllers\GestionEscolarController;
 use App\Http\Controllers\UnidadEducativaController;
-
-
+use App\Http\Controllers\DocumentoController;
+use App\Http\Controllers\HistorialController;
 
 Route::middleware(['auth', 'IsTsocial'])->group(function () {
 Route::get('PanelTSocial',[PanelTSocialController::class,'index'])->name('PanelTSocial');
@@ -25,4 +25,5 @@ Route::get('/reporte/residentes', [ReporteResidentesController::class, 'generarP
 Route::resource('escolaridad', EscolaridadController::class)->names('escolaridad');
 Route::resource('gestionescolar', GestionEscolarController::class)->names('gestionescolar');  
 Route::resource('UEducativa', UnidadEducativaController::class)->names('UEducativa');
+Route::resource('historiales', HistorialController::class)->names('historiales');
 
