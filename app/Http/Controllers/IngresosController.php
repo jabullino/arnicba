@@ -19,8 +19,8 @@ class IngresosController extends Controller
     public function index()
     {
         $ingresos = Ingreso::with('origen')
-            ->orderBy('fecha', 'desc')
-            ->paginate(10); // puedes cambiar el 10
+            ->orderBy('created_at', 'desc') // Ordena por fecha de creación
+            ->paginate(10);
 
         return view('Almacen.Ingresos.EditarIngreso', compact('ingresos'));
     }
@@ -227,7 +227,7 @@ class IngresosController extends Controller
 
             DB::commit();
 
-            return back()->with('success', 'Ingreso actualizado correctamente');
+            return redirect()->route('ingresos.pdf', $ingreso->id);
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -324,5 +324,14 @@ class IngresosController extends Controller
                 'defaultFont' => 'DejaVu Sans'
             ])
             ->stream('Ingreso_' . $ingreso->id . '.pdf', ['Attachment' => false]);
+    }
+
+    public function listarIngresos()
+    {
+        $ingresos = Ingreso::with('origen')
+            ->orderBy('created_at', 'desc') // Ordena por fecha de creación
+            ->paginate(10);
+
+        return view('Almacen.Ingresos.ImprimirIngresos', compact('ingresos'));
     }
 }

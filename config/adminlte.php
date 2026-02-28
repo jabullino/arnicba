@@ -685,6 +685,12 @@ return [
                     'url'  => '', // corregido
 
                     'submenu' => [
+                             
+                        [
+                            'text' => 'Lista de Ingresos',
+                            'icon' => 'fas fa-list',
+                            'url'  => 'Almacen/ListaIngresos', // corregido
+                        ],
                         [
                             'text' => 'Registro de Ingresos',
                             'icon' => 'fas fa-edit',
@@ -734,6 +740,12 @@ return [
                             'icon' => 'fas fa-arrow-right',
                             'url' => 'Almacen/Lote', // corregido
                         ],
+                         [
+                            'text' => 'Imprimir Linea Kardex',
+                            'icon' => 'fas fa-print',
+                            'url' => '/Almacen/imprimir_reversoingreso', // corregido
+                        ],
+
 
                     ],
                 ],
