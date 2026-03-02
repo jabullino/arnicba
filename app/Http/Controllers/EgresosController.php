@@ -31,7 +31,8 @@ class EgresosController extends Controller
      */
     public function create()
     {
-        //
+        $destinatarios = Destinatario::all();
+        return view('Almacen.Egresos.RegistrarEgreso')->with(['destinatarios' => $destinatarios]);
     }
 
     /**
@@ -252,5 +253,14 @@ class EgresosController extends Controller
             ->findOrFail($id);
 
         return view('egresos.print', compact('egreso'));
+    }
+
+    public function listarEgresos()
+    {
+        $egresos = Egreso::with('destinatario')
+            ->orderBy('created_at', 'desc')
+            ->paginate(10); // 👈 IMPORTANTE
+
+        return view('Almacen.Egresos.ImprimirEgresos', compact('egresos'));
     }
 }

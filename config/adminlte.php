@@ -689,7 +689,7 @@ return [
                         [
                             'text' => 'Lista de Ingresos',
                             'icon' => 'fas fa-list',
-                            'url'  => 'Almacen/ListaIngresos', // corregido
+                            'url'  => 'Almacen/Ingresos', // corregido
                         ],
                         [
                             'text' => 'Registro de Ingresos',
@@ -718,7 +718,7 @@ return [
                         [
                             'text' => 'Registrar Egreso',
                             'icon' => 'fas fa-arrow-right',
-                            'url' => 'Almacen/Egresos', // corregido
+                            'url' => 'Almacen/Egresos/create', // corregido
                         ],
                          
 
@@ -733,20 +733,14 @@ return [
                         [
                             'text' => 'Impresión de Ingresos',
                             'icon' => 'fas fa-print',
-                            'url'  => 'Almacen/kardex/prueba', // corregido
+                            'url'  => 'Almacen/ListaIngresos', // corregido
                         ],
                         [
                             'text' => 'Impresión de Egresos',
                             'icon' => 'fas fa-arrow-right',
-                            'url' => 'Almacen/Lote', // corregido
+                            'url' => 'Almacen/ListaEgresos', // corregido
                         ],
-                         [
-                            'text' => 'Imprimir Linea Kardex',
-                            'icon' => 'fas fa-print',
-                            'url' => '/Almacen/imprimir_reversoingreso', // corregido
-                        ],
-
-
+                         
                     ],
                 ],
 

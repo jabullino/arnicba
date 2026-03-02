@@ -44,11 +44,6 @@
                                                     Editar
                                                 </a>
 
-                                                <a href="{{ route('Egresos.show', $egreso->id) }}"
-                                                   class="btn btn-info btn-sm flex-fill">
-                                                    Ver
-                                                </a>
-
                                                 <form action="{{ route('Egresos.destroy', $egreso->id) }}"
                                                       method="POST"
                                                       class="flex-fill">

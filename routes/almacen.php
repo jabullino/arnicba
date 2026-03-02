@@ -11,10 +11,8 @@ use App\Http\Controllers\ImpresionIngresosEgresosController;
 use App\Http\Controllers\IngresosController;
 
 
-Route::get('prueba-123', function () {
-    return 'FUNCIONA ALMACEN';
-});
-//Route::middleware(['auth', 'IsAlmacen'])->group(function () {
+
+Route::middleware(['auth', 'IsAlmacen'])->group(function () {
   
 Route::get('PanelAlmacen',[PanelAlmacenController::class,'index'])->name('PanelAlmacen');
 Route::resource('Producto',ProductoController::class)->names('Producto');
@@ -32,20 +30,12 @@ Route::get('lineaegreso',[ImpresionIngresosEgresosController::class, 'lineaEgres
 Route::get('imprimir-egreso',[ImpresionIngresosEgresosController::class, 'imprimirLineaEgreso'])->name('imprimir-egreso');
 Route::get('imprimir-ingreso',[ImpresionIngresosEgresosController::class, 'imprimirLineaIngreso'])->name('imprimir-ingreso');
 Route::resource('Ingresos',IngresosController::class)->names('Ingresos');
-Route::get('imprimircabeceraingreso/{id?}',
-    [ImpresionIngresosEgresosController::class, 'imprimirCabeceraIngreso']
-)->name('imprimircabeceraingreso');
-Route::get('imprimircabeceraegreso/{id?}',
-    [ImpresionIngresosEgresosController::class, 'imprimirCabeceraEgreso']
-)->name('imprimircabeceraegreso');
-Route::get('imprimir_reversoingreso/{id?}',
-    [ImpresionIngresosEgresosController::class, 'imprimirReversoIngreso']
-)->name('imprimir_reversoingreso');
-Route::get('imprimir_reversoegreso/{id?}',
-    [ImpresionIngresosEgresosController::class, 'imprimirReversoEgreso']
-)->name('imprimir_reversoegreso');
-Route::get('Almacen/imprimirIngresos/{id}', 
+Route::get('imprimirIngresos/{id}', 
     [ImpresionIngresosEgresosController::class, 'contraldorImpresionIngresos']
 )->name('imprimirIngresos');
+Route::get('imprimirEgresos/{id}', 
+    [ImpresionIngresosEgresosController::class, 'contraldorImpresionEgresos']
+)->name('imprimirEgresos');
+Route::get('ListaEgresos', [EgresosController::class, 'listarEgresos'])->name('ListaEgresos');
   
-//});
+});
