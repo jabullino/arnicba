@@ -37,5 +37,15 @@ Route::get('imprimirEgresos/{id}',
     [ImpresionIngresosEgresosController::class, 'contraldorImpresionEgresos']
 )->name('imprimirEgresos');
 Route::get('ListaEgresos', [EgresosController::class, 'listarEgresos'])->name('ListaEgresos');
-  
+
+  Route::get(
+        '/impresion/ingreso/{id}/{indice?}',
+        [ImpresionIngresosEgresosController::class, 'flujoImpresionIngreso']
+    )->name('almacen.impresion.ingreso.flujo');
+
+    Route::get(
+        '/impresion/ingreso/{id}/{indice}/print',
+        [ImpresionIngresosEgresosController::class, 'imprimirProductoIngreso']
+    )->name('almacen.impresion.ingreso.imprimir');
+
 });

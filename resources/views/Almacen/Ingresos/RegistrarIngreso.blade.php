@@ -142,6 +142,41 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+{{-- SWEETALERT PARA ERRORES Y MENSAJES --}}
+@if ($errors->any())
+<script>
+Swal.fire({
+    icon: 'error',
+    title: 'Errores en el formulario',
+    html: `{!! implode('<br>', $errors->all()) !!}`,
+    confirmButtonColor:'#134e4a'
+});
+</script>
+@endif
+
+@if(session('success'))
+<script>
+Swal.fire({
+    icon:'success',
+    title:'Éxito',
+    text:'{{ session("success") }}',
+    confirmButtonColor:'#134e4a'
+});
+</script>
+@endif
+
+@if(session('error'))
+<script>
+Swal.fire({
+    icon:'error',
+    title:'Error',
+    text:'{{ session("error") }}',
+    confirmButtonColor:'#134e4a'
+});
+</script>
+@endif
+
+
 <script>
 
 let facturaInput = document.getElementById('factura');

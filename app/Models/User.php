@@ -99,6 +99,11 @@ class User extends Authenticatable
         return $this->belongsTo(Provincia::class);
     }
 
+    public function tipopersonal(): BelongsTo
+    {
+        return $this->belongsTo(TipoPersonal::class);
+    }
+
     public function file(): HasOne
     {
 

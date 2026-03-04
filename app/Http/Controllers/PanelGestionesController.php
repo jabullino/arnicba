@@ -37,8 +37,8 @@ class PanelGestionesController extends Controller
             session()->flash('success', "Primer semestre creado correctamente.");
         } elseif ($tipo === 'segundo') {
             $request->validate([
-                'salarioMinimo' => 'required|numeric',
-                'haberBasico' => 'required|numeric',
+                'salarioMinimo' => 'nullable| numeric',
+                'haberBasico' => 'nullable|numeric',
             ]);
 
             Gestion::creaSegundoSemestre($request->salarioMinimo, $request->haberBasico);

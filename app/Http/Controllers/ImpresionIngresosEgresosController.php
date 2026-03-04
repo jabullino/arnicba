@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Producto;
-use setasign\Fpdf\Fpdf;
 use App\Models\Ingreso;
 use App\Models\DetalleIngreso;
 use App\Models\Egreso;
@@ -15,473 +13,282 @@ use App\Models\EgresoDetalle;
 class ImpresionIngresosEgresosController extends Controller
 {
 
-    public function imprimirCabeceraIngreso(
-        $id,
+/*
+======================================================
+CABECERA INGRESO
+======================================================
+*/
+
+public function imprimirCabeceraIngreso(
+    $productoId,
+    $fecha,
+    $documento,
+    $cantidad,
+    $saldo,
+    $vencimiento
+){
+
+    $producto = $this->obtenerNombre($productoId);
+    $unidades = Producto::obtenerUnidadNombre($productoId);
+
+    $pdf = new \TCPDF('P','mm',[195,215],true,'UTF-8',false);
+
+    $pdf->setPrintHeader(false);
+    $pdf->setPrintFooter(false);
+
+    $pdf->SetMargins(0,0,0);
+    $pdf->SetAutoPageBreak(false,0);
+    $pdf->AddPage();
+    $pdf->SetFont('helvetica','',6.5);
+
+    $pdf->SetXY(57.2,32);
+    $pdf->Cell(0,5,'FUNDACION CENTRO DE ACOGIDA ARCA DE RESCATE',0,1);
+
+    $pdf->SetXY(25,38);
+    $pdf->Cell(0,5,'CENTRAL',0,1);
+
+    $pdf->SetXY(125,38);
+    $pdf->Cell(0,5,'LOCALIZACION: COCHABAMBA GRANDE-VILOMA',0,1);
+
+    $pdf->SetXY(26,43);
+    $pdf->Cell(28,5,'MATERIAL:',0,0);
+    $pdf->Cell(100,5,strtoupper($producto['nombre']),0,0);
+
+    $pdf->SetXY(130,43);
+    $pdf->Cell(25,5,'UNIDAD:',0,0);
+    $pdf->Cell(30,5,strtoupper($unidades),0,1);
+
+    $pdf->SetY(58);
+
+    $this->lineaIngreso(
         $pdf,
-        $fecha,
-        $factura,
-        $entrada,
-        $saldo,
-        $fechaVencimiento = null
-    ) {
-        $id = $id ?? 1;
-
-        $producto = $this->obtenerNombre($id);
-
-        if (!$producto) {
-            abort(404, 'Producto no encontrado');
-        }
-
-        $unidades = Producto::obtenerUnidadNombre($id);
-
-        // ⚠️ Se mantiene tu orientación y tamaño original
-        $pdf = new \TCPDF(
-            'P',          // NO se cambia
-            'mm',
-            [195, 215],   // NO se cambia
-            true,
-            'UTF-8',
-            false
-        );
-
-        $pdf->SetMargins(0, 0, 0);
-        $pdf->SetAutoPageBreak(false, 0);
-        $pdf->AddPage();
-
-        // 🔽 Reducimos tamaño de letra en cabecera
-        $pdf->SetFont('helvetica', '', 6.5);
-
-        /*
-    ======================================================
-                        CABECERA
-    ======================================================
-    */
-
-        // FUNDACION (antes 60.2 mm → ahora 57.2 mm)
-        $pdf->SetXY(57.2, 32);
-        $pdf->Cell(0, 5, 'FUNDACION CENTRO DE ACOGIDA ARCA DE RESCATE', 0, 1);
-
-        // CENTRAL (2.5 cm = 25 mm)
-        $pdf->SetXY(25, 38);
-        $pdf->Cell(0, 5, 'CENTRAL', 0, 1);
-
-        // LOCALIZACION (12.5 cm = 125 mm)
-        $pdf->SetXY(125, 38);
-        $pdf->Cell(0, 5, 'LOCALIZACION: COHACHACA GRANDE-VILOMA', 0, 1);
-
-        // NOMBRE PRODUCTO (2.6 cm = 26 mm)
-        $pdf->SetXY(26, 43);
-        $pdf->Cell(0, 5, strtoupper($producto['nombre']), 0, 1);
-
-        // UNIDADES (15.6 cm = 156 mm)
-        $pdf->SetXY(156, 43);
-        $pdf->Cell(0, 5, strtoupper($unidades), 0, 1);
-
-        /*
-    ======================================================
-            BAJAR 0.5 CM MÁS LA LINEA INGRESO
-    ======================================================
-    */
-
-        // Antes estaba +10mm → ahora +15mm (1.5 cm total)
-        $pdf->SetY($pdf->GetY() + 15);
-
-        /*
-    ======================================================
-                    LINEA INGRESO
-    ======================================================
-    */
-
-        $this->lineaIngreso(
-
-            $pdf,
-            $fecha,
-            $factura,
-            $entrada,
-            $saldo,
-            $fechaVencimiento = null
-        );
-
-        return response()->stream(
-            fn() => $pdf->Output('Kardex_' . $producto['id'] . '.pdf', 'I'),
-            200,
-            ['Content-Type' => 'application/pdf']
-        );
-    }
-
-    public function imprimirCabeceraEgreso($id,
-        $pdf,
-        $fecha,
-        $factura,
-        $entrada,
-        $saldo,)
-    {
-
-        $producto = $this->obtenerNombre($id);
-
-        if (!$producto) {
-            abort(404, 'Producto no encontrado');
-        }
-
-        $unidades = Producto::obtenerUnidadNombre($id);
-
-        // Se mantiene orientación y tamaño original
-        $pdf = new \TCPDF(
-            'P',
-            'mm',
-            [195, 215],
-            true,
-            'UTF-8',
-            false
-        );
-
-        $pdf->SetMargins(0, 0, 0);
-        $pdf->SetAutoPageBreak(false, 0);
-        $pdf->AddPage();
-
-        // Fuente pequeña para cabecera
-        $pdf->SetFont('helvetica', '', 6.5);
-
-        /*
-    ======================================================
-                        CABECERA
-    ======================================================
-    */
-
-        // FUNDACION
-        $pdf->SetXY(57.2, 32);
-        $pdf->Cell(0, 5, 'FUNDACION CENTRO DE ACOGIDA ARCA DE RESCATE', 0, 1);
-
-        // CENTRAL
-        $pdf->SetXY(25, 38);
-        $pdf->Cell(0, 5, 'CENTRAL', 0, 1);
-
-        // LOCALIZACION
-        $pdf->SetXY(125, 38);
-        $pdf->Cell(0, 5, 'LOCALIZACION: COHACHACA GRANDE-VILOMA', 0, 1);
-
-        // PRODUCTO
-        $pdf->SetXY(26, 43);
-        $pdf->Cell(0, 5, strtoupper($producto['nombre']), 0, 1);
-
-        // UNIDADES
-        $pdf->SetXY(156, 43);
-        $pdf->Cell(0, 5, strtoupper($unidades), 0, 1);
-
-        /*
-    ======================================================
-        AJUSTE VERTICAL FINAL (ahora +9 mm)
-    ======================================================
-    */
-
-        $pdf->SetY($pdf->GetY() + 9);
-
-        /*
-    ======================================================
-                    LINEA EGRESO
-    ======================================================
-    */
-
-        $this->lineaEgreso($pdf,$fecha,$factura,$entrada,$saldo);
-       
-        return response()->stream(
-            fn() => $pdf->Output('Kardex_' . $producto['id'] . '.pdf', 'I'),
-            200,
-            ['Content-Type' => 'application/pdf']
-        );
-    }
-    public function obtenerNombre($id)
-    {
-        $producto = Producto::findOrFail($id);
-
-        $info = $producto->obtenerNombreProducto(
-            $producto->id,
-            $producto->categoria_id
-        );
-
-        return $info;
-    }
-
-    public function imprimeIngreso($id) {}
-
-    public function imprimeEgreso($id) {}
-
-
-
-    public function lineaIngreso(
-        $pdf,
-        $fecha,
-        $factura,
-        $entrada,
-        $saldo,
-        $fechaVencimiento = null
-    ) {
-
-
-        $anchos = [21, 17, 14, 5, 12, 17];
-
-        $xBase = 10;
-        $yBase = $pdf->GetY() - 5; // dejamos tu ajuste vertical estable
-
-        $x1 = $xBase;
-        $x2 = $x1 + $anchos[0];
-        $x3 = $x2 + $anchos[1];
-        $x4 = $x3 + $anchos[2];
-
-        // 🔥 AQUI ESTA EL AJUSTE GRANDE (1.7 cm)
-        $x5 = $x4 + $anchos[3] + 12;  // 17 - 5 = 12 mm
-
-        $x6 = $x5 + $anchos[4] + 3;
-
-        // 1 Fecha
-        $pdf->Text($x1, $yBase, $fecha);
-
-        // 2 Factura
-        $pdf->Text($x2 + 2, $yBase, $factura);
-
-        // 3 Entrada alineada derecha
-        $entradaTexto = number_format($entrada, 2);
-        $pdf->Text(
-            $x3 + ($anchos[2] - $pdf->GetStringWidth($entradaTexto) - 1),
-            $yBase,
-            $entradaTexto
-        );
-
-        // 4 Columna vacía (no imprimir nada)
-
-        // 5 Saldo alineado derecha correctamente dentro de su nuevo espacio
-        $saldoTexto = number_format($saldo, 2);
-        $pdf->Text(
-            $x5 + ($anchos[4] - $pdf->GetStringWidth($saldoTexto) - 2),
-            $yBase,
-            $saldoTexto
-        );
-
-        // 6 Fecha vencimiento
-        $pdf->Text($x6, $yBase, $fechaVencimiento ?? '');
-    }
-    public function lineaEgreso($pdf,$fecha,$numrecibo,$cantidad,$saldo)
-    {
-        
-        $fecha = now()->format('d-m-Y');
-        $numeroRecibo = $numrecibo;
-        $valor1 = $cantidad;
-        $valor2 = $saldo;
-
-        $alto = 8;
-
-        $anchos = [
-            21,
-            17,
-            16,
-            14,
-            15,
-            16,
-            18,
-            19,
-            17,
-            19,
-            22
-        ];
-
-        $pdf->SetX(10);
-
-        $pdf->Cell($anchos[0], $alto, $fecha, 0, 0, 'C');
-        $pdf->Cell($anchos[1], $alto, $numeroRecibo, 0, 0, 'C');
-        $pdf->Cell($anchos[2], $alto, '', 0, 0, 'C');
-        $pdf->Cell($anchos[3], $alto, number_format($valor1, 2), 0, 0, 'C');
-        $pdf->Cell($anchos[4], $alto, number_format($valor2, 2), 0, 0, 'C');
-        $pdf->Cell($anchos[5], $alto, '', 0, 0, 'C');
-        $pdf->Cell($anchos[6], $alto, '', 0, 0, 'C');
-        $pdf->Cell($anchos[7], $alto, '', 0, 0, 'C');
-        $pdf->Cell($anchos[8], $alto, '', 0, 0, 'C');
-        $pdf->Cell($anchos[9], $alto, '', 0, 0, 'C');
-        $pdf->Cell($anchos[10], $alto, '', 0, 1, 'C');
-    }
-    public function imprimirLineaEgreso($fecha,$numrecibo,$cantidad,$saldo)
-    {
-        $pdf = new \TCPDF(
-            'P',              // 👈 IMPORTANTE (no usar L)
-            'mm',
-            [215, 165],       // Tu tamaño real
-            true,
-            'UTF-8',
-            false
-        );
-
-        $pdf->SetMargins(5, 5, 5); // pequeño margen para que no corte
-        $pdf->SetAutoPageBreak(false, 0);
-        $pdf->AddPage();
-        $pdf->SetFont('helvetica', '', 8);
-
-        $fila = rand(2, 13);
-
-        $inicio = 64;
-        $altoCelda = 8;
-
-        $posicionY = $inicio + (($fila - 2) * $altoCelda);
-
-        $pdf->SetY($posicionY);
-
-        $this->lineaEgreso($pdf,$fecha,$numrecibo,$cantidad,$saldo);
-
-        return $pdf->Output('posicion_fila.pdf', 'I');
-    }
-
-    public function imprimirLineaIngreso($fecha, $factura, $entrada, $saldo, $fechaVencimiento = null, $lineas)
-    {
-
-
-        $pdf = new \TCPDF(
-            'P',
-            'mm',
-            [215, 165],
-            true,
-            'UTF-8',
-            false
-        );
-
-        $pdf->SetMargins(5, 5, 5);
-        $pdf->SetAutoPageBreak(false, 0);
-        $pdf->AddPage();
-        $pdf->SetFont('helvetica', '', 8);
-
-        $fila = $lineas;
-
-        // 🔼 Subimos 3 mm
-        $inicio = 63;   // antes 66
-        $altoCelda = 8;
-
-        $posicionY = $inicio + (($fila - 2) * $altoCelda);
-
-        $pdf->SetY($posicionY);
-
-
-        $this->lineaIngreso(
-            $pdf,
-            $fecha,
-            $factura,
-            $entrada,
-            $saldo,
-            $fechaVencimiento
-        );
-
-        return $pdf->Output('linea_ingreso.pdf', 'I');
-    }
-
-    public function imprimirReversoIngreso(
         $fecha,
         $documento,
         $cantidad,
         $saldo,
-        $vencimiento = null
-    ) {
-        $pdf = new \TCPDF(
-            'P',
-            'mm',
-            [195, 215],
-            true,
-            'UTF-8',
-            false
-        );
+        $vencimiento
+    );
 
-        $pdf->SetMargins(0, 0, 0);
-        $pdf->SetAutoPageBreak(false, 0);
-        $pdf->AddPage();
-        $pdf->SetFont('helvetica', '', 7);
+    return $pdf->Output('kardex.pdf','I');
+}
 
-        // 2.5 cm desde el borde superior
-        $pdf->SetY(25);
+/*
+======================================================
+OBTENER NOMBRE PRODUCTO
+======================================================
+*/
 
-        $this->lineaIngreso(
-            $pdf,
+public function obtenerNombre($id)
+{
+    $producto = Producto::findOrFail($id);
+
+    return $producto->obtenerNombreProducto(
+        $producto->id,
+        $producto->categoria_id
+    );
+}
+
+/*
+======================================================
+LINEA INGRESO
+======================================================
+*/
+
+public function lineaIngreso(
+    $pdf,
+    $fecha,
+    $factura,
+    $entrada,
+    $saldo,
+    $fechaVencimiento = null
+){
+
+    $anchos = [21,17,14,5,12,17];
+
+    $xBase = 10;
+    $yBase = $pdf->GetY();
+
+    $x1 = $xBase;
+    $x2 = $x1 + $anchos[0];
+    $x3 = $x2 + $anchos[1];
+    $x4 = $x3 + $anchos[2];
+    $x5 = $x4 + $anchos[3] + 12;
+    $x6 = $x5 + $anchos[4] + 3;
+
+    $pdf->Text($x1+3,$yBase,$fecha);
+    $pdf->Text($x2+2,$yBase,$factura);
+
+    $entradaTexto = number_format($entrada,2);
+
+    $pdf->Text(
+        $x3 + ($anchos[2] - $pdf->GetStringWidth($entradaTexto) - 1),
+        $yBase,
+        $entradaTexto
+    );
+
+    $saldoTexto = number_format($saldo,2);
+
+    $pdf->Text(
+        $x5 + ($anchos[4] - $pdf->GetStringWidth($saldoTexto) - 2),
+        $yBase,
+        $saldoTexto
+    );
+
+    $pdf->Text($x6,$yBase,$fechaVencimiento ?? '');
+}
+
+/*
+======================================================
+LINEA EGRESO
+======================================================
+*/
+
+public function lineaEgreso($pdf,$fecha,$numrecibo,$cantidad,$saldo)
+{
+
+    $alto = 8;
+
+    $anchos = [
+        21,17,16,14,15,16,18,19,17,19,22
+    ];
+
+    $pdf->SetX(13);
+
+    $pdf->Cell($anchos[0],$alto,$fecha,0,0,'C');
+    $pdf->Cell($anchos[1],$alto,$numrecibo,0,0,'C');
+    $pdf->Cell($anchos[2],$alto,'',0,0,'C');
+    $pdf->Cell($anchos[3],$alto,number_format($cantidad,2),0,0,'C');
+    $pdf->Cell($anchos[4],$alto,number_format($saldo,2),0,0,'C');
+
+    for($i=5;$i<=10;$i++){
+        $pdf->Cell($anchos[$i],$alto,'',0,0,'C');
+    }
+}
+
+/*
+======================================================
+REVERSO INICIO (14-16)
+======================================================
+*/
+
+private function posicionReversoInicio($lineas)
+{
+    $fila14 = 21;
+    $altoCelda = 8;
+
+    return $fila14 + (($lineas - 14) * $altoCelda);
+}
+
+/*
+======================================================
+REVERSO RESTO (17-32)
+======================================================
+*/
+
+private function calcularPosicionReverso($lineas)
+{
+
+    $posiciones = [
+
+        17 => 45,
+        18 => 53,
+        19 => 61,
+        20 => 69,
+        21 => 77,
+        22 => 85,
+        23 => 93,
+        24 => 101,
+        25 => 109,
+        26 => 117,
+        27 => 125,
+        28 => 133,
+        29 => 141,
+        30 => 149,
+        31 => 157,
+        32 => 165
+
+    ];
+
+    return $posiciones[$lineas] ?? 45;
+}
+
+/*
+======================================================
+REINICIAR LINEAS
+======================================================
+*/
+
+private function reiniciarLineasProducto($productoId)
+{
+    Producto::where('id',$productoId)
+        ->update(['lineas'=>0]);
+}
+
+/*
+======================================================
+CONTROLADOR IMPRESION INGRESOS
+======================================================
+*/
+
+public function contraldorImpresionIngresos($id,$indice=0)
+{
+
+    $ingreso = Ingreso::findOrFail($id);
+
+    $fecha     = $ingreso->fecha;
+    $documento = $ingreso->factura ?? $ingreso->recibo ?? null;
+
+    $detalle = DetalleIngreso::where('ingreso_id',$id)
+                ->skip($indice)
+                ->first();
+
+    $producto = Producto::findOrFail($detalle->producto_id);
+
+    $cantidad    = $detalle->cantidad;
+    $vencimiento = $detalle->vencimiento;
+    $saldo       = $producto->saldo;
+    $lineas      = (int)$producto->lineas;
+
+    if($lineas == 1){
+        return $this->imprimirCabeceraIngreso(
+            $producto->id,
             $fecha,
             $documento,
             $cantidad,
             $saldo,
-            $vencimiento = null,
-        );
-
-        return response()->stream(
-            fn() => $pdf->Output('Reverso_Ingreso.pdf', 'I'),
-            200,
-            ['Content-Type' => 'application/pdf']
+            $vencimiento
         );
     }
 
-    public function imprimirReversoEgreso(
-        $fecha,
-        $documento,
-        $cantidad,
-        $saldo
-       
-    ) {
-        $pdf = new \TCPDF(
-            'P',
-            'mm',
-            [195, 215],
-            true,
-            'UTF-8',
-            false
-        );
+    $pdf = new \TCPDF('P','mm',[195,215],true,'UTF-8',false);
 
-        $pdf->SetMargins(0, 0, 0);
-        $pdf->SetAutoPageBreak(false, 0);
-        $pdf->AddPage();
-        $pdf->SetFont('helvetica', '', 7);
+    $pdf->setPrintHeader(false);
+    $pdf->setPrintFooter(false);
 
-        // Posición final ajustada: 18 mm desde el borde superior
-        $pdf->SetY(18);
+    $pdf->SetMargins(0,0,0);
+    $pdf->SetAutoPageBreak(false,0);
+    $pdf->AddPage();
+    $pdf->SetFont('helvetica','',8);
 
-        $this->lineaEgreso($pdf,$fecha,$documento,$cantidad,$saldo);
+    if($lineas >= 14){
 
-        return response()->stream(
-            fn() => $pdf->Output('Reverso_Egreso.pdf', 'I'),
-            200,
-            ['Content-Type' => 'application/pdf']
-        );
-    }
-
-    public function contraldorImpresionIngresos($id)
-    {
-
-        $pdf = new \TCPDF(
-            'P',
-            'mm',
-            [195, 215],
-            true,
-            'UTF-8',
-            false
-        );
-        // 1️⃣ Obtener ingreso
-        $ingreso = Ingreso::findOrFail($id);
-
-        $fecha     = $ingreso->fecha;
-        $documento = $ingreso->factura ?? $ingreso->recibo ?? null;
-
-        // 2️⃣ Obtener detalles del ingreso
-        $detalles = DetalleIngreso::where('ingreso_id', $id)->get();
-
-        if ($detalles->isEmpty()) {
-            abort(404, 'El ingreso no tiene productos.');
+        if($lineas <= 16){
+            $posicionY = $this->posicionReversoInicio($lineas);
+        }else{
+            $posicionY = $this->calcularPosicionReverso($lineas);
         }
 
-        // 3️⃣ Recorrer productos del ingreso
-        foreach ($detalles as $detalle) {
+    }else{
 
-            $producto = Producto::findOrFail($detalle->producto_id);
+        $inicio = 58;
+        $altoCelda = 8;
 
-            $cantidad    = $detalle->cantidad;
-            $vencimiento = $detalle->vencimiento;
-            $saldo       = $producto->saldo;
-            $lineas      = $producto->lineas;
-           
-            // 4️⃣ Según cantidad de líneas llamar función correcta
+        $posicionY = $inicio + (($lineas - 1) * $altoCelda);
+    }
 
-            if ($lineas == 1) {
+    $pdf->SetXY(10,$posicionY);
 
-    return $this->imprimirCabeceraIngreso(
-        $producto->id,
+    $this->lineaIngreso(
         $pdf,
         $fecha,
         $documento,
@@ -490,122 +297,49 @@ class ImpresionIngresosEgresosController extends Controller
         $vencimiento
     );
 
-} elseif ($lineas >= 2 && $lineas <= 13) {
-
-    return $this->imprimirLineaIngreso(
-        $fecha,
-        $documento,
-        $cantidad,
-        $saldo,
-        $vencimiento,
-        $lineas
-    );
-
-} elseif ($lineas == 14) {
-
-    return $this->imprimirReversoIngreso(
-        $fecha,
-        $documento,
-        $cantidad,
-        $saldo,
-        $vencimiento
-    );
-
-} elseif ($lineas >= 15 && $lineas <= 32) {
-
-    return $this->imprimirLineaIngreso(
-        $fecha,
-        $documento,
-        $cantidad,
-        $saldo,
-        $vencimiento,
-        $lineas
-    );
-}
-        }
-
-        abort(404, 'No se pudo determinar el tipo de impresión.');
+    if($lineas == 32){
+        $this->reiniciarLineasProducto($producto->id);
     }
 
-
-     public function contraldorImpresionEgresos($id)
-    {
-       
-        $pdf = new \TCPDF(
-            'P',
-            'mm',
-            [195, 215],
-            true,
-            'UTF-8',
-            false
-        );
-        // 1️⃣ Obtener ingreso
-        $egreso = Egreso::findOrFail($id);
-
-        $fecha     = $egreso->fecha;
-        $documento = $egreso->factura ?? $egreso->recibo ?? null;
-
-        // 2️⃣ Obtener detalles del ingreso
-        $detalles = EgresoDetalle::where('egreso_id', $id)->get();
-
-        if ($detalles->isEmpty()) {
-            abort(404, 'El ingreso no tiene productos.');
-        }
-
-        // 3️⃣ Recorrer productos del ingreso
-        foreach ($detalles as $detalle) {
-
-            $producto = Producto::findOrFail($detalle->producto_id);
-
-            $cantidad    = $detalle->cantidad;
-            $saldo       = $producto->saldo;
-            $lineas      = $producto->lineas;
-           
-            // 4️⃣ Según cantidad de líneas llamar función correcta
-
-            if ($lineas == 1) {
-
-    return $this->imprimirCabeceraEgreso(
-        $producto->id,
-        $pdf,
-        $fecha,
-        $documento,
-        $cantidad,
-        $saldo,
-    );
-
-} elseif ($lineas >= 2 && $lineas <= 13) {
-
-    return $this->imprimirLineaEgreso(
-        $fecha,
-        $documento,
-        $cantidad,
-        $saldo,
-        $lineas
-    );
-
-} elseif ($lineas == 14) {
-
-    return $this->imprimirReversoEgreso(
-        $fecha,
-        $documento,
-        $cantidad,
-        $saldo,
-        
-    );
-
-} elseif ($lineas >= 15 && $lineas <= 32) {
-
-    return $this->imprimirLineaEgreso(
-        $fecha,
-        $documento,
-        $cantidad,
-        $saldo,
-        $lineas
-    );
+    return $pdf->Output('kardex_ingreso.pdf','I');
 }
-        }
 
-        abort(404, 'No se pudo determinar el tipo de impresión.');
+/*
+======================================================
+FLUJO IMPRESION
+======================================================
+*/
+
+public function flujoImpresionIngreso($id, $indice = 0)
+{
+    $ingreso = Ingreso::findOrFail($id);
+
+    $detalles = DetalleIngreso::where('ingreso_id', $id)
+            ->get()
+            ->values();
+
+    if (!isset($detalles[$indice])) {
+        return view('impresion.finalizado');
     }
+
+    $detalle = $detalles[$indice];
+    $producto = Producto::findOrFail($detalle->producto_id);
+
+    return view('impresion.pantalla', [
+        'id'          => $id,
+        'indice'      => $indice,
+        'total'       => count($detalles),
+        'producto'    => $producto->nombre ?? '',
+        'urlImprimir' => route('almacen.impresion.ingreso.imprimir', [
+                                'id' => $id,
+                                'indice' => $indice
+                            ])
+    ]);
+}
+
+public function imprimirProductoIngreso($id, $indice)
+{
+    return $this->contraldorImpresionIngresos($id,$indice);
+}
+
 }

@@ -23,7 +23,7 @@
             <div id='envoltorio' class='grid-container'>
 
                 <!-- Primer Semestre -->
-                <div id='primerSemestre'>
+                <div id='primerSemestre' class='mt-4'>
                     <form action="{{ route('PanelGestiones.store') }}" method="POST">
                         @csrf
                         <input type="hidden" name="tipo" value="primer">
@@ -39,13 +39,13 @@
                         <div id='boton'>
                             <button id='btnSegundoSemestre' type="submit"
                                 class="semestre-btn bg-green-500"
-                                disabled>Registrar Incremento Salarial</button>
+                                >Registrar Incremento Salarial</button>
                         </div>
                         <div id='cajas' class='form-group'>
                             <label for="salarioMinimo">Salario Minimo</label>
                             <input type="text" name='salarioMinimo' id='salarioMinimo' class="form-control">
-                            <label for="haberBasico" class='mt-2'>Haber Básico (%)</label>
-                            <input type="text" name='haberBasico' id='haberBasico' class="form-control" disabled>
+                            <label for="haberBasico" class='mt-2'>Haber Básico ('Porcentaje Incrementado Num. Entero')</label>
+                            <input type="text" name='haberBasico' id='haberBasico' class="form-control">
                         </div>
                     </form>
                 </div>

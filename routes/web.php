@@ -26,6 +26,7 @@ use App\Models\Municipio;
 use App\Http\Controllers\AlumnosController;
 use App\Http\Controllers\UserAdminSisController;
 use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\ImpresionIngresosEgresosController;
 
 Route::post('AdminSis.RegistraAdminSis',[UserAdminSisController::class,'saveadminsis'])->name('AdminSis.RegistraAdminSis');
 Route::get('/provincias/{ciudad_id}', function($ciudad_id) {
@@ -265,3 +266,13 @@ Route::get('TSocial/escolaridad/alumnos', [AlumnosController::class, 'alumnos'])
 
      Route::get('/Almacen/buscar-producto', [ProductoController::class, 'buscar'])
      ->name('productos.buscar');
+
+     Route::get(
+'/almacen/impresion/ingreso/{id}/{indice?}',
+[ImpresionIngresosEgresosController::class,'flujoImpresionIngreso']
+)->name('almacen.impresion.ingreso');
+
+Route::get(
+'/almacen/impresion/ingreso/imprimir/{id}/{indice}',
+[ImpresionIngresosEgresosController::class,'imprimirProductoIngreso']
+)->name('almacen.impresion.ingreso.imprimir');
