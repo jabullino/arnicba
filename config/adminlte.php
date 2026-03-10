@@ -528,6 +528,93 @@ return [
 
                     ],
                 ],
+                [
+                    'text' => 'Material Escolar',
+                    'icon' => 'fas fa-graduation-cap',
+                    'url' => '',
+                    'submenu' => [
+
+                        
+                            
+                                [
+                                    'text' => 'Lista de Productos ',
+                                    'icon' => 'fas fa-list',
+                                    'url'  => 'Administrador/ProductoEscolar', // corregido
+                                ],
+                                [
+                                    'text' => 'Registrar Producto ',
+                                    'icon' => 'fas fa-plus',
+                                    'url'  => 'Administrador/ProductoEscolar/create', // corregido
+                                ],
+
+                            
+
+                        
+
+                        [
+                            'text' => 'Ingresos',
+                            'icon' => 'fa fa-arrow-left',
+                            'url'  => '', // corregido
+
+                            'submenu' => [
+
+                                [
+                                    'text' => 'Lista de Ingresos',
+                                    'icon' => 'fas fa-list',
+                                    'url'  => 'Administrador/IngresoEscolar', // corregido
+                                ],
+                                [
+                                    'text' => 'Registro de Ingresos',
+                                    'icon' => 'fas fa-edit',
+                                    'url'  => 'Administrador/IngresoEscolar/create', // corregido
+                                ],
+
+                            ],
+                        ],
+                        [
+                            'text' => 'Egresos',
+                            'icon' => 'fa fa-arrow-right',
+                            'url'  => '', // corregido
+
+                            'submenu' => [
+                                [
+                                    'text' => ' Lista de Egresos',
+                                    'icon' => 'fas fa-list',
+                                    'url' => 'Administrador/EgresosEscolar', // corregido
+                                ],
+                                [
+                                    'text' => 'Registrar Egreso',
+                                    'icon' => 'fas fa-arrow-right',
+                                    'url' => 'Administrador/EgresosEscolar/create', // corregido
+                                ],
+                                 
+
+
+
+                            ],
+                        ],
+                        [
+                            'text' => 'Impresión de Kardex',
+                            'icon' => 'fa fa-print',
+                            'url'  => '', // corregido
+
+                            'submenu' => [
+                                [
+                                    'text' => 'Impresión de Ingresos',
+                                    'icon' => 'fas fa-print',
+                                    'url'  => 'Administrador/ListaIngresos', // corregido
+                                ],
+                                [
+                                    'text' => 'Impresión de Egresos',
+                                    'icon' => 'fas fa-arrow-right',
+                                    'url' => 'Administrador/ListaEgresos', // corregido
+                                ],
+
+                            ],
+                        ],
+
+                    ],
+                ],
             ],
         ],
         [
@@ -578,7 +665,7 @@ return [
 
                     ],
                 ],
-                 [
+                [
                     'text' => 'Historial Residentes',
                     'icon' => 'fa fa-child',
                     'url' => '',
@@ -685,7 +772,7 @@ return [
                     'url'  => '', // corregido
 
                     'submenu' => [
-                             
+
                         [
                             'text' => 'Lista de Ingresos',
                             'icon' => 'fas fa-list',
@@ -720,7 +807,7 @@ return [
                             'icon' => 'fas fa-arrow-right',
                             'url' => 'Almacen/Egresos/create', // corregido
                         ],
-                         
+
 
                     ],
                 ],
@@ -740,7 +827,7 @@ return [
                             'icon' => 'fas fa-arrow-right',
                             'url' => 'Almacen/ListaEgresos', // corregido
                         ],
-                         
+
                     ],
                 ],
 

@@ -20,11 +20,12 @@ class DetalleIngreso extends Model
     {
         return $this->belongsTo(Ingreso::class);
     }
-
-    public function producto()
+public function producto()
 {
-    return $this->belongsTo(Producto::class);
+    return $this->belongsTo(\App\Models\Producto::class, 'producto_id');
 }
+
+
 
    
 

@@ -26,5 +26,9 @@ class Egreso extends Model
 {
     return $this->hasMany(EgresoDetalle::class);
 }
+public function egresoDetalles()
+{
+    return $this->hasMany(\App\Models\EgresoDetalle::class, 'egreso_id');
+}
 
 }

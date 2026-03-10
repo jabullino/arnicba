@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('productos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre',30);
+            $table->string('nombre',100);
             $table->string('marca',50);
             $table->string('codigo',50);
             $table->decimal('saldo', 10, 2)->default(0);

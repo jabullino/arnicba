@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Models\OrigenFondos;
@@ -11,21 +10,21 @@ use App\Models\Ingreso;
 use App\Models\DetalleIngreso;
 use Barryvdh\DomPDF\Facade\Pdf;
 
-class IngresosController extends Controller
+class IngresoEscolarController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $ingresos = Ingreso::with(['origen', 'detalleIngresos.producto'])
-            ->whereDoesntHave('detalleIngresos.producto', function ($q) {
+            ->whereHas('detalleIngresos.producto', function ($q) {
                 $q->whereIn('categoria_id', [4, 7]);
+            })
+            ->whereDoesntHave('detalleIngresos.producto', function ($q) {
+                $q->whereNotIn('categoria_id', [4, 7]);
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('Almacen.Ingresos.EditarIngreso', compact('ingresos'));
+        return view('Administrador.MaterialEscolar.Ingresos.EditarIngresoEscolar', compact('ingresos'));
     }
 
     /**
@@ -36,7 +35,7 @@ class IngresosController extends Controller
         $productos = Producto::all();
         $origenFondos = OrigenFondos::all();
 
-        return view('Almacen.Ingresos.RegistrarIngreso', compact('productos', 'origenFondos'));
+        return view('Administrador.MaterialEscolar.Ingresos.RegistrarIngresoEscolar', compact('productos', 'origenFondos'));
     }
 
     /**
@@ -103,7 +102,7 @@ class IngresosController extends Controller
             DB::commit();
 
             // Redirigir al PDF recién creado
-            return redirect()->route('ingresos.pdf', $ingreso->id);
+            return redirect()->route('ingresosescolar.pdf', $ingreso->id);
         } catch (\Exception $e) {
 
             DB::rollBack();
@@ -134,7 +133,7 @@ class IngresosController extends Controller
         $origenFondos = OrigenFondos::all();
 
         return view(
-            'Almacen.Ingresos.DetalleIngreso',
+            'Administrador.MaterialEscolar.Ingresos.DetalleIngresoEscolar',
             compact('ingreso', 'origenFondos')
         );
     }
@@ -152,53 +151,23 @@ class IngresosController extends Controller
             'recibo'  => 'nullable|string|max:50|required_without:factura',
 
             'detalles' => 'required|array|min:1',
+            'detalles.*.id' => 'required|exists:detalle_ingresos,id',
             'detalles.*.producto_id' => 'required|exists:productos,id',
             'detalles.*.cantidad' => 'required|numeric|min:0.01',
             'detalles.*.precio' => 'required|numeric|min:0.01',
             'detalles.*.fecha_vencimiento' => 'nullable|date',
-        ], [
-            'factura.required_without' => 'Debe ingresar factura o recibo.',
-            'recibo.required_without' => 'Debe ingresar factura o recibo.',
-            'detalles.required' => 'Debe agregar al menos un producto al carrito.',
         ]);
-
-        if ($request->filled('factura') && $request->filled('recibo')) {
-            return back()
-                ->withErrors(['factura' => 'No puede ingresar factura y recibo al mismo tiempo.'])
-                ->withInput();
-        }
 
         DB::beginTransaction();
 
         try {
 
-            $ingreso = Ingreso::with('detalles')->findOrFail($id);
+            $ingreso = Ingreso::findOrFail($id);
 
             /*
-        |--------------------------------------------------------------------------
-        | 1️⃣ RESTAR SALDO ANTERIOR
-        |--------------------------------------------------------------------------
-        */
-            foreach ($ingreso->detalles as $detalleAnterior) {
-
-                $producto = Producto::find($detalleAnterior->producto_id);
-
-                if ($producto) {
-                    $producto->decrement('saldo', (float) $detalleAnterior->cantidad);
-                }
-            }
-
-            /*
-        |--------------------------------------------------------------------------
-        | 2️⃣ ELIMINAR DETALLES ANTERIORES
-        |--------------------------------------------------------------------------
-        */
-            $ingreso->detalles()->delete();
-
-            /*
-        |--------------------------------------------------------------------------
-        | 3️⃣ ACTUALIZAR ENCABEZADO
-        |--------------------------------------------------------------------------
+        |---------------------------------------
+        | ACTUALIZAR ENCABEZADO
+        |---------------------------------------
         */
             $ingreso->update([
                 'fecha' => $request->fecha,
@@ -208,37 +177,41 @@ class IngresosController extends Controller
             ]);
 
             /*
-        |--------------------------------------------------------------------------
-        | 4️⃣ CREAR NUEVOS DETALLES Y SUMAR SALDO
-        |--------------------------------------------------------------------------
+        |---------------------------------------
+        | ACTUALIZAR DETALLES
+        |---------------------------------------
         */
             foreach ($request->detalles as $detalle) {
 
-                $ingreso->detalles()->create([
-                    'producto_id' => $detalle['producto_id'],
-                    'cantidad' => $detalle['cantidad'],
-                    'precio' => $detalle['precio'],
-                    'vencimiento' => $detalle['fecha_vencimiento'] ?? null,
-                ]);
+                $detalleDB = $ingreso->detalles()->where('id', $detalle['id'])->first();
 
-                $producto = Producto::find($detalle['producto_id']);
+                if ($detalleDB) {
 
-                if ($producto) {
-                    $producto->increment('saldo', (float) $detalle['cantidad']);
+                    // ajustar saldo si cambió cantidad
+                    $diferencia = $detalle['cantidad'] - $detalleDB->cantidad;
+
+                    $producto = Producto::find($detalle['producto_id']);
+
+                    if ($producto && $diferencia != 0) {
+                        $producto->increment('saldo', $diferencia);
+                    }
+
+                    $detalleDB->update([
+                        'producto_id' => $detalle['producto_id'],
+                        'cantidad' => $detalle['cantidad'],
+                        'precio' => $detalle['precio'],
+                        'vencimiento' => $detalle['fecha_vencimiento'] ?? null,
+                    ]);
                 }
             }
 
             DB::commit();
 
-            return redirect()->route('ingresos.pdf', $ingreso->id);
+            return redirect()->route('ingresosescolar.pdf', $ingreso->id);
         } catch (\Exception $e) {
 
             DB::rollBack();
             dd($e->getMessage());
-
-            return back()
-                ->with('error', 'Ocurrió un error al actualizar el ingreso.')
-                ->withInput();
         }
     }
 
@@ -272,7 +245,7 @@ class IngresosController extends Controller
             DB::commit();
 
             return redirect()
-                ->route('Ingresos.index')
+                ->route('IngresoEscolar.index')
                 ->with('success', 'Ingreso eliminado correctamente');
         } catch (\Exception $e) {
 
@@ -283,10 +256,13 @@ class IngresosController extends Controller
         }
     }
 
-    public function pdfIngreso($id)
+    public function pdfIngresoEscolar($id)
     {
         $ingreso = Ingreso::with(['origen', 'detalles.producto'])
             ->findOrFail($id);
+
+        // Formatear fecha a dd-mm-aaaa
+        $ingreso->fecha = \Carbon\Carbon::parse($ingreso->fecha)->format('d-m-Y');
 
         $productosFormateados = [];
 
@@ -328,16 +304,21 @@ class IngresosController extends Controller
             ])
             ->stream('Ingreso_' . $ingreso->id . '.pdf', ['Attachment' => false]);
     }
-
     public function listarIngresos()
     {
         $ingresos = Ingreso::with(['origen', 'detalleIngresos.producto'])
-            ->whereDoesntHave('detalleIngresos.producto', function ($q) {
+            ->whereHas('detalleIngresos.producto', function ($q) {
                 $q->whereIn('categoria_id', [4, 7]);
+            })
+            ->whereDoesntHave('detalleIngresos.producto', function ($q) {
+                $q->whereNotIn('categoria_id', [4, 7]);
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('Almacen.Ingresos.ImprimirIngresos', compact('ingresos'));
+        return view(
+            'Administrador.MaterialEscolar.Ingresos.ImprimirIngresosEscolar',
+            compact('ingresos')
+        );
     }
 }

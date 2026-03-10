@@ -20,12 +20,14 @@ class EgresoDetalle extends Model
     }
 
     public function producto()
-    {
-        return $this->belongsTo(Producto::class);
-    }
+{
+    return $this->belongsTo(\App\Models\Producto::class, 'producto_id');
+}
 
     public function detalles()
     {
         return $this->hasMany(EgresoDetalle::class);
     }
+
+    
 }

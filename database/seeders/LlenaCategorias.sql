@@ -4,7 +4,7 @@
 			  INSERT INTO categorias (ID,NOMBRE) VALUES('4','Tela');
               INSERT INTO categorias (ID,NOMBRE) VALUES('5','Vestimenta');
 			  INSERT INTO categorias (ID,NOMBRE) VALUES('6','Zapatos');
-			  INSERT INTO categorias (ID,NOMBRE) VALUES('7','Escolar');
+			  INSERT INTO categorias (ID,NOMBRE) VALUES('7','Material Escolar');
 			 
               
 

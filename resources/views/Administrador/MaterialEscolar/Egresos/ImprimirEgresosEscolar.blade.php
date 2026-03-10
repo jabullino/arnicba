@@ -45,14 +45,12 @@
                                             </td>
 
                                             <td>
-                                            <td>
                                                 <a
-                                                    href="{{ route('almacen.impresion.egreso.flujo', ['id' => $egreso->id]) }}">
+                                                    href="{{ route('escolar.impresion.egreso.flujo', ['id' => $egreso->id]) }}">
                                                     <button class="btn btn-primary">
                                                         Imprimir tarjetas Kardex
                                                     </button>
                                                 </a>
-                                            </td>
                                             </td>
                                         </tr>
                                     @empty

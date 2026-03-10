@@ -306,7 +306,74 @@ public function contraldorImpresionIngresos($id,$indice=0)
 
 /*
 ======================================================
-FLUJO IMPRESION
+CONTROLADOR IMPRESION EGRESOS
+======================================================
+*/
+
+public function contraldorImpresionEgresos($id,$indice=0)
+{
+
+    $egreso = Egreso::findOrFail($id);
+
+    $fecha     = $egreso->fecha;
+    $documento = $egreso->factura ?? $egreso->recibo ?? null;
+
+    $detalle = EgresoDetalle::where('egreso_id',$id)
+                ->skip($indice)
+                ->first();
+
+    $producto = Producto::findOrFail($detalle->producto_id);
+
+    $cantidad = $detalle->cantidad;
+    $saldo    = $producto->saldo;
+    $lineas   = (int)$producto->lineas;
+
+    $pdf = new \TCPDF('P','mm',[195,215],true,'UTF-8',false);
+
+    $pdf->setPrintHeader(false);
+    $pdf->setPrintFooter(false);
+
+    $pdf->SetMargins(0,0,0);
+    $pdf->SetAutoPageBreak(false,0);
+    $pdf->AddPage();
+    $pdf->SetFont('helvetica','',8);
+
+    if($lineas >= 14){
+
+        if($lineas <= 16){
+            $posicionY = $this->posicionReversoInicio($lineas);
+        }else{
+            $posicionY = $this->calcularPosicionReverso($lineas);
+        }
+
+    }else{
+
+        $inicio = 58;
+        $altoCelda = 8;
+
+        $posicionY = $inicio + (($lineas - 1) * $altoCelda);
+    }
+
+    $pdf->SetXY(10,$posicionY);
+
+    $this->lineaEgreso(
+        $pdf,
+        $fecha,
+        $documento,
+        $cantidad,
+        $saldo
+    );
+
+    if($lineas == 32){
+        $this->reiniciarLineasProducto($producto->id);
+    }
+
+    return $pdf->Output('kardex_egreso.pdf','I');
+}
+
+/*
+======================================================
+FLUJO IMPRESION INGRESO
 ======================================================
 */
 
@@ -337,9 +404,47 @@ public function flujoImpresionIngreso($id, $indice = 0)
     ]);
 }
 
+/*
+======================================================
+FLUJO IMPRESION EGRESO
+======================================================
+*/
+
+public function flujoImpresionEgreso($id, $indice = 0)
+{
+    $egreso = Egreso::findOrFail($id);
+
+    $detalles = EgresoDetalle::where('egreso_id', $id)
+            ->get()
+            ->values();
+
+    if (!isset($detalles[$indice])) {
+        return view('impresion.finalizado');
+    }
+
+    $detalle = $detalles[$indice];
+    $producto = Producto::findOrFail($detalle->producto_id);
+
+    return view('impresion.pantallaegreso', [
+        'id'          => $id,
+        'indice'      => $indice,
+        'total'       => count($detalles),
+        'producto'    => $producto->nombre ?? '',
+        'urlImprimir' => route('almacen.impresion.egreso.imprimir', [
+                                'id' => $id,
+                                'indice' => $indice
+                            ])
+    ]);
+}
+
 public function imprimirProductoIngreso($id, $indice)
 {
     return $this->contraldorImpresionIngresos($id,$indice);
+}
+
+public function imprimirProductoEgreso($id, $indice)
+{
+    return $this->contraldorImpresionEgresos($id,$indice);
 }
 
 }

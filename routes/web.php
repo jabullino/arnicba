@@ -27,6 +27,7 @@ use App\Http\Controllers\AlumnosController;
 use App\Http\Controllers\UserAdminSisController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ImpresionIngresosEgresosController;
+use App\Http\Controllers\ImpresionIngresosEgresosEscolarController;
 
 Route::post('AdminSis.RegistraAdminSis',[UserAdminSisController::class,'saveadminsis'])->name('AdminSis.RegistraAdminSis');
 Route::get('/provincias/{ciudad_id}', function($ciudad_id) {
@@ -276,3 +277,25 @@ Route::get(
 '/almacen/impresion/ingreso/imprimir/{id}/{indice}',
 [ImpresionIngresosEgresosController::class,'imprimirProductoIngreso']
 )->name('almacen.impresion.ingreso.imprimir');
+
+//==========RUTAS MATERIAL ESCOLAR ========================
+
+Route::get(
+'/escolar/impresion/ingreso/{id}/{indice?}',
+[ImpresionIngresosEgresosEscolarController::class,'flujoImpresionIngreso']
+)->name('escolar.impresion.ingreso');
+
+Route::get(
+'/escolar/impresion/ingreso/imprimir/{id}/{indice}',
+[ImpresionIngresosEgresosEscolarController::class,'imprimirProductoIngreso']
+)->name('escolar.impresion.ingreso.imprimir');
+
+ Route::get(
+'/escolar/impresion/egreso/{id}/{indice?}',
+[ImpresionIngresosEgresosEscolarController::class,'flujoImpresionEgreso']
+)->name('escolar.impresion.egreso');
+
+Route::get(
+'/escolar/impresion/egreso/imprimir/{id}/{indice}',
+[ImpresionIngresosEgresosEscolarController::class,'imprimirProductoEgreso']
+)->name('escolar.impresion.egreso.imprimir');

@@ -14,12 +14,17 @@ class Ingreso extends Model
     public $timestamps = true;
 
     public function origen()
-{
-    return $this->belongsTo(OrigenFondos::class, 'origen_id');
-}
+    {
+        return $this->belongsTo(OrigenFondos::class, 'origen_id');
+    }
 
     public function detalles()
     {
-        return $this->hasMany(DetalleIngreso::class);
+        return $this->hasMany(DetalleIngreso::class, 'ingreso_id');
     }
+
+    public function detalleIngresos()
+{
+    return $this->hasMany(\App\Models\DetalleIngreso::class, 'ingreso_id');
+}
 }

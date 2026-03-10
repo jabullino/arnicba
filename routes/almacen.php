@@ -25,6 +25,7 @@ Route::get('/egresos/{id}/pdf', [EgresosController::class, 'pdf'])
 Route::get('/ingresos/pdf/{id}', [IngresosController::class, 'pdfIngreso'])
     ->name('ingresos.pdf');
 Route::get('ListaIngresos', [IngresosController::class, 'listarIngresos'])->name('ListaIngresos');
+Route::get('ListaEgresos', [EgresosController::class, 'listarIngresos'])->name('ListaEgresos');
 Route::get('lineaingreso',[ImpresionIngresosEgresosController::class, 'lineaIngreso'])->name('lineaingreso');
 Route::get('lineaegreso',[ImpresionIngresosEgresosController::class, 'lineaEgreso'])->name('lineaegreso');
 Route::get('imprimir-egreso',[ImpresionIngresosEgresosController::class, 'imprimirLineaEgreso'])->name('imprimir-egreso');
@@ -38,14 +39,24 @@ Route::get('imprimirEgresos/{id}',
 )->name('imprimirEgresos');
 Route::get('ListaEgresos', [EgresosController::class, 'listarEgresos'])->name('ListaEgresos');
 
-  Route::get(
+Route::get(
         '/impresion/ingreso/{id}/{indice?}',
         [ImpresionIngresosEgresosController::class, 'flujoImpresionIngreso']
     )->name('almacen.impresion.ingreso.flujo');
+
+Route::get(
+        '/impresion/egreso/{id}/{indice?}',
+        [ImpresionIngresosEgresosController::class, 'flujoImpresionEgreso']
+    )->name('almacen.impresion.egreso.flujo');
 
     Route::get(
         '/impresion/ingreso/{id}/{indice}/print',
         [ImpresionIngresosEgresosController::class, 'imprimirProductoIngreso']
     )->name('almacen.impresion.ingreso.imprimir');
+
+    Route::get(
+        '/impresion/ingreso/{id}/{indice}/print',
+        [ImpresionIngresosEgresosController::class, 'imprimirProductoEgreso']
+    )->name('almacen.impresion.egreso.imprimir');
 
 });

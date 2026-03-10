@@ -271,6 +271,11 @@ class Producto extends Model
 
         return $producto->devuelveUnidades->first()->nombre;
     }
+
+    public function colores(): BelongsToMany
+    {
+        return $this->belongsToMany(Color::class);
+    }
     protected static function booted()
     {
         // Siempre excluir registros eliminados (deleted_at no nulo)

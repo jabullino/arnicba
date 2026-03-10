@@ -442,6 +442,42 @@ public function buscar(Request $request)
     return response()->json($resultado);
 }
 
+public function buscarEscolar(Request $request)
+{
+    $q = trim($request->q);
+
+    if (!$q) {
+        return response()->json([]);
+    }
+
+    $productos = DB::table('productos')
+        ->where(function ($query) use ($q) {
+            $query->where('nombre', 'like', "{$q}%")
+                ->orWhere('codigo', 'like', "{$q}%")
+                ->orWhere('marca', 'like', "{$q}%");
+        })
+        ->limit(10)
+        ->get();
+
+    $resultado = [];
+
+    foreach ($productos as $producto) {
+
+        $info = $this->obtenerNombreProductoEscolar(
+            $producto->id,
+            $producto->categoria_id
+        );
+
+        $resultado[] = [
+            'id'     => $producto->id,
+            'nombre' => $info['nombre'],
+            'saldo'  => $producto->saldo, // 👈 AQUÍ ESTABA EL PROBLEMA
+        ];
+    }
+
+    return response()->json($resultado);
+}
+
     public function obtenerNombreProducto($id, $categoria)
     {
         // ================= PRODUCTO BASE =================
@@ -456,7 +492,7 @@ public function buscar(Request $request)
         }
 
         // Nombre base SIEMPRE
-        $nombre = trim($producto->codigo . ' ' . $producto->nombre . ' ' . $producto->marca);
+        $nombre = trim( $producto->nombre . ' ' . $producto->marca);
 
         /*
     |------------------------------------------------------------------
@@ -579,4 +615,74 @@ public function buscar(Request $request)
             'saldo'  => $saldo
         ];
     }
+
+
+   public function obtenerNombreProductoEscolar($id, $categoria)
+{
+    // ================= PRODUCTO BASE =================
+    $producto = DB::table('productos')->where('id', $id)->first();
+
+    if (!$producto) {
+        return [
+            'id'     => $id,
+            'nombre' => '',
+            'saldo'  => 0
+        ];
+    }
+
+    // Nombre base SIEMPRE
+    $nombre = trim($producto->nombre . ' ' . $producto->marca);
+
+    /*
+    |------------------------------------------------------------------
+    | SOLO CATEGORÍAS 4 Y 7
+    |------------------------------------------------------------------
+    */
+
+    // ================= CATEGORÍA 4 (TELAS) =================
+    if ($categoria == 4) {
+
+        $tela = DB::table('telas')
+            ->where('producto_id', $id)
+            ->first();
+
+        if ($tela) {
+            $nombre = trim(
+                $nombre . ' ' .
+                ($tela->ancho ?? '') . ' ' .
+                ($tela->largo ?? '')
+            );
+        }
+    }
+
+    // ================= CATEGORÍA 7 (COLOR) =================
+    if ($categoria == 7) {
+
+        $color = DB::table('color_producto')
+            ->join('colores', 'colores.id', '=', 'color_producto.color_id')
+            ->where('color_producto.producto_id', $id)
+            ->value('colores.nombre');
+
+        $nombre = trim(
+            $nombre . ' ' .
+            ($color ?? '')
+        );
+    }
+
+    /*
+    |------------------------------------------------------------------
+    | SALDO
+    |------------------------------------------------------------------
+    */
+    $saldo = DB::table('lotes')
+        ->where('producto_id', $id)
+        ->where('saldo', '>', 0)
+        ->sum('saldo');
+
+    return [
+        'id'     => $id,
+        'nombre' => trim($nombre),
+        'saldo'  => $saldo
+    ];
+}
 }

@@ -13,21 +13,22 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Producto;
 
 
-class EgresosController extends Controller
+class EgresosEscolarController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         $egresos = Egreso::with(['destinatario', 'egresoDetalles.producto'])
-            ->whereDoesntHave('egresoDetalles.producto', function ($q) {
+            ->whereHas('egresoDetalles.producto', function ($q) {
                 $q->whereIn('categoria_id', [4, 7]);
+            })
+            ->whereDoesntHave('egresoDetalles.producto', function ($q) {
+                $q->whereNotIn('categoria_id', [4, 7]);
             })
             ->orderBy('id', 'desc')
             ->get();
 
-        return view('Almacen.Egresos.MostrarEgresos', compact('egresos'));
+        return view('Administrador.MaterialEscolar.Egresos.MostrarEgresosEscolar', compact('egresos'));
     }
     /**
      * Show the form for creating a new resource.
@@ -35,7 +36,7 @@ class EgresosController extends Controller
     public function create()
     {
         $destinatarios = Destinatario::all();
-        return view('Almacen.Egresos.RegistrarEgreso')->with(['destinatarios' => $destinatarios]);
+        return view('Administrador.MaterialEscolar.Egresos.RegistrarEgresoEscolar')->with(['destinatarios' => $destinatarios]);
     }
 
     /**
@@ -155,7 +156,7 @@ class EgresosController extends Controller
 
         $destinatarios = Destinatario::orderBy('nombre')->get();
 
-        return view('Almacen.Egresos.EditarEgreso', compact('egreso', 'destinatarios'));
+        return view('Administrador.MaterialEscolar.Egresos.EditarEgresoEscolar', compact('egreso', 'destinatarios'));
     }
 
     /**
@@ -214,7 +215,7 @@ class EgresosController extends Controller
 
             DB::commit();
 
-            return redirect()->route('Egresos.index')
+            return redirect()->route('EgresosEscolar.index')
                 ->with('success', 'Egreso actualizado correctamente.');
         } catch (\Exception $e) {
 
@@ -261,12 +262,15 @@ class EgresosController extends Controller
     public function listarEgresos()
     {
         $egresos = Egreso::with(['destinatario', 'egresoDetalles.producto'])
-            ->whereDoesntHave('egresoDetalles.producto', function ($q) {
+            ->whereHas('egresoDetalles.producto', function ($q) {
                 $q->whereIn('categoria_id', [4, 7]);
+            })
+            ->whereDoesntHave('egresoDetalles.producto', function ($q) {
+                $q->whereNotIn('categoria_id', [4, 7]);
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        return view('Almacen.Egresos.ImprimirEgresos', compact('egresos'));
+        return view('Administrador.MaterialEscolar.Egresos.ImprimirEgresosEscolar', compact('egresos'));
     }
 }

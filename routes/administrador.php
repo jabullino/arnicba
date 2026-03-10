@@ -28,6 +28,12 @@ use App\Http\Controllers\VacacionController;
 use App\Http\Controllers\ImprimeBoletasPagoController;
 use App\Http\Controllers\EntregasCajaChicaController;
 use App\Http\Controllers\AdministradorEntregasController;
+use App\Http\Controllers\ImpresionIngresosEgresosController;
+use App\Http\Controllers\ProductoEscolarController;
+use App\Http\Controllers\IngresoEscolarController;
+use App\Http\Controllers\EgresosEscolarController;
+use App\Http\Controllers\ImpresionIngresosEgresosEscolarController;
+
 
 
 
@@ -70,5 +76,24 @@ Route::middleware(['auth', 'IsAdministrador'])->group(function () {
         ->name('listaEntregascajachica');
      Route::get('listaEntregascajachica.lista', [AdministradorEntregasController::class, 'ajaxTotales'])
         ->name('listaEntregascajachica.lista');
+
+        //=====RUTAS MATERIAL ESCOLAR =====
+
+        Route::resource('ProductoEscolar',ProductoEscolarController::class)->names('ProductoEscolar');
+        Route::resource('IngresoEscolar',IngresoEscolarController::class)->names('IngresoEscolar');
+        Route::resource('EgresosEscolar',EgresosEscolarController::class)->names('EgresosEscolar');
+        Route::get('/ingresosescolar/pdf/{id}', [IngresoEscolarController::class, 'pdfIngresoEscolar'])
+    ->name('ingresosescolar.pdf');
+    Route::get(
+        '/impresion/ingreso/{id}/{indice?}',
+        [ImpresionIngresosEgresosEscolarController::class, 'flujoImpresionIngreso']
+    )->name('escolar.impresion.ingreso.flujo');
+    Route::get(
+        '/impresion/egreso/{id}/{indice?}',
+        [ImpresionIngresosEgresosEscolarController::class, 'flujoImpresionEgreso']
+    )->name('escolar.impresion.egreso.flujo');
+   
+    Route::get('ListaIngresos', [IngresoEscolarController::class, 'listarIngresos'])->name('ListaIngresos');
+    Route::get('ListaEgresos', [EgresosEscolarController::class, 'listarEgresos'])->name('ListaEgresos');
     
 });
