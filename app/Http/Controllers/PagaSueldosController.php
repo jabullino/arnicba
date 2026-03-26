@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\Sueldo;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Personal;
 
 class PagaSueldosController extends Controller
 {
@@ -65,7 +66,7 @@ class PagaSueldosController extends Controller
    }
    public function pagaSueldos(Request $request)
    {
-      
+
       // Validación
       $validator = Validator::make($request->all(), [
          'fechapago' => 'required|date|before_or_equal:today',
@@ -79,147 +80,151 @@ class PagaSueldosController extends Controller
          return redirect()->back()->withErrors($validator)->withInput();
       }
 
-      
-      try{
+
+      try {
          dB::beginTransaction();
-      $fechapago = Carbon::parse($request->fechapago)->format('Y-m-d');
-      $escogidos = $request->input('escogidos', []);
-      $cargoIds = $request->input('cargos', []);
-     
-      // Tipos de cambio
-      $valortipocambiocompra = (float) str_replace(',', '', TipoCambioCompra::latest('id')->value('tc'));
-      $tipocambiocompra_id = TipoCambioCompra::latest('id')->value('id');
-      $tipocambioventa_id = TipoCambioVenta::latest('id')->value('id');
+         $fechapago = Carbon::parse($request->fechapago)->format('Y-m-d');
+         $escogidos = $request->input('escogidos', []);
+         $cargoIds = $request->input('cargos', []);
 
-      // Gestión
-      $gestion = Carbon::parse($fechapago)->format('Y');
-      $gestion_id = Gestion::where('nombre', $gestion)->value('id');
+         // Tipos de cambio
+         $valortipocambiocompra = (float) str_replace(',', '', TipoCambioCompra::latest('id')->value('tc'));
+         $tipocambiocompra_id = TipoCambioCompra::latest('id')->value('id');
+         $tipocambioventa_id = TipoCambioVenta::latest('id')->value('id');
 
-      foreach ($escogidos as $userId) {
-         $ultimoId = Asiento::latest('id')->value('id');
-         $cargoId = User::where('id', $userId)->value('cargo_id');
+         // Gestión
+         $gestion = Carbon::parse($fechapago)->format('Y');
+         $gestion_id = Gestion::where('nombre', $gestion)->value('id');
 
-         // Calcular sueldos
-         $sueldoBs = (float) str_replace(',', '', $this->calculaSueldo($cargoId, $userId, $request->fechapago));
-         $sueldoSus = $sueldoBs / $valortipocambiocompra;
+         foreach ($escogidos as $userId) {
+            $ultimoId = Asiento::latest('id')->value('id');
+            $cargoId = User::where('id', $userId)->value('cargo_id');
 
-         // Subcuenta según cargo
-         $subcuenta = match ($cargoId) {
-            2, 3 => 11,
-            4 => 9,
-            5, 6, 7 => 12,
-            8, 9 => 10,
-            10, 11 => 13,
-            default => 14,
-         };
-          
-         // Crear asiento
-         Asiento::create([
-            'gestion_id' => $gestion_id,
-            'fec_asiento' => $fechapago,
-            'tc_id' => $tipocambiocompra_id,
-            'tv_id' => $tipocambioventa_id,
-            'recibo' => $ultimoId + 1,
-            'factura' => null,
-            'cuenta' => '3',
-            'sub_cuenta' => $subcuenta,
-            'monto_bs' => $sueldoBs,
-            'monto_sus' => $sueldoSus,
-            'origenfondos_id' => '1',
-            'tipomovimiento_id' => '1',
-            'proyecto_id' => null,
-            'estado_id' => 1,
-         ]);
+            // Calcular sueldos
+            $sueldoBs = (float) str_replace(',', '', $this->calculaSueldo($cargoId, $userId, $request->fechapago));
+            $sueldoSus = $sueldoBs / $valortipocambiocompra;
 
-         $mes = Carbon::parse($fechapago)->subMonth()->format('m');
-       
-         $sueldo = Sueldo::create([
-            'mes' => $mes,
-            'total' => $sueldoBs,
-            'gestion_id' => $gestion_id,
-            'user_id' => $userId,
-         ]);
-             
-         $fechadeingreso = User::where('id', $userId)->value('fec_ingreso');
-         $haberbasico = $this->devuelvemontohaberbasico($userId, $request->fechapago);
-         $montoantiguedad = $this->devuelvemontoantiguedad($request->fechapago, $fechadeingreso, $userId);
-          
-         DB::table('bono_sueldo')->insert([
-            'bono_id' => '10',
-            'sueldo_id' => $sueldo->id,
-            'user_id' => $userId,
-            'monto' => $montoantiguedad,
-         ]);
-          //dd($fechadeingreso,$haberbasico,$sueldo->id,$userId,$montoantiguedad);
-         //AQUI SE HACE LA DIFERENCIA PARA QUE NO SE HAGAN DESCUENTO NI A SUBDIRECTOR NI ADMINISTRADOR
-         if (($cargoId != 2) && ($cargoId != 3)) {
-            $descuentogestora = $this->devuelvemontogestora($fechapago, $fechadeingreso, $userId);
+            // Subcuenta según cargo
+            $subcuenta = match ($cargoId) {
+               2, 3 => 11,
+               4 => 9,
+               5, 6, 7 => 12,
+               8, 9 => 10,
+               10, 11 => 13,
+               default => 14,
+            };
+
+            // Crear asiento
+            Asiento::create([
+               'gestion_id' => $gestion_id,
+               'fec_asiento' => $fechapago,
+               'tc_id' => $tipocambiocompra_id,
+               'tv_id' => $tipocambioventa_id,
+               'recibo' => $ultimoId + 1,
+               'factura' => null,
+               'cuenta' => '3',
+               'sub_cuenta' => $subcuenta,
+               'monto_bs' => $sueldoBs,
+               'monto_sus' => $sueldoSus,
+               'origenfondos_id' => '1',
+               'tipomovimiento_id' => '1',
+               'proyecto_id' => null,
+               'estado_id' => 1,
+            ]);
+
+            $mes = Carbon::parse($fechapago)->subMonth()->format('m');
+
+            $sueldo = Sueldo::create([
+               'mes' => $mes,
+               'total' => $sueldoBs,
+               'gestion_id' => $gestion_id,
+               'user_id' => $userId,
+            ]);
+
+            $fechadeingreso = User::where('id', $userId)->value('fec_ingreso');
+            $haberbasico = $this->devuelvemontohaberbasico($userId, $request->fechapago);
+            $montoantiguedad = $this->devuelvemontoantiguedad($request->fechapago, $fechadeingreso, $userId);
+
+            DB::table('bono_sueldo')->insert([
+               'bono_id' => '10',
+               'sueldo_id' => $sueldo->id,
+               'user_id' => $userId,
+               'monto' => $montoantiguedad,
+            ]);
+            //dd($fechadeingreso,$haberbasico,$sueldo->id,$userId,$montoantiguedad);
+            //AQUI SE HACE LA DIFERENCIA PARA QUE NO SE HAGAN DESCUENTO NI A SUBDIRECTOR NI ADMINISTRADOR
+           
+           $tipopersonal = Personal::where('user_id', $userId)->value('tipo_id');
+           
+            if ($tipopersonal && $tipopersonal == 1) {
+                $descuentogestora = $this->devuelvemontogestora($fechapago, $fechadeingreso, $userId);
+             }else{
+               $descuentogestora = 0.00;
+             }
+
+
+               DB::table('descuento_sueldo')->insert([
+                  'descuento_id' => 5,
+                  'sueldo_id' => $sueldo->id,
+                  'user_id' => $userId,
+                  'monto' => $descuentogestora,
+               ]);
+           
          }
-         if (($cargoId == 3) || ($cargoId == 3)) {
-            $descuentogestora = 0.00;
-         }
-         
-         DB::table('descuento_sueldo')->insert([
-            'descuento_id' => 5,
-            'sueldo_id' => $sueldo->id,
-            'user_id' => $userId,
-            'monto' => $descuentogestora,
-         ]);
-      }
 
-      // Obtener datos de usuarios activos con cargos activos (cambio mínimo aplicado)
-      $datos = User::withoutGlobalScopes()  // <- evita el conflicto de deleted_at
-         ->select(
-            'users.nombre',
-            'users.apellido',
-            'users.cargo_id',
-            'users.fec_ingreso',
-            'cargos.nombre as cargo_nombre',
-            DB::raw('(SELECT hb.monto 
+         // Obtener datos de usuarios activos con cargos activos (cambio mínimo aplicado)
+         $datos = User::withoutGlobalScopes()  // <- evita el conflicto de deleted_at
+            ->select(
+               'users.nombre',
+               'users.apellido',
+               'users.cargo_id',
+               'users.fec_ingreso',
+               'cargos.nombre as cargo_nombre',
+               DB::raw('(SELECT hb.monto 
                       FROM haber_basicos hb 
                       WHERE hb.cargo_id = users.cargo_id 
                       ORDER BY hb.id DESC 
                       LIMIT 1) as ultimo_monto')
-         )
-         ->join('cargos', 'cargos.id', '=', 'users.cargo_id')
-         ->where('users.id', '!=', 1)
-         ->whereNull('users.deleted_at')
-         ->whereNull('cargos.deleted_at')
-         ->get();
+            )
+            ->join('cargos', 'cargos.id', '=', 'users.cargo_id')
+            ->where('users.id', '!=', 1)
+            ->whereNull('users.deleted_at')
+            ->whereNull('cargos.deleted_at')
+            ->get();
 
-      $smn = SalarioMinimo::latest()->value('monto');
+         $smn = SalarioMinimo::latest()->value('monto');
 
-      foreach ($datos as $dat) {
-         $ant = $this->calculaAntiguedad($request->fechapago, $dat->fec_ingreso);
+         foreach ($datos as $dat) {
+            $ant = $this->calculaAntiguedad($request->fechapago, $dat->fec_ingreso);
 
-         if ($ant >= 2) {
-            $bonoant = match (true) {
-               $ant < 5 => $smn * 0.05,
-               $ant < 8 => $smn * 0.11,
-               $ant < 11 => $smn * 0.18,
-               $ant < 15 => $smn * 0.26,
-               $ant < 20 => $smn * 0.34,
-               $ant < 25 => $smn * 0.42,
-               default => $smn * 0.50,
+            if ($ant > 2) {
+                $bonoant = match (true) {
+                $ant <= 5 => $smn * 0.05,
+                $ant <= 8 => $smn * 0.11,
+                $ant <= 11 => $smn * 0.18,
+                $ant <= 15 => $smn * 0.26,
+                $ant <= 20 => $smn * 0.34,
+                $ant <= 25 => $smn * 0.42,
+                default => $smn * 0.50,
             };
-            $dat->ultimo_monto += $bonoant;
-         }
 
-         $dat->ultimo_monto -= $dat->ultimo_monto * 0.1271;
-         $dat->ultimo_monto = 
-         
-         number_format($dat->ultimo_monto, 2, '.', ',');
+            $dat->ultimo_monto += $bonoant;
+          }    
+
+            $dat->ultimo_monto -= $dat->ultimo_monto * 0.1271;
+            $dat->ultimo_monto =
+
+               number_format($dat->ultimo_monto, 2, '.', ',');
+         }
+         session()->flash('success', '¡Sueldos pagados exitosamente!');
+         DB::commit();
+         return redirect()
+            ->route('muestraformfechasueldos')
+            ->with('success', 'Sueldos pagados correctamente');
+      } catch (QueryException $e) {
+         DB::rollBack();
+         return back()->with('error', 'No se pudo efectuar el pago de sueldos' . $e->getMessage());
       }
-        session()->flash('success', '¡Sueldos pagados exitosamente!');
-        DB::commit();
-      return redirect()
-         ->route('muestraformfechasueldos')
-         ->with('success', 'Sueldos pagados correctamente');
-        
-      }catch (QueryException $e) {
-            DB::rollBack();
-            return back()->with('error', 'No se pudo efectuar el pago de sueldos' . $e->getMessage());
-        }
    }
 
 
@@ -231,8 +236,8 @@ class PagaSueldosController extends Controller
       $gestion = $anio;
       $gestion_id = Gestion::where('nombre', $gestion)->value('id');
       $smn = DB::table('salario_minimos')
-             ->orderByDesc('id')
-              ->value('monto');
+         ->orderByDesc('id')
+         ->value('monto');
 
       $haberbasico = DB::table('haber_basicos as hb')
          ->join('users as u', 'u.cargo_id', '=', 'hb.cargo_id')
@@ -245,7 +250,7 @@ class PagaSueldosController extends Controller
 
       $ant = $this->calculaAntiguedad($fechapago, $fecha_ingreso);
 
-      if ($ant >= 2 && $ant < 5) {
+      if ($ant > 2 && $ant <= 5) {
          $bonoant = $smn * 0.05;
          $haberbasico += $bonoant;
          if (($cargoId != 2) && ($cargoId != 3)) {
@@ -253,7 +258,7 @@ class PagaSueldosController extends Controller
             $haberbasico -= $descuento;
          }
          $haberbasico = round($haberbasico, 2);
-      } elseif ($ant >= 5 && $ant < 8) {
+      } elseif ($ant > 5 && $ant <= 8) {
          $bonoant = $smn * 0.11;
          $haberbasico += $bonoant;
          if (($cargoId != 2) && ($cargoId != 3)) {
@@ -261,7 +266,7 @@ class PagaSueldosController extends Controller
             $haberbasico -= $descuento;
          }
          $haberbasico = round($haberbasico, 2);
-      } elseif ($ant >= 8 && $ant < 11) {
+      } elseif ($ant > 8 && $ant <= 11) {
          $bonoant = $smn * 0.18;
          $haberbasico += $bonoant;
          if (($cargoId != 2) && ($cargoId != 3)) {
@@ -269,7 +274,7 @@ class PagaSueldosController extends Controller
             $haberbasico -= $descuento;
          }
          $haberbasico = round($haberbasico, 2);
-      } elseif ($ant >= 11 && $ant < 15) {
+      } elseif ($ant > 11 && $ant <= 15) {
 
          $bonoant = $smn * 0.26;
          $haberbasico += $bonoant;
@@ -278,7 +283,7 @@ class PagaSueldosController extends Controller
             $haberbasico -= $descuento;
          }
          $haberbasico = round($haberbasico, 2);
-      } elseif ($ant >= 15 && $ant < 20) {
+      } elseif ($ant > 15 && $ant <= 20) {
          $bonoant = $smn * 0.34;
          $haberbasico += $bonoant;
          if (($cargoId != 2) && ($cargoId != 3)) {
@@ -286,7 +291,7 @@ class PagaSueldosController extends Controller
             $haberbasico -= $descuento;
          }
          $haberbasico = round($haberbasico, 2);
-      } elseif ($ant >= 20 && $ant < 25) {
+      } elseif ($ant > 20 && $ant <= 25) {
          $bonoant = $smn * 0.42;
          $haberbasico += $bonoant;
          if (($cargoId != 2) && ($cargoId != 3)) {
@@ -294,7 +299,7 @@ class PagaSueldosController extends Controller
             $haberbasico -= $descuento;
          }
          $haberbasico = round($haberbasico, 2);
-      } elseif ($ant >= 25) {
+      } elseif ($ant > 25) {
          $bonoant = $smn * 0.50;
          $haberbasico += $bonoant;
          if (($cargoId != 2) && ($cargoId != 3)) {
@@ -367,14 +372,14 @@ class PagaSueldosController extends Controller
          )
          ->get();
 
-     $smn = DB::table('salario_minimos')
-             ->orderByDesc('id')
-              ->value('monto');
+      $smn = DB::table('salario_minimos')
+         ->orderByDesc('id')
+         ->value('monto');
 
       foreach ($datos as $dat) {
          $ant = $this->calculaAntiguedad($fecha, $dat->fec_ingreso);
-
-         if ($ant >= 2 && $ant < 5) {
+         
+         if ($ant > 2 && $ant <= 5) {
             $bonoant = $smn * 0.05;
             $dat->monto += $bonoant;
             if (($dat->cargo_id != 3) && ($dat->cargo_id != 4)) {
@@ -382,7 +387,7 @@ class PagaSueldosController extends Controller
                $dat->monto -= $descuento;
             }
             $dat->monto = round($dat->monto, 2);
-         } elseif ($ant >= 5 && $ant < 8) {
+         } elseif ($ant > 5 && $ant <= 8) {
             $bonoant = $smn * 0.11;
             $dat->monto += $bonoant;
             if (($dat->cargo_id != 3) && ($dat->cargo_id != 4)) {
@@ -390,7 +395,7 @@ class PagaSueldosController extends Controller
                $dat->monto -= $descuento;
             }
             $dat->monto = round($dat->monto, 2);
-         } elseif ($ant >= 8 && $ant < 11) {
+         } elseif ($ant > 8 && $ant <= 11) {
             $bonoant = $smn * 0.18;
             $dat->monto += $bonoant;
             if (($dat->cargo_id != 3) && ($dat->cargo_id != 4)) {
@@ -398,7 +403,7 @@ class PagaSueldosController extends Controller
                $dat->monto -= $descuento;
             }
             $dat->monto = round($dat->monto, 2);
-         } elseif ($ant >= 11 && $ant < 15) {
+         } elseif ($ant > 11 && $ant <= 15) {
 
             $bonoant = $smn * 0.26;
             $dat->monto += $bonoant;
@@ -407,7 +412,7 @@ class PagaSueldosController extends Controller
                $dat->monto -= $descuento;
             }
             $dat->monto = round($dat->monto, 2);
-         } elseif ($ant >= 15 && $ant < 20) {
+         } elseif ($ant > 15 && $ant <= 20) {
             $bonoant = $smn * 0.34;
             $dat->monto += $bonoant;
             if (($dat->cargo_id != 3) && ($dat->cargo_id != 4)) {
@@ -415,7 +420,7 @@ class PagaSueldosController extends Controller
                $dat->monto -= $descuento;
             }
             $dat->monto = round($dat->monto, 2);
-         } elseif ($ant >= 20 && $ant < 25) {
+         } elseif ($ant > 20 && $ant <= 25) {
             $bonoant = $smn * 0.42;
             $dat->monto += $bonoant;
             if (($dat->cargo_id != 3) && ($dat->cargo_id != 4)) {
@@ -423,7 +428,7 @@ class PagaSueldosController extends Controller
                $dat->monto -= $descuento;
             }
             $dat->monto = round($dat->monto, 2);
-         } elseif ($ant >= 25) {
+         } elseif ($ant > 25) {
             $bonoant = $smn * 0.50;
             $dat->monto += $bonoant;
             if (($dat->cargo_id != 3) && ($dat->cargo_id != 4)) {
@@ -480,31 +485,31 @@ class PagaSueldosController extends Controller
       $gestion = $anio;
       $gestion_id = Gestion::where('nombre', $gestion)->value('id');
       $smn = DB::table('salario_minimos')
-             ->orderByDesc('id')
-              ->value('monto');
+         ->orderByDesc('id')
+         ->value('monto');
 
 
       $ant = $this->calculaAntiguedad($fechapago, $fec_ingreso, $userId);
 
-      if ($ant >= 2 && $ant < 5) {
+      if ($ant > 2 && $ant <= 5) {
          $bonoant = $smn * 0.05;
          $bonoant = round($bonoant, 2);
-      } elseif ($ant >= 5 && $ant < 8) {
+      } elseif ($ant > 5 && $ant <= 8) {
          $bonoant = $smn * 0.11;
          $bonoant = round($bonoant, 2);
-      } elseif ($ant >= 8 && $ant < 11) {
+      } elseif ($ant > 8 && $ant <= 11) {
          $bonoant = $smn * 0.18;
          $bonoant = round($bonoant, 2);
-      } elseif ($ant >= 11 && $ant < 15) {
+      } elseif ($ant > 11 && $ant <= 15) {
          $bonoant = $smn * 0.26;
          $bonoant = round($bonoant, 2);
-      } elseif ($ant >= 15 && $ant < 20) {
+      } elseif ($ant > 15 && $ant <= 20) {
          $bonoant = $smn * 0.34;
          $bonoant = round($bonoant, 2);
-      } elseif ($ant >= 20 && $ant < 25) {
+      } elseif ($ant > 20 && $ant <= 25) {
          $bonoant = $smn * 0.42;
          $bonoant = round($bonoant, 2);
-      } elseif ($ant >= 25) {
+      } elseif ($ant > 25) {
          $bonoant = $smn * 0.50;
          $bonoant = round($bonoant, 2);
       } else {
@@ -521,11 +526,11 @@ class PagaSueldosController extends Controller
       $anio = $fechapago->format('Y');
       $gestion = $anio;
       $gestion_id = Gestion::where('nombre', $gestion)->value('id');
-     
-      $smn=DB::table('salario_minimos')
-               ->orderByDesc('id')
-               ->value('monto');
-      
+
+      $smn = DB::table('salario_minimos')
+         ->orderByDesc('id')
+         ->value('monto');
+
       $ant = $this->calculaAntiguedad($fechapago, $fec_ingreso, $userId);
 
       $haberbasico = $this->devuelvemontohaberbasico($userId, $fechapago);
@@ -580,5 +585,4 @@ class PagaSueldosController extends Controller
 
       return view('Administrador.FormSeleccionaSueldos');
    }
- 
 }

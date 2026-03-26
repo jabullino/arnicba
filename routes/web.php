@@ -16,7 +16,7 @@ use App\Http\Controllers\PrimerRegistroController;
 use App\Models\Personal;
 use App\Models\Cargo;
 use Illuminate\Support\Carbon;
-USE App\Models\SalarioMinimo;
+use App\Models\SalarioMinimo;
 use App\Models\HaberBasico;
 use Illuminate\Support\Facades\Log;
 use App\Models\Gestion;
@@ -28,6 +28,7 @@ use App\Http\Controllers\UserAdminSisController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ImpresionIngresosEgresosController;
 use App\Http\Controllers\ImpresionIngresosEgresosEscolarController;
+use App\Http\Controllers\MunicipiosController;
 
 Route::post('AdminSis.RegistraAdminSis',[UserAdminSisController::class,'saveadminsis'])->name('AdminSis.RegistraAdminSis');
 Route::get('/provincias/{ciudad_id}', function($ciudad_id) {
@@ -45,18 +46,13 @@ Route::get('/municipios/{ciudad_id}', function($ciudad_id) {
    return response()->json($municipios);
 });
 
-Route::get('/get-municipios/{ciudad_id}', function ($ciudad_id) {
-    $municipios = \App\Models\Municipio::where('ciudad_id', $ciudad_id)
-        ->select('id', 'nombre')
-        ->orderBy('nombre')
-        ->get();
+Route::get('/get-municipios/{ciudad_id}', [MunicipiosController::class,'getMunicipios'])
+    ->name('getMunicipios');
 
-    return response()->json($municipios);
-})->name('getMunicipios');
 
 // LOGIN / LOGOUT
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('inicio');
-Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login');
+Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
 Route::post('/logout', function(Request $request){
     Auth::logout();
     $request->session()->invalidate();
@@ -76,7 +72,7 @@ Route::middleware('auth')->group(function(){
 // RUTAS PROTEGIDAS (auth + twofactor)
 Route::middleware(['auth', 'twofactor'])->group(function(){
     Route::get('/dashboard', fn()=>view('dashboard'))->name('dashboard');
-    Route::get('/adminsis/dashboard', fn()=>view('adminsis.dashboard'))->name('PanelAdminSis');
+    Route::get('/adminsis/dashboard', fn()=>view('adminsis.dashboard'))->name('admin.dashboard');
     Route::get('/administrador/dashboard', fn()=>view('administrador.dashboard'))->name('PanelAdministrador');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

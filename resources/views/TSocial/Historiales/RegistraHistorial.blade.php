@@ -22,10 +22,7 @@
                                 Seleccionar Residente
                             </label>
 
-                            <select name="residente_id"
-                                    id="residenteSelect"
-                                    class="form-select form-select-lg"
-                                    required>
+                            <select name="residente_id" id="residenteSelect" class="form-select form-select-lg" required>
 
                                 <option value="">Seleccione un residente</option>
 
@@ -48,9 +45,7 @@
                         </div>
 
                         {{-- CABECERA DINÁMICA --}}
-                        <div id="cabeceraResidente"
-                             class="border rounded p-3 mb-4 d-none">
-
+                        <div id="cabeceraResidente" class="border rounded p-3 mb-4 d-none">
                             <div class="row g-3">
                                 <div class="col-12 col-md-6 col-lg-4">
                                     <strong>Nombre:</strong><br>
@@ -93,12 +88,9 @@
                                 Título
                             </label>
 
-                            <input type="text"
-                                   name="titulo"
-                                   id="tituloInput"
-                                   class="form-control form-control-lg text-center"
-                                   value="{{ old('titulo') }}"
-                                   required>
+                            <input type="text" name="titulo" id="tituloInput"
+                                class="form-control form-control-lg text-center"
+                                value="{{ old('titulo') }}" required>
                         </div>
 
                         {{-- CONTENIDO --}}
@@ -107,15 +99,19 @@
                                 Contenido
                             </label>
 
-                            <textarea name="contenido"
-                                      id="editor"
-                                      rows="10"
-                                      class="form-control">{{ old('contenido') }}</textarea>
+                            <div style="max-height:400px; overflow-y:auto;">
+                                <div id="editor" class="form-control"
+                                    style="max-height:400px; overflow-y:auto; background:#fff;">
+                                    {!! old('contenido') !!}
+                                </div>
+                            </div>
+
+                            {{-- INPUT OCULTO --}}
+                            <input type="hidden" name="contenido" id="contenidoInput">
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit"
-                                    class="btn btn-primary btn-lg">
+                            <button type="submit" class="btn btn-primary btn-lg">
                                 Guardar Historial
                             </button>
                         </div>
@@ -170,42 +166,47 @@ document.addEventListener('DOMContentLoaded', function() {
 {{-- CKEDITOR --}}
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 <script>
-ClassicEditor.create(document.querySelector('#editor'));
-</script>
+let editorInstance;
 
+ClassicEditor.create(document.querySelector('#editor'))
+    .then(editor => {
+        editorInstance = editor;
+
+        // 🔥 SINCRONIZA SIEMPRE
+        editor.model.document.on('change:data', () => {
+            document.getElementById('contenidoInput').value = editor.getData();
+        });
+    })
+    .catch(error => {
+        console.error(error);
+    });
+</script>
 @endsection
 
 @push('css')
 <style>
-
-/* Editor fondo oscuro */
 .ck-editor__editable {
     background-color: #1f2d3d !important;
     color: #ffffff !important;
     min-height: 350px;
 }
 
-/* Toolbar oscuro */
 .ck.ck-toolbar {
     background-color: #2b3a4b !important;
     border: 1px solid #3d4b5c !important;
 }
 
-/* ICONOS CLAROS */
 .ck.ck-button .ck-icon {
     color: #ffffff !important;
     fill: #ffffff !important;
 }
 
-/* Hover */
 .ck.ck-button:hover {
     background-color: #3d4b5c !important;
 }
 
-/* Activo */
 .ck.ck-button.ck-on {
     background-color: #556ee6 !important;
 }
-
 </style>
 @endpush

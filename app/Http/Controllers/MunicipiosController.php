@@ -137,13 +137,15 @@ class MunicipiosController extends Controller
 }
 
 public function getMunicipios($ciudad_id)
-{
-    $municipios = \App\Models\Municipio::where('ciudad_id', $ciudad_id)
-        ->select('id', 'nombre')
-        ->orderBy('nombre')
-        ->get();
+    {
+        $municipios = Municipio::where('ciudad_id', $ciudad_id)
+            ->select('id','nombre')
+            ->orderBy('nombre')
+            ->get();
 
-    return response()->json($municipios);
-}
+        return response()->json($municipios);
+    }
+
+
 
 }

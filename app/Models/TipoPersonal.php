@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TipoPersonal extends Model
 {
-    use HasMany;
+   
 
     protected $fillable=['id','nombre'];
     protected $table='tipo_personales';
@@ -18,5 +18,10 @@ class TipoPersonal extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    public function personal(): HasMany
+    {
+        return $this->hasMany(Personal::class);
     }
 }

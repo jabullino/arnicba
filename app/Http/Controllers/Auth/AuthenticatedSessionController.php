@@ -29,36 +29,44 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(Request $request)
-    {
-
-        if (User::count() === 0) {
-            // Redirigir al primer registro
-            return redirect()->route('primerRegistro');
-            // Asegúrate de tener definida esta ruta apuntando a:
-            // resources/views/AdminSis/UserAdminSis/register.blade.php
-        }
-
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'string']
-        ]);
-
-        if (!Auth::attempt($credentials, $request->boolean('remember'))) {
-            return back()->withErrors(['email' => 'Credenciales inválidas']);
-        }
-
-        $request->session()->regenerate();
-        $user = Auth::user();
-
-        // Si NO tiene 2FA → QR
-        if (empty($user->two_factor_secret)) {
-            return redirect()->route('two-factor.setup');
-        }
-
-        // Si tiene 2FA → pedir código
-        return redirect()->route('two-factor.verify');
+public function store(Request $request)
+{
+    if (User::count() === 0) {
+        return redirect()->route('primerRegistro');
     }
+
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required', 'string']
+    ]);
+
+    // 🔹 Buscar usuario primero
+    $user = User::where('email', $credentials['email'])->first();
+
+    // 🔴 Si existe pero está inactivo
+    if ($user && $user->status !== 'Activo') {
+        return back()->withErrors([
+            'email' => 'Usuario inactivo o bloqueado'
+        ]);
+    }
+
+    // 🔐 Intento de login normal
+    if (!Auth::attempt($credentials, $request->boolean('remember'))) {
+        return back()->withErrors([
+            'email' => 'Credenciales inválidas'
+        ]);
+    }
+
+    $request->session()->regenerate();
+    $user = Auth::user();
+
+    // 🔹 2FA
+    if (empty($user->two_factor_secret)) {
+        return redirect()->route('two-factor.setup');
+    }
+
+    return redirect()->route('two-factor.verify');
+}
     /**
      * Destroy an authenticated session.
      */

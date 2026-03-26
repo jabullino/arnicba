@@ -13,68 +13,66 @@ class HistorialController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $historiales = Historial::with('residente')
-            ->orderBy('created_at', 'desc')
-            ->get();
+public function index()
+{
+    $historiales = Historial::with('residente')
+        ->orderBy('created_at', 'desc')
+        ->get();
 
-        return view('TSocial.Historiales.IndexHistorial', compact('historiales'));
-    }
-
+    return view('TSocial.Historiales.IndexHistorial', compact('historiales'));
+}
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        $residentes = Residente::with([
+public function create()
+{
+    $residentes = Residente::with([
             'acogida.tipologiaRel',
             'acogida.ciudadRel',
             'acogida.municipioRel'
         ])
-            ->orderBy('apellido')
-            ->get()
-            ->map(function ($residente) {
+        ->whereDoesntHave('historial') // 🔥 CLAVE
+        ->orderBy('apellido')
+        ->get()
+        ->map(function ($residente) {
 
-                $edad = $residente->fecnac
-                    ? $residente->fecnac->age
-                    : null;
+            $edad = $residente->fecnac
+                ? $residente->fecnac->age
+                : null;
 
-                // Fecha ingreso original
-                $fechaIngresoRaw = $residente->acogida?->fecha;
+            $fechaIngresoRaw = $residente->acogida?->fecha;
 
-                $fechaIngresoFormateada = $fechaIngresoRaw
-                    ? \Carbon\Carbon::parse($fechaIngresoRaw)->format('d-m-Y')
-                    : null;
+            $fechaIngresoFormateada = $fechaIngresoRaw
+                ? \Carbon\Carbon::parse($fechaIngresoRaw)->format('d-m-Y')
+                : null;
 
-                // 🔹 Calcular estadía
-                $estadia = null;
+            $estadia = null;
 
-                if ($fechaIngresoRaw) {
-                    $fechaIngreso = \Carbon\Carbon::parse($fechaIngresoRaw);
-                    $ahora = \Carbon\Carbon::now();
+            if ($fechaIngresoRaw) {
+                $fechaIngreso = \Carbon\Carbon::parse($fechaIngresoRaw);
+                $ahora = \Carbon\Carbon::now();
 
-                    $diff = $fechaIngreso->diff($ahora);
+                $diff = $fechaIngreso->diff($ahora);
 
-                    $estadia = "{$diff->y} años, {$diff->m} meses y {$diff->d} días";
-                }
+                $estadia = "{$diff->y} años, {$diff->m} meses y {$diff->d} días";
+            }
 
-                return [
-                    'id' => $residente->id,
-                    'nombre' => $residente->nombre,
-                    'apellido' => $residente->apellido,
-                    'fecnac' => optional($residente->fecnac)->format('d-m-Y'),
-                    'edad' => $edad,
-                    'fecha_ingreso' => $fechaIngresoFormateada,
-                    'estadia' => $estadia, // ✅ NUEVO
-                    'tipologia' => $residente->acogida?->tipologiaRel?->nombre,
-                    'ciudad' => $residente->acogida?->ciudadRel?->nombre,
-                    'municipio' => $residente->acogida?->municipioRel?->nombre,
-                ];
-            });
+            return [
+                'id' => $residente->id,
+                'nombre' => $residente->nombre,
+                'apellido' => $residente->apellido,
+                'fecnac' => optional($residente->fecnac)->format('d-m-Y'),
+                'edad' => $edad,
+                'fecha_ingreso' => $fechaIngresoFormateada,
+                'estadia' => $estadia,
+                'tipologia' => $residente->acogida?->tipologiaRel?->nombre,
+                'ciudad' => $residente->acogida?->ciudadRel?->nombre,
+                'municipio' => $residente->acogida?->municipioRel?->nombre,
+            ];
+        });
 
-        return view('TSocial.Historiales.RegistraHistorial', compact('residentes'));
-    }
+    return view('TSocial.Historiales.RegistraHistorial', compact('residentes'));
+}
     /**
      * Store a newly created resource in storage.
      */
@@ -149,7 +147,7 @@ class HistorialController extends Controller
                     'ciudad' => $residente->acogida?->ciudadRel?->nombre,
                     'municipio' => $residente->acogida?->municipioRel?->nombre,
                 ];
-            });
+           });
 
         return view('TSocial.Historiales.EditaHistorial', compact('historial', 'residentes'));
     }
@@ -157,10 +155,26 @@ class HistorialController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'residente_id' => 'required|exists:residentes,id',
+        'titulo' => 'required|string|max:255',
+        'contenido' => 'required|string',
+    ]);
+
+    $historial = Historial::findOrFail($id);
+
+    $historial->update([
+        'residente_id' => $request->residente_id,
+        'titulo' => $request->titulo,
+        'contenido' => $request->contenido,
+    ]);
+
+    return redirect()
+        ->route('historiales.edit', $historial->id)
+        ->with('success', 'Historial actualizado correctamente.');
+}
 
     /**
      * Remove the specified resource from storage.

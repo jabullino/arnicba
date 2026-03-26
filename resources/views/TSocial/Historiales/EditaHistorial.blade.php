@@ -13,6 +13,17 @@
                         Editar Historial
                     </h3>
 
+                    {{-- ERRORES --}}
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <form action="{{ route('historiales.update', $historial->id) }}" method="POST">
                         @csrf
                         @method('PUT')
@@ -23,10 +34,7 @@
                                 Seleccionar Residente
                             </label>
 
-                            <select name="residente_id"
-                                    id="residenteSelect"
-                                    class="form-select form-select-lg"
-                                    required>
+                            <select name="residente_id" id="residenteSelect" class="form-select form-select-lg" required>
 
                                 @foreach ($residentes as $residente)
                                     <option value="{{ $residente['id'] }}"
@@ -47,9 +55,7 @@
                         </div>
 
                         {{-- CABECERA DINÁMICA --}}
-                        <div id="cabeceraResidente"
-                             class="border rounded p-3 mb-4">
-
+                        <div id="cabeceraResidente" class="border rounded p-3 mb-4">
                             <div class="row g-3">
 
                                 <div class="col-12 col-md-6 col-lg-4">
@@ -98,26 +104,28 @@
                         {{-- TÍTULO --}}
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Título</label>
-                            <input type="text"
-                                   name="titulo"
-                                   id="tituloInput"
-                                   class="form-control form-control-lg text-center"
-                                   value="{{ old('titulo', $historial->titulo) }}"
-                                   required>
+                            <input type="text" name="titulo" id="tituloInput"
+                                class="form-control form-control-lg text-center"
+                                value="{{ old('titulo', $historial->titulo) }}" required>
                         </div>
 
                         {{-- CONTENIDO --}}
                         <div class="mb-4">
                             <label class="form-label fw-semibold">Contenido</label>
-                            <textarea name="contenido"
-                                      rows="10"
-                                      class="form-control"
-                                      required>{{ old('contenido', $historial->contenido) }}</textarea>
+
+                            <div style="max-height:400px; overflow-y:auto;">
+                                <div id="editor" class="form-control"
+                                    style="max-height:400px; overflow-y:auto; background:#fff;">
+                                    {!! old('contenido', $historial->contenido) !!}
+                                </div>
+                            </div>
+
+                            {{-- INPUT OCULTO --}}
+                            <input type="hidden" name="contenido" id="contenidoInput">
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit"
-                                    class="btn btn-success btn-lg">
+                            <button type="submit" class="btn btn-success btn-lg">
                                 Actualizar Historial
                             </button>
                         </div>
@@ -140,7 +148,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function actualizarCabecera() {
 
         const selected = select.options[select.selectedIndex];
-
         if (!selected) return;
 
         const nombreCompleto = selected.dataset.nombre + ' ' + selected.dataset.apellido;
@@ -163,23 +170,77 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     select.addEventListener('change', actualizarCabecera);
-
-    // 👇 IMPORTANTE: cargar datos al entrar
     actualizarCabecera();
 });
 </script>
 
-{{-- SWEET ALERT --}}
-@if(session('success'))
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{{-- CKEDITOR --}}
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 <script>
-Swal.fire({
-    icon: 'success',
-    title: 'Éxito',
-    text: "{{ session('success') }}",
-    confirmButtonColor: '#3085d6'
+let editorInstance;
+
+ClassicEditor.create(document.querySelector('#editor'))
+    .then(editor => {
+        editorInstance = editor;
+
+        // sincronización automática
+        editor.model.document.on('change:data', () => {
+            document.getElementById('contenidoInput').value = editor.getData();
+        });
+
+        // cargar contenido inicial
+        document.getElementById('contenidoInput').value = editor.getData();
+    });
+
+// respaldo extra
+document.querySelector('form').addEventListener('submit', function() {
+    document.getElementById('contenidoInput').value = editorInstance.getData();
 });
 </script>
+
+{{-- SWEET ALERT --}}
+@if (session('success'))
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: "{{ session('success') }}",
+            confirmButtonColor: '#3085d6'
+        });
+    </script>
 @endif
 
+@push('css')
+<style>
+    /* Fondo del editor */
+    .ck-editor__editable {
+        background-color: #1f2d3d !important;
+        color: #ffffff !important;
+        min-height: 350px;
+    }
+
+    /* Toolbar */
+    .ck.ck-toolbar {
+        background-color: #2b3a4b !important;
+        border: 1px solid #3d4b5c !important;
+    }
+
+    /* Iconos */
+    .ck.ck-button .ck-icon {
+        color: #ffffff !important;
+        fill: #ffffff !important;
+    }
+
+    /* Hover */
+    .ck.ck-button:hover {
+        background-color: #3d4b5c !important;
+    }
+
+    /* Botón activo */
+    .ck.ck-button.ck-on {
+        background-color: #556ee6 !important;
+    }
+</style>
+@endpush
 @endsection

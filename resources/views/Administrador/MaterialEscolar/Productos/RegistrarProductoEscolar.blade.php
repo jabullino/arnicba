@@ -71,8 +71,9 @@
                         <div class="col-12 col-md-6 mb-2 form-group">
                             <label>Color</label>
                             <select name="color_id" id="color" class="form-control">
+                                     <option value="0">Escoja un Color</option>                        
                                 @foreach ($colores as $color)
-                                     <option value="0">Escoja un Color</option>
+
                                     <option value="{{ $color->id }}">{{ $color->nombre }}</option>
                                 @endforeach
                             </select>

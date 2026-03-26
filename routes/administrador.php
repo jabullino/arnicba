@@ -39,7 +39,7 @@ use App\Http\Controllers\ImpresionIngresosEgresosEscolarController;
 
 
 Route::middleware(['auth', 'IsAdministrador'])->group(function () {
-    Route::get('PanelAdministrador', [PanelAdministradorController::class, 'index'])->name('PanelAdministrador');
+    Route::get('PanelAdministrador', [PanelAdministradorController::class, 'index'])->name('admin.paneldecontrol');
     Route::resource('Asientos', AsientoController::class)->names('Asientos');
     Route::get('PanelContabilidad', function () {
         return view('Administrador.PanelContabilidad');
@@ -81,6 +81,8 @@ Route::middleware(['auth', 'IsAdministrador'])->group(function () {
 
         Route::resource('ProductoEscolar',ProductoEscolarController::class)->names('ProductoEscolar');
         Route::resource('IngresoEscolar',IngresoEscolarController::class)->names('IngresoEscolar');
+        Route::get('/buscar-item-escolar', [ProductoEscolarController::class, 'buscarItemEscolar'])
+    ->name('buscar.item.escolar');
         Route::resource('EgresosEscolar',EgresosEscolarController::class)->names('EgresosEscolar');
         Route::get('/ingresosescolar/pdf/{id}', [IngresoEscolarController::class, 'pdfIngresoEscolar'])
     ->name('ingresosescolar.pdf');

@@ -47,7 +47,7 @@ class AsientoController extends Controller
             $tipomovimiento = TipoMovimiento::all();
             $origenfondos = OrigenFondos::all();
             $cuentas = Cuenta::all();
-            $asientos = Asiento::paginate(5);
+            $asientos = Asiento::orderBy('id', 'desc')->paginate(5);
             $asiento = new Asiento();
             $cuentasaux = new Cuenta();
             $subcuentasaux = new SubCuenta();
@@ -181,7 +181,7 @@ class AsientoController extends Controller
         $origenesfondos = OrigenFondos::all();
         $tiposmovimientos = TipoMovimiento::all();
 
-        return view('Administrador.FormeditaAsiento')->with(['asiento' => $asiento, 'numinterno' => $numinterno, 'tipocambiocompra' => $tipocambiocompra, 'tipocambioventa' => $tipocambioventa, 'cuenta' => $cuenta, 'subcuenta' => $subcuenta, 'origenfondos' => $origenfondos, 'tipomovimiento' => $tipomovimiento, 'cuentas' => $cuentas, 'subcuentas' => $subcuentas, 'tiposmovimientos' => $tiposmovimientos, 'origenesfondos' => $origenesfondos]);
+        return view('Administrador.FormEditaAsiento')->with(['asiento' => $asiento, 'numinterno' => $numinterno, 'tipocambiocompra' => $tipocambiocompra, 'tipocambioventa' => $tipocambioventa, 'cuenta' => $cuenta, 'subcuenta' => $subcuenta, 'origenfondos' => $origenfondos, 'tipomovimiento' => $tipomovimiento, 'cuentas' => $cuentas, 'subcuentas' => $subcuentas, 'tiposmovimientos' => $tiposmovimientos, 'origenesfondos' => $origenesfondos]);
     }
 
     /**

@@ -129,7 +129,7 @@ class UsuariosController extends Controller
             $cont = 0;
             session()->flash('success', '¡Usuario creado exitosamente!');
             DB::commit();
-            return view('Adminsis.Usuarios')->with(['usuarios' => $usuarios, 'cont' => $cont, 'cargos' => $cargos]);
+            return view('AdminSis.Usuarios')->with(['usuarios' => $usuarios, 'cont' => $cont, 'cargos' => $cargos]);
         } catch (QueryException $e) {
             DB::rollBack();
             return back()->with('error', 'No se pudo crear el usuario' . $e->getMessage());
@@ -139,22 +139,30 @@ class UsuariosController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
+public function show(string $id)
+{
+    $usr = User::findOrFail($id);
 
-        $usr = User::find($id);
-        $extensiones = Extension::all();
-        $ciudades = Ciudad::all();
-        $cargos = Cargo::all();
-        $documentos = Documento::all();
-        $ext = new Extension();
-        $ciu = new Ciudad();
-        $car = new Cargo();
-        $prov = new Provincia();
-        $documentosSeleccionados = $usr->documentos->pluck('id')->toArray();
-        return view('AdminSis.MuestraUsuario')->with(['usr' => $usr, 'extensiones' => $extensiones, 'ciudades' => $ciudades, 'cargos' => $cargos, 'ext' => $ext, 'ciu' => $ciu, 'car' => $car, 'prov' => $prov, 'documentos' => $documentos, 'documentosSeleccionados' => $documentosSeleccionados]);
-    }
+    $extensiones = Extension::all();
+    $ciudades = Ciudad::all();
+    $cargos = Cargo::all();
 
+    $ext = new Extension();
+    $ciu = new Ciudad();
+    $car = new Cargo();
+    $prov = new Provincia();
+
+    return view('AdminSis.MuestraUsuario', compact(
+        'usr',
+        'extensiones',
+        'ciudades',
+        'cargos',
+        'ext',
+        'ciu',
+        'car',
+        'prov'
+    ));
+}
     /**
      * Show the form for editing the specified resource.
      */
@@ -177,93 +185,94 @@ class UsuariosController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'required|alpha_spaces|max:255',
-            'apellido' => 'required|alpha_spaces|max:255',
-            'ci' => 'required|string|max:20',
-            'extension' => 'required',
-            'fecnac' => 'required|date',
-            'ciudad' => 'required',
-            'provincia' => 'required',
-            'direccion' => 'required|string|max:100',
-            'referencias' => 'required|string|max:100',
-            'telefono' => 'required|string|max:20',
-            'email' => 'required|email|max:255|unique:users',
+      public function update(Request $request, string $id)
+{
+    $validator = Validator::make($request->all(), [
+        'nombre' => 'required|alpha_spaces|max:255',
+        'apellido' => 'required|alpha_spaces|max:255',
+        'ci' => 'required|string|max:20',
+        'extension' => 'required',
+        'fecnac' => 'required|date',
+        'ciudad' => 'required',
+        'provincia' => 'required',
+        'direccion' => 'required|string|max:100',
+        'referencias' => 'required|string|max:100',
+        'telefono' => 'required|string|max:20',
 
-            // Reglas del password
-            'password' => [
-                'required',
-                'confirmed',
-                'string',
-                'min:8',
-                'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/'
-            ],
+        // ✅ CORREGIDO AQUÍ
+        'email' => 'required|email|max:255|unique:users,email,' . $id,
 
-            'password_confirmation' => 'required|same:password|min:8',
-            'cargo' => 'required',
-            'fecingreso' => 'required|date',
-            'foto' => 'image|mimes:jpeg,png,jpg,gif|max:1000'
-        ]);
-        DB::beginTransaction();
-        // Si la validación falla, redirige con los errores
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-       
-        try {
-            
-            $user = User::find($id);
-            $user->nombre = $request->nombre;
-            $user->apellido = $request->apellido;
-            $user->ci = $request->ci;
-            $user->extension_id = $request->extension;
-            $user->fecnac = $request->fecnac;
-            $user->ciudad_id = $request->ciudad;
-            $user->provincia_id = $request->provincia;
-            $user->direccion = $request->direccion;
-            $user->referencias = $request->referencias;
-            $user->telefono = $request->telefono;
-            if ($user->email != $request->email) {
-                $user->email = $request->email;
-            }
-            if ($request->has('password') && !empty($request->password)) {
-                $user->password = Hash::make($request->password);
-            }
-            if ($request->has('fecegreso')) {
-                $user->fec_egreso = $request->fecegreso;
-            } else {
-                Carbon::today()->toDateString();
-            }
+        'password' => [
+            'nullable', // 🔥 mejor que required en update
+            'confirmed',
+            'string',
+            'min:8',
+            'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/'
+        ],
 
-            if ($request->has('foto')) {
-                $nom = substr($request->nombre, 0, 3);
-                $ape = substr($request->apellido, 0, 3);
-                $nomfinal = $nom . $ape;
+        'password_confirmation' => 'nullable|same:password|min:8',
+        'cargo' => 'required',
+        'fecingreso' => 'required|date',
+        'foto' => 'image|mimes:jpeg,png,jpg,gif|max:1000'
+    ]);
 
-                $file = $request->file('foto');
-                $nombrePersonalizado = Str::slug($nomfinal) . '.' . $file->getClientOriginalExtension();
-                $ruta = $file->storeAs('fotos', $nombrePersonalizado, 'public');
-            }
-            /* $documentosform = $request->input('documentos', []);
-        $documentosexistentesIds = $user->documentos()->pluck('documentos.id')->toArray();
-        $documentsnuevos = array_diff($documentosform, $documentosexistentesIds);
-            $user->documentos()->attach($documentsnuevos);*/
+    DB::beginTransaction();
 
-            $user->cargo_id = $request->cargo;
-            $user->save();
-            $users = User::all();
-            session()->flash('success', '¡Usuario Editado exitosamente!');
-            DB::commit();
-            return redirect()->route('Usuarios.index')->with(['usuarios', $users]);
-        } catch (QueryException $e) {
-            DB::rollBack();
-            return back()->with('error', 'No se editar el usuario' . $e->getMessage());
-        }
+    if ($validator->fails()) {
+        return redirect()->back()->withErrors($validator)->withInput();
     }
 
+    try {
+        $user = User::find($id);
+
+        $user->nombre = $request->nombre;
+        $user->apellido = $request->apellido;
+        $user->ci = $request->ci;
+        $user->extension_id = $request->extension;
+        $user->fecnac = $request->fecnac;
+        $user->ciudad_id = $request->ciudad;
+        $user->provincia_id = $request->provincia;
+        $user->direccion = $request->direccion;
+        $user->referencias = $request->referencias;
+        $user->telefono = $request->telefono;
+
+        // Ya no necesitas comparar
+        $user->email = $request->email;
+
+        // ✅ Solo actualiza password si se envía
+        if (!empty($request->password)) {
+            $user->password = Hash::make($request->password);
+        }
+
+        if ($request->has('fecegreso')) {
+            $user->fec_egreso = $request->fecegreso;
+        }
+
+        if ($request->hasFile('foto')) {
+            $nom = substr($request->nombre, 0, 3);
+            $ape = substr($request->apellido, 0, 3);
+            $nomfinal = $nom . $ape;
+
+            $file = $request->file('foto');
+            $nombrePersonalizado = Str::slug($nomfinal) . '.' . $file->getClientOriginalExtension();
+            $ruta = $file->storeAs('fotos', $nombrePersonalizado, 'public');
+
+            $user->foto = $ruta; // ⚠️ asegúrate de guardar la ruta
+        }
+
+        $user->cargo_id = $request->cargo;
+        $user->save();
+
+        DB::commit();
+
+        session()->flash('success', '¡Usuario Editado exitosamente!');
+        return redirect()->route('Usuarios.index');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->with('error', 'No se pudo editar el usuario: ' . $e->getMessage());
+    }
+}
     /**
      * Remove the specified resource from storage.
      */

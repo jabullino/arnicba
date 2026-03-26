@@ -97,19 +97,6 @@
                     <input type="date" name='fecingreso' value="{{ $usr->fec_ingreso }}" class='form-control' readonly>
                 </div>
 
-                <div class='text-white bg-gray-700 text-center rounded mt-2 mb-2'>
-                    DOCUMENTOS
-                </div>
-
-                <div class='grid documentos-grid'>
-                    @foreach ($documentos as $documento)
-                        <div class="documento-item">
-                            <input type="checkbox" name="documentos[]" value="{{ $documento->id }}"
-                                {{ in_array($documento->id, $documentosSeleccionados) ? 'checked' : '' }} disabled>
-                            {{ $documento->nombre }}
-                        </div>
-                    @endforeach
-                </div>
 
                 <div class='mb-2 form-group'>
                     <button class='bg-sky-900 text-white bold form-control rounded'>Volver</button>
@@ -119,7 +106,6 @@
         </form>    
     </div><!---fin div class card ---->
 </div><!---fin div principal ----->
-@endsection
 
 @section('css')
 <style>

@@ -820,12 +820,12 @@ return [
                         [
                             'text' => 'Impresión de Ingresos',
                             'icon' => 'fas fa-print',
-                            'url'  => 'Almacen/ListaIngresos', // corregido
+                            'url'  => 'Almacen/Almacen/ListaIngresos', // corregido
                         ],
                         [
                             'text' => 'Impresión de Egresos',
                             'icon' => 'fas fa-arrow-right',
-                            'url' => 'Almacen/ListaEgresos', // corregido
+                            'url' => 'Almacen/Almacen/ListaEgresos', // corregido
                         ],
 
                     ],

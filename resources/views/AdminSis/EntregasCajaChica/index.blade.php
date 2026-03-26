@@ -35,9 +35,12 @@
     <div class="card-header">
         <h3 class="card-title">Filtros</h3>
     </div>
+
     <div class="card-body">
         <div class='w-full'>
-            <a href="{{ route('entregascajachicas.create') }}" class="btn btn-success w-full">Crear Nueva Entrega</a>
+            <a href="{{ route('entregascajachicas.create') }}" class="btn btn-success w-full">
+                Crear Nueva Entrega
+            </a>
         </div>
 
         <div class="mb-3 mt-3">
@@ -71,17 +74,13 @@
     <div class="card-body">
         <div id="resultado-entregas" data-ajax-url="{{ route('entregascajachicas.ajax') }}">
             <table id="tablaEntregas">
-                <thead>
-                    <!-- Headers generados dinámicamente -->
-                </thead>
-                <tbody>
-                </tbody>
+                <thead></thead>
+                <tbody></tbody>
             </table>
         </div>
     </div>
 </div>
 
-{{-- ====== ESTILOS RESPONSIVE ====== --}}
 <style>
 .card {
     max-width: 1000px;
@@ -102,7 +101,10 @@ label {
     display: block;
 }
 
-input, select, button {
+/* ✅ FIX REAL (NO AFECTA BOTONES DEL LAYOUT) */
+input,
+select,
+textarea {
     width: 100%;
     padding: 8px 10px;
     border-radius: 6px;
@@ -110,6 +112,15 @@ input, select, button {
     font-size: 15px;
     box-sizing: border-box;
     margin-bottom: 10px;
+}
+
+/* botones normales */
+button {
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    width: auto; /* 🔥 CLAVE */
 }
 
 button.btn {
@@ -127,13 +138,14 @@ table th, table td {
     text-align: center;
 }
 
-/* ====== Media queries ====== */
+/* ====== Responsive ====== */
 @media (max-width: 992px) {
     .card {
         width: 95%;
         padding: 10px;
     }
-    input, select, button {
+
+    input, select {
         font-size: 14px;
         padding: 7px;
     }
@@ -190,7 +202,7 @@ table th, table td {
         margin: 10px;
     }
 
-    input, select, button {
+    input, select {
         font-size: 13px;
         padding: 6px;
     }
@@ -206,6 +218,7 @@ table th, table td {
 
 @section('js')
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 <script>
 $(document).ready(function() {
 
@@ -246,7 +259,7 @@ $(document).ready(function() {
                     tabla += '<td data-label="Acciones">';
                     tabla += '<a href="' + verUrl + '" class="btn btn-info btn-sm me-1">Ver</a>';
                     tabla += '<a href="' + editarUrl + '" class="btn btn-warning btn-sm me-1">Editar</a>';
-                    tabla += '<button class="btn btn-danger btn-sm eliminar-entrega w-[70px]" data-url="' + eliminarUrl + '">Eliminar</button>';
+                    tabla += '<button class="btn btn-danger btn-sm eliminar-entrega" data-url="' + eliminarUrl + '">Eliminar</button>';
                     tabla += '</td></tr>';
                 });
 

@@ -233,7 +233,7 @@ document.getElementById('buscarProducto').addEventListener('keyup', function() {
     }
 
     timeout = setTimeout(() => {
-        fetch(`/Administrador/buscar-producto?q=${query}`)
+        fetch(`{{ route('buscar.item.escolar') }}?q=${query}`) 
             .then(res => res.json())
             .then(data => {
 

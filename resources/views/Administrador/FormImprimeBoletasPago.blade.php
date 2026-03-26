@@ -17,6 +17,12 @@
 
             <div class="page">
                 @for ($copy = 1; $copy <= 2; $copy++)
+
+                    {{-- 🔹 NO imprimir copia si tipo_id = 2 --}}
+                    @if($copy == 2 && ($primero->tipo_id ?? 1) == 2)
+                        @continue
+                    @endif
+
                     <div class="boleta @if($copy==1) original @else copia @endif">
                         <div class="boleta-content">
                             <div class="text-right font-bold mb-1">
@@ -28,7 +34,6 @@
                                 PERSONERÍA JURÍDICA 215532<br>
                                 NIT 1029939029
                             </div>
-
 
                             <div class="text-center text-bold text-lg mb-1">
                                 BOLETA DE PAGO DE SUELDOS
@@ -87,7 +92,6 @@
                                 Total Líquido Pagable: {{ number_format($liquido,2) }}
                             </div>
 
-                            <!-- Firmas con espacio vertical suficiente y todo contenido visible -->
                             <div class="firmas">
                                 <div class="firma">
                                     Entregué Conforme<br>
@@ -105,11 +109,17 @@
                         </div>
                     </div>
 
+                    {{-- 🔹 CONTROL SIN ROMPER DISEÑO --}}
                     @if($copy == 1)
-                        <div class="divisor">
-                            ————————————————————————————————————————————————————————————————
-                        </div>
+                        @if(($primero->tipo_id ?? 1) == 2)
+                            @break
+                        @else
+                            <div class="divisor">
+                                ————————————————————————————————————————————————————————————————
+                            </div>
+                        @endif
                     @endif
+
                 @endfor
             </div>
         @endforeach
@@ -134,6 +144,7 @@ body, html { margin:0; padding:0; background:#eee; height:100%; -webkit-print-co
     overflow: visible;
 }
 
+/* 🔥 FIX CLAVE */
 .boleta {
     width: 100%;
     box-sizing: border-box;
@@ -141,7 +152,7 @@ body, html { margin:0; padding:0; background:#eee; height:100%; -webkit-print-co
     padding:0.25cm;
     display:flex;
     flex-direction:column;
-    flex: 1 1 50%;
+    flex: 0 0 50%; /* 👈 evita que se rompa el layout */
     min-height: 13.5cm;
 }
 
@@ -160,6 +171,7 @@ body, html { margin:0; padding:0; background:#eee; height:100%; -webkit-print-co
     margin-top:auto;
     gap:0.4cm;
     padding-top:0.5cm;
+    flex-direction: row; /* 👈 fuerza horizontal */
 }
 
 .firma {
@@ -172,12 +184,6 @@ body, html { margin:0; padding:0; background:#eee; height:100%; -webkit-print-co
 }
 
 .small-line { font-size:0.85rem; display:block; }
-.firma span.small-line {
-    display:inline;      /* cambia de block a inline para eliminar salto de línea extra */
-    line-height:1;       /* altura de línea mínima */
-    margin:0;
-    padding:0;
-}
 
 .flex { display:flex; gap:0.35rem; }
 .flex-1 { flex:1; min-width:80px; }
@@ -198,57 +204,13 @@ body, html { margin:0; padding:0; background:#eee; height:100%; -webkit-print-co
     margin:0.15cm 0;
 }
 
-/* --- Impresión --- */
 @media print {
     body { background:none !important; margin:0; padding:0; }
     .page { padding:0; margin:0; height: 27.94cm; }
 
-    .boleta {
-        flex: 1 1 50%;
-        min-height: auto;
-        height: auto;
-        padding:0.25cm;
-    }
-
-    .boleta-content { overflow: visible; }
-
-    /* Ajuste de firmas para impresión */
     .firmas {
-        flex-shrink:0;
-        padding-top:1cm; /* más espacio entre total líquido y firmas */
-        justify-content:space-between;
-        gap:0.4cm;
-    }
-
-    .firma {
-        flex:0 0 48%;
-        text-align:center;
-        border-bottom:1px solid #000;
-        padding-bottom:0.25cm;
-        font-size:0.85rem;
-        line-height:1.05;
-    }
-
-    .small-line {
-        font-size:0.85rem;
-        display:block;
-        margin:0;       /* elimina márgenes */
-        line-height:1;  /* ajusta la altura de línea para compactar */
-    }
-
-    /* opcional: si quieres que el último span no tenga padding extra */
-    .firma span.small-line {
-    display:inline;      /* cambia de block a inline para eliminar salto de línea extra */
-    line-height:1;       /* altura de línea mínima */
-    margin:0;
-    padding:0;
-}
-    .divisor {
-        height:0.3cm;
-        border-top:1px dashed #999;
-        margin:0.15cm 0;
+        flex-direction: row !important;
     }
 }
-
 </style>
 @endsection

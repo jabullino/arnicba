@@ -64,7 +64,7 @@ class EscolaridadController extends Controller
         $ueducativas=UnidadEducativa::all();
         $cursos=Curso::all();
         $grados=Grado::all();
-        return view('Tsocial.Escolaridad.CreaRegistroEscolar',compact('gestiones','residentes','ueducativas','cursos','grados'));
+        return view('TSocial.Escolaridad.CreaRegistroEscolar',compact('gestiones','residentes','ueducativas','cursos','grados'));
     }
 
     /**

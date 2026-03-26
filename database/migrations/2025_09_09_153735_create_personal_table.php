@@ -16,8 +16,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('user_cod',15);
+            $table->unsignedBigInteger('tipo_id');
             $table->softdeletes();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('tipo_id')->references('id')->on('tipo_personales')->onDelete('cascade');
             $table->timestamps();
         });
     }

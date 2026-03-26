@@ -9,6 +9,6 @@ class PanelTSocialController extends Controller
 {
     public function index(){
 
-        return view('TSocial.PanelTsocial');
+        return view('TSocial.PanelTSocial');
     }
 }

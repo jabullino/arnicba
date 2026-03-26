@@ -37,6 +37,7 @@ class UserAdminSisController extends Controller
             'cargo' => 'required',
             'latitud'  => 'nullable|numeric',
             'longitud' => 'nullable|numeric',
+            'status' => 'Activo',
             
         ]);
 

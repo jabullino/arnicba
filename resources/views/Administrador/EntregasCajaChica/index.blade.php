@@ -35,6 +35,7 @@
     <div class="card-header">
         <h3 class="card-title">Filtros</h3>
     </div>
+
     <div class="card-body">
         <div class="mb-3 mt-3">
             <label for="anio">Año:</label>
@@ -67,11 +68,8 @@
     <div class="card-body">
         <div id="resultado-entregas" data-ajax-url="{{ route('listaEntregascajachica.lista') }}">
             <table id="tablaEntregas">
-                <thead>
-                    <!-- Headers generados dinámicamente -->
-                </thead>
-                <tbody>
-                </tbody>
+                <thead></thead>
+                <tbody></tbody>
             </table>
         </div>
     </div>
@@ -98,7 +96,10 @@ label {
     display: block;
 }
 
-input, select, button {
+/* ✅ CORRECCIÓN REAL */
+input,
+select,
+textarea {
     width: 100%;
     padding: 8px 10px;
     border-radius: 6px;
@@ -106,6 +107,15 @@ input, select, button {
     font-size: 15px;
     box-sizing: border-box;
     margin-bottom: 10px;
+}
+
+/* botones normales (no full width) */
+button {
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    width: auto; /* 👈 clave */
 }
 
 button.btn {
@@ -129,7 +139,8 @@ table th, table td {
         width: 95%;
         padding: 10px;
     }
-    input, select, button {
+
+    input, select {
         font-size: 14px;
         padding: 7px;
     }
@@ -186,7 +197,7 @@ table th, table td {
         margin: 10px;
     }
 
-    input, select, button {
+    input, select {
         font-size: 13px;
         padding: 6px;
     }
@@ -202,6 +213,7 @@ table th, table td {
 
 @section('js')
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 <script>
 $(document).ready(function() {
 
@@ -241,7 +253,6 @@ $(document).ready(function() {
                     tabla += '</tr>';
                 });
 
-                // 👇 Fila TOTAL al final
                 tabla += '<tr>';
                 tabla += '<td style="font-weight:bold;">TOTAL</td>';
                 tabla += '<td style="font-weight:bold;">' + total.toFixed(2) + '</td>';
@@ -277,4 +288,3 @@ $(document).ready(function() {
 });
 </script>
 @stop
-

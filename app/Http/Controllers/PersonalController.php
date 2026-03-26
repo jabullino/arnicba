@@ -10,6 +10,7 @@ use App\Models\Personal;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 use App\Models\File;
+use App\Models\TipoPersonal;
 
 class PersonalController extends Controller
 {
@@ -37,11 +38,12 @@ class PersonalController extends Controller
             )
             ->where('users.id', '!=', 1)
             ->get();
+        $tipopersonal = TipoPersonal::all();
 
 
 
         $cont = 1;
-        return view('AdminSis.FormGestionaPersonal')->with(['usuarios' => $usuarios, 'cont' => $cont]);
+        return view('AdminSis.FormGestionaPersonal')->with(['usuarios' => $usuarios, 'tipopersonal' => $tipopersonal, 'cont' => $cont]);
     }
 
     public function formulariogestionusuarios()
@@ -67,24 +69,39 @@ class PersonalController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store($id)
+
+    public function store(Request $request, $id)
     {
+        // Validación
+        $request->validate([
+            'tipopersonal_id' => 'required'
+        ], [
+            'tipopersonal_id.required' => 'Debe seleccionar una categoría.'
+        ]);
+
+        $tipopersonal = $request->tipopersonal_id;
 
         $nombreinicial = User::where('id', $id)->value('nombre');
         $nombrefinal = substr($nombreinicial, 0, 3);
+
         $apellidoinicial = User::where('id', $id)->value('apellido');
         $apellidofinal = substr($apellidoinicial, 0, 3);
+
         $fechanac = User::where('id', $id)->value('fecnac');
         $fecnac = Carbon::parse($fechanac)->format('d-m');
-        $codigo = $nombrefinal.$apellidofinal .'-'. $fecnac;
+
+        $codigo = $nombrefinal . $apellidofinal . '-' . $fecnac;
 
         try {
             Personal::create([
                 'user_id' => $id,
                 'user_cod' => $codigo,
+                'tipo_id' => $tipopersonal
             ]);
 
-            
+            User::where('id', $id)->update([
+                'status' => 'Activo'
+            ]);
         } catch (\Exception $e) {
             return back()->with('error', 'Error al crear el registro: ' . $e->getMessage());
         }
@@ -137,10 +154,11 @@ class PersonalController extends Controller
             )
             ->where('users.id', $id)
             ->first();
+        $tipopersonal = TipoPersonal::all();
 
         $cargos = DB::table('cargos')->pluck('nombre', 'id');
 
-        return view('AdminSis.FormEditaPersonal', compact('usuario', 'cargos'));
+        return view('AdminSis.FormEditaPersonal', compact('usuario', 'cargos', 'tipopersonal'));
     }
 
 
@@ -157,7 +175,8 @@ class PersonalController extends Controller
             'fec_ingreso' => 'required|date',
             'cargo_id' => 'required|integer|exists:cargos,id',
             'user_cod' => 'required|string|max:50',
-            'ultimo_monto' => 'nullable|numeric|min:0', // validación para el último monto
+            'tipopersonal_id' => 'required|integer|exists:tipo_personals,id',
+            'ultimo_monto' => 'nullable|numeric|min:0',
         ]);
 
         // Actualizar tabla users
@@ -172,11 +191,12 @@ class PersonalController extends Controller
         // Actualizar tabla personal
         DB::table('personal')->where('user_id', $id)->update([
             'user_cod' => $request->user_cod,
+            'tipo_id' => $request->tipopersonal_id, // ← NUEVO CAMPO
         ]);
 
         // Actualizar el último monto en haber_basicos
         if ($request->ultimo_monto !== null) {
-            // Buscar el último registro para el cargo actual
+
             $ultimo = DB::table('haber_basicos')
                 ->where('cargo_id', $request->cargo_id)
                 ->orderByDesc('id')
@@ -187,7 +207,6 @@ class PersonalController extends Controller
                     'monto' => $request->ultimo_monto
                 ]);
             }
-            // No se crea nuevo registro, solo se actualiza el existente
         }
 
         return redirect()->route('Personal')->with('success', 'Usuario actualizado correctamente.');

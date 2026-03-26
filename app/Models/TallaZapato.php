@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
-class Tallazapato extends Model
+class TallaZapato extends Model
 {
     use SoftDeletes;
     protected $fillable=['nombre'];
+    protected $table='tallazapatos';
     public $timestamps=false;
 
     protected static function booted()

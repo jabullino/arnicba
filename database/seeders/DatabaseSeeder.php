@@ -77,7 +77,7 @@ class DatabaseSeeder extends Seeder
         $this->call(GeneroSeeder::class);
         $this->call(TipologiaSeeder::class);
         $this->call(MunicipioSeeder::class);
-        $this->call(UnidadEducativaSeeder::class);
+        //$this->call(UnidadEducativaSeeder::class);
         $this->call(GradoSeeder::class);
         $this->call(CursoSeeder::class);
         $this->call(CategoriaSeeder::class);
@@ -89,9 +89,9 @@ class DatabaseSeeder extends Seeder
         $this->call(CapacidadSeeder::class);
         $this->call(DestinatarioSeeder::class);
         $this->call(TipoPersonalSeeder::class);
-        Vestimenta::factory()->count(10)->create();
-        Tela::factory()->count(5)->create();
-        Zapato::factory()->count(8)->create();
+        //Vestimenta::factory()->count(10)->create();
+        //Tela::factory()->count(5)->create();
+        //Zapato::factory()->count(8)->create();
 
         
 

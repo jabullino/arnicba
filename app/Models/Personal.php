@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Personal extends Model
 {
-     protected $fillable=['user_id','user_cod'];
+     protected $fillable=['user_id','user_cod','tipo_id'];
      protected $table='personal';
     /** @use HasFactory<\Database\Factories\PersonalFactory> */
     use HasFactory,SoftDeletes;
@@ -20,17 +20,16 @@ class Personal extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function tipopersonal(): BelongsTo
+    {
+        return $this->belongsTo(TipoPersonal::class);
+    }
+
      public function documentos(): BelongsToMany
     {
         return $this->belongsToMany(Documento::class);
 
     }
 
-    protected static function booted()
-    {
-        // Siempre excluir registros eliminados (deleted_at no nulo)
-        static::addGlobalScope('not_deleted', function ($query) {
-            $query->whereNull('deleted_at');
-        });
-    }
+   
 }

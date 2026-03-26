@@ -24,7 +24,7 @@ class ResidenteController extends Controller
     public function index()
     {
         $residentes = Residente::all();
-        return view('Tsocial.Residente.ListaResidente')->with(['residentes' => $residentes]);
+        return view('TSocial.Residente.ListaResidente')->with(['residentes' => $residentes]);
     }
 
     /**

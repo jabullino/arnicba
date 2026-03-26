@@ -8,7 +8,7 @@ use App\Models\Producto;
 use Database\Seeders\CategoriaSeeder;
 use App\Models\Color;
 use App\Models\Talla;
-use App\Models\Tallazapato;
+use App\Models\TallaZapato;
 use App\Models\Categoria;
 use App\Models\Presentacion;
 use App\Models\Capacidad;
@@ -253,7 +253,7 @@ class ProductoController extends Controller
     $unidades       = Unidad::all();
     $colores        = Color::all();
     $tallas         = Talla::all();
-    $tallazapatos   = Tallazapato::all();
+    $tallazapatos   = TallaZapato::all();
 
     return view('Almacen.Productos.EditarProducto', compact(
         'producto',
