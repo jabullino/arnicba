@@ -129,89 +129,112 @@ class PersonalController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
+public function edit($id)
+{
+    $usuario = DB::table('users')
+        ->join('personal', 'users.id', '=', 'personal.user_id')
+        ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
+        ->select(
+            'users.id',
+            'users.nombre',
+            'users.apellido',
+            'users.ci',
+            DB::raw("DATE_FORMAT(users.fec_ingreso, '%Y-%m-%d') as fec_ingreso"),
+            'users.cargo_id',
+            'cargos.nombre as cargo_nombre',
+            'personal.user_cod',
 
+            // 👇 tu campo requerido
+            'personal.tipo_id as tipo_id',
 
-    public function edit($id)
-    {
-        $usuario = DB::table('users')
-            ->join('personal', 'users.id', '=', 'personal.user_id')
-            ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
-            ->select(
-                'users.id',
-                'users.nombre',
-                'users.apellido',
-                'users.ci',
-                DB::raw("DATE_FORMAT(users.fec_ingreso, '%Y-%m-%d') as fec_ingreso"),
-                'users.cargo_id',
-                'cargos.nombre as cargo_nombre',
-                'personal.user_cod',
-                // Subquery para obtener el último monto de haber_basicos según cargo_id
-                DB::raw("(SELECT monto 
-                      FROM haber_basicos 
-                      WHERE cargo_id = users.cargo_id 
-                      ORDER BY id DESC 
-                      LIMIT 1) as ultimo_monto")
-            )
-            ->where('users.id', $id)
-            ->first();
-        $tipopersonal = TipoPersonal::all();
+            DB::raw("(SELECT monto
+                FROM haber_basicos
+                WHERE cargo_id = users.cargo_id
+                ORDER BY id DESC
+                LIMIT 1) as ultimo_monto")
+        )
+        ->where('users.id', $id)
+        ->first();
 
-        $cargos = DB::table('cargos')->pluck('nombre', 'id');
+    // 👇 NUEVO: obtener el registro de tipo_personales
+    $tipoPersonal = DB::table('tipo_personales')
+        ->where('id', $usuario->tipo_id)
+        ->first();
 
-        return view('AdminSis.FormEditaPersonal', compact('usuario', 'cargos', 'tipopersonal'));
-    }
+    $tipopersonal = TipoPersonal::all();
+    $cargos = DB::table('cargos')->pluck('nombre', 'id');
 
+    return view('AdminSis.FormEditaPersonal', compact(
+        'usuario',
+        'cargos',
+        'tipopersonal',
+        'tipoPersonal' // 👈 lo envías a la vista
+    ));
+}
+
+    
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
-    {
-        // Validación básica
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'apellido' => 'required|string|max:255',
-            'ci' => 'required|string|max:50',
-            'fec_ingreso' => 'required|date',
-            'cargo_id' => 'required|integer|exists:cargos,id',
-            'user_cod' => 'required|string|max:50',
-            'tipopersonal_id' => 'required|integer|exists:tipo_personals,id',
-            'ultimo_monto' => 'nullable|numeric|min:0',
-        ]);
+public function update(Request $request, $id)
+{
+    // Validación básica
+    $request->validate([
+        'nombre' => 'required|string|max:255',
+        'apellido' => 'required|string|max:255',
+        'ci' => 'required|string|max:50',
+        'fec_ingreso' => 'required|date',
+        'cargo_id' => 'required|integer|exists:cargos,id',
+        'user_cod' => 'required|string|max:50',
 
-        // Actualizar tabla users
-        DB::table('users')->where('id', $id)->update([
-            'nombre' => $request->nombre,
-            'apellido' => $request->apellido,
-            'ci' => $request->ci,
-            'fec_ingreso' => $request->fec_ingreso,
-            'cargo_id' => $request->cargo_id,
-        ]);
+        // ✅ CORREGIDO (nombre correcto del campo)
+        'tipo_id' => 'nullable|integer|exists:tipo_personales,id',
 
-        // Actualizar tabla personal
-        DB::table('personal')->where('user_id', $id)->update([
-            'user_cod' => $request->user_cod,
-            'tipo_id' => $request->tipopersonal_id, // ← NUEVO CAMPO
-        ]);
+        'ultimo_monto' => 'nullable|numeric|min:0',
+    ]);
 
-        // Actualizar el último monto en haber_basicos
-        if ($request->ultimo_monto !== null) {
+    // Actualizar tabla users
+    DB::table('users')->where('id', $id)->update([
+        'nombre' => $request->nombre,
+        'apellido' => $request->apellido,
+        'ci' => $request->ci,
+        'fec_ingreso' => $request->fec_ingreso,
+        'cargo_id' => $request->cargo_id,
+    ]);
 
-            $ultimo = DB::table('haber_basicos')
-                ->where('cargo_id', $request->cargo_id)
-                ->orderByDesc('id')
-                ->first();
+    // 🔥 mantener valor actual si no se envía
+    $tipoId = $request->tipo_id;
 
-            if ($ultimo) {
-                DB::table('haber_basicos')->where('id', $ultimo->id)->update([
-                    'monto' => $request->ultimo_monto
-                ]);
-            }
-        }
-
-        return redirect()->route('Personal')->with('success', 'Usuario actualizado correctamente.');
+    if (!$tipoId) {
+        $tipoId = DB::table('personal')
+            ->where('user_id', $id)
+            ->value('tipo_id');
     }
 
+    // Actualizar tabla personal
+    DB::table('personal')->where('user_id', $id)->update([
+        'user_cod' => $request->user_cod,
+        'tipo_id' => $tipoId,
+    ]);
+
+    // Actualizar el último monto en haber_basicos
+    if ($request->ultimo_monto !== null) {
+
+        $ultimo = DB::table('haber_basicos')
+            ->where('cargo_id', $request->cargo_id)
+            ->orderByDesc('id')
+            ->first();
+
+        if ($ultimo) {
+            DB::table('haber_basicos')->where('id', $ultimo->id)->update([
+                'monto' => $request->ultimo_monto
+            ]);
+        }
+    }
+
+    return redirect()->route('Personal')->with('success', 'Usuario actualizado correctamente.');
+}
 
 
     /**

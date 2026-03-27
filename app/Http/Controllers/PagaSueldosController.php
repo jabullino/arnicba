@@ -382,7 +382,7 @@ class PagaSueldosController extends Controller
          if ($ant > 2 && $ant <= 5) {
             $bonoant = $smn * 0.05;
             $dat->monto += $bonoant;
-            if (($dat->cargo_id != 3) && ($dat->cargo_id != 4)) {
+            if (($dat->cargo_id != 2) && ($dat->cargo_id != 3)) {
                $descuento = $dat->monto * 0.1271;
                $dat->monto -= $descuento;
             }
@@ -390,7 +390,7 @@ class PagaSueldosController extends Controller
          } elseif ($ant > 5 && $ant <= 8) {
             $bonoant = $smn * 0.11;
             $dat->monto += $bonoant;
-            if (($dat->cargo_id != 3) && ($dat->cargo_id != 4)) {
+            if (($dat->cargo_id != 2) && ($dat->cargo_id != 3)) {
                $descuento = $dat->monto * 0.1271;
                $dat->monto -= $descuento;
             }
@@ -398,7 +398,7 @@ class PagaSueldosController extends Controller
          } elseif ($ant > 8 && $ant <= 11) {
             $bonoant = $smn * 0.18;
             $dat->monto += $bonoant;
-            if (($dat->cargo_id != 3) && ($dat->cargo_id != 4)) {
+            if (($dat->cargo_id != 2) && ($dat->cargo_id != 3)) {
                $descuento = $dat->monto * 0.1271;
                $dat->monto -= $descuento;
             }
@@ -407,7 +407,7 @@ class PagaSueldosController extends Controller
 
             $bonoant = $smn * 0.26;
             $dat->monto += $bonoant;
-            if (($dat->cargo_id != 3) && ($dat->cargo_id != 4)) {
+            if (($dat->cargo_id != 2) && ($dat->cargo_id != 3)) {
                $descuento = $dat->monto * 0.1271;
                $dat->monto -= $descuento;
             }
@@ -415,7 +415,7 @@ class PagaSueldosController extends Controller
          } elseif ($ant > 15 && $ant <= 20) {
             $bonoant = $smn * 0.34;
             $dat->monto += $bonoant;
-            if (($dat->cargo_id != 3) && ($dat->cargo_id != 4)) {
+            if (($dat->cargo_id != 2) && ($dat->cargo_id != 3)) {
                $descuento = $dat->monto * 0.1271;
                $dat->monto -= $descuento;
             }
@@ -423,7 +423,7 @@ class PagaSueldosController extends Controller
          } elseif ($ant > 20 && $ant <= 25) {
             $bonoant = $smn * 0.42;
             $dat->monto += $bonoant;
-            if (($dat->cargo_id != 3) && ($dat->cargo_id != 4)) {
+            if (($dat->cargo_id != 2) && ($dat->cargo_id != 3)) {
                $descuento = $dat->monto * 0.1271;
                $dat->monto -= $descuento;
             }
@@ -431,13 +431,13 @@ class PagaSueldosController extends Controller
          } elseif ($ant > 25) {
             $bonoant = $smn * 0.50;
             $dat->monto += $bonoant;
-            if (($dat->cargo_id != 3) && ($dat->cargo_id != 4)) {
+            if (($dat->cargo_id != 2) && ($dat->cargo_id != 3)) {
                $descuento = $dat->monto * 0.1271;
                $dat->monto -= $descuento;
             }
             $dat->monto = round($dat->monto, 2);
          } else {
-            if (($dat->cargo_id != 3) && ($dat->cargo_id != 4)) {
+            if (($dat->cargo_id != 2) && ($dat->cargo_id != 3)) {
                $descuento = $dat->monto * 0.1271;
                $dat->monto -= $descuento;
             }
