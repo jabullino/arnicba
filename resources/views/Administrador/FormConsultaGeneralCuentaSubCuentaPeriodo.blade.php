@@ -1,129 +1,205 @@
 @extends('layouts.app')
 @section('content')
+
 <style>
     table, th, td {
-        border: 1px solid black;
+        border: 1px solid #000;
         border-collapse: collapse;
         padding: 8px;
     }
 
+    .tabla-reporte {
+        background-color: #0f172a;
+        color: #e5e7eb;
+    }
+
+    .encabezado {
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        font-weight: bold;
+    }
+
+    .fila-cuenta {
+        background-color: #0033cc !important;
+        color: #ffffff !important;
+        font-weight: bold;
+    }
+
+    .fila-subcuenta {
+        background-color: #333333 !important;
+        color: #ffffff !important;
+        font-weight: bold;
+    }
+
     @media print {
-        #btnImprimir {
-            display: none;
+        body, table {
+            background: #ffffff !important;
+            color: #000 !important;
         }
-    }
 
-    /* ------------------ Responsive ------------------ */
-    @media (max-width: 1024px) {
-        table {
-            font-size: 0.9rem;
+        .encabezado {
+            background: #fff !important;
+            color: #000 !important;
+            border: 2px solid #000 !important;
         }
-        th, td {
-            padding: 6px;
-        }
-    }
 
-    @media (max-width: 768px) {
-        table {
-            display: block;
-            overflow-x: auto;
-            width: 100%;
+        .fila-cuenta {
+            background: #e0e0e0 !important;
+            color: #000 !important;
         }
-        th, td {
-            padding: 5px;
-            font-size: 0.85rem;
-        }
-        .card-header {
-            font-size: 1rem !important;
-            text-align: center;
-        }
-    }
 
-    @media (max-width: 480px) {
-        table {
-            display: block;
-            overflow-x: auto;
-            width: 100%;
+        .fila-subcuenta {
+            background: #f5f5f5 !important;
+            color: #000 !important;
         }
-        th, td {
-            padding: 4px;
-            font-size: 0.75rem;
-        }
-        .card-header {
-            font-size: 0.9rem !important;
-            text-align: center;
+
+        td, th {
+            border: 1px solid #000 !important;
+            color: #000 !important;
         }
     }
 </style>
 
-<div><!---div principal--->
-    <div class='card'>
-        <div class="card-body mt-[-15px]">
-            
-            <table class="table table-striped mb-2 pagination mx-auto mt-0">
-                <tbody>
-                    <thead>
-                        <tr colspan='7'>
-                            <div class='card-header bg-sky-900 text-black bold text-center w-full'>
-                                REPORTE GENERAL DE GASTOS POR CUENTA, SUBCUENTA PERIODO
-                                {{ \Carbon\Carbon::parse($fecinicio)->format('d-m-Y') }} &nbsp;
-                                {{ \Carbon\Carbon::parse($fecfin)->format('d-m-Y') }}
-                            </div>
-                        </tr>
-                        <tr class='bg-sky-900 text-black bold'>
-                            <th scope="col" class='text-center w-8 text-black'>Item #</th>
-                            <th scope="col" class='text-center w-8 text-black'>Num. Asiento</th>
-                            <th scope="col" class='text-center w-24 text-black'>Fecha</th>
-                            <th scope="col" class='text-center w-24 text-black'>Factura</th>
-                            <th scope="col" class='text-center w-24 text-black'>Recibo</th>
-                            <th scope="col" class='text-center w-48 text-black'>Importe Bs.</th>
-                            <th scope="col" class='text-center w-48 text-black'>Importe $us</th>
-                        </tr>
-                    </thead>
+<div class='card'>
+<div class="card-body">
 
-                    @foreach ($asientos as $asi)
-                        <tr>
-                            <th scope="row" class='text-center'>{{ $cont = $cont + 1 }}</th>
-                            <th scope="row" class='text-center'>{{ $asi->id }}</th>
-                            <td class='text-center'>{{ \Carbon\Carbon::parse($asi->fec_asiento)->format('d-m-Y') }}</td>
-                            <td class='text-center'>{{ $asi->factura }}</td>
-                            <td class='text-center'>{{ $asi->recibo }}</td>
-                            <td class='text-center'>{{ $asi->monto_bs }}</td>
-                            <td class='text-center'>{{ $asi->monto_sus }}</td>
-                        </tr>
+<table class="table tabla-reporte">
 
-                        @php
-                            $sumatotalbs += $asi->monto_bs;
-                            $sumatotalsus += $asi->monto_sus;
-                            $montobs += $asi->monto_bs;
-                            $montosus += $asi->monto_sus;
-                        @endphp
-                    @endforeach
+<thead>
+<tr>
+<td colspan="7" class="encabezado" style="text-align:center !important;">
+REPORTE GENERAL DE GASTOS POR CUENTA, SUBCUENTA PERIODO
+<br>
+{{ \Carbon\Carbon::parse($fecinicio)->format('d-m-Y') }}
+-
+{{ \Carbon\Carbon::parse($fecfin)->format('d-m-Y') }}
+</td>
+</tr>
 
-                    <tr>
-                        <td colspan="3" class='bg-green-700'></td>
-                        <td colspan="2" class='bg-green-700 text-black text-right text-lg bold'>TOTAL GASTOS EN EL PERÍODO</td>
-                        <td colspan="1" class='bg-green-700 text-black text-lg bold text-center'>
-                            {{ number_format($sumatotalbs, 2) }}</td>
-                        <td colspan="1" class='bg-green-700 text-black text-lg bold text-center'>
-                            {{ number_format($sumatotalsus, 2) }}</td>
-                    </tr>
+<tr class="encabezado">
+<th style="text-align:center !important;">#</th>
+<th style="text-align:center !important;">Asiento</th>
+<th style="text-align:center !important;">Fecha</th>
+<th style="text-align:center !important;">Factura</th>
+<th style="text-align:center !important;">Recibo</th>
+<th style="text-align:center !important;">Bs</th>
+<th style="text-align:center !important;">$us</th>
+</tr>
+</thead>
 
-                    @php
-                        $sumatotalbs = 0;
-                        $sumatotalsus = 0;
-                        $montobs = 0;
-                        $montosus = 0;
-                    @endphp
+<tbody>
 
-                </tbody>
-            </table>
+@php
+$cont = 0;
+$cuentaActual = null;
+$subcuentaActual = null;
 
-            <div class="text-center mt-2">
-                <button id="btnImprimir" onclick="window.print()" class="bg-sky-900 text-white bold p-2 rounded">Imprimir</button>
-            </div>
+$subtotalBs = 0;
+$subtotalSus = 0;
 
-        </div><!--- fin div card-body---->
-    </div><!---fin class card---->
-</div><!---fin div principal---->
+$totalCuentaBs = 0;
+$totalCuentaSus = 0;
+
+$totalGeneralBs = 0;
+$totalGeneralSus = 0;
+@endphp
+
+@foreach ($asientos as $asi)
+
+@if ($subcuentaActual !== null && $subcuentaActual != $asi->sub_cuenta)
+<tr>
+<td colspan="5" style="background:#ff9800 !important; text-align:center !important;"><b>SUBTOTAL</b></td>
+<td style="background:#ff9800 !important; text-align:center !important;"><b>{{ number_format($subtotalBs,2) }}</b></td>
+<td style="background:#ff9800 !important; text-align:center !important;"><b>{{ number_format($subtotalSus,2) }}</b></td>
+</tr>
+
+@php
+$subtotalBs = 0;
+$subtotalSus = 0;
+@endphp
+@endif
+
+@if ($cuentaActual !== $asi->cuenta)
+
+@if ($cuentaActual !== null)
+<tr>
+<td colspan="5" style="background:#00c853 !important; text-align:center !important;"><b>TOTAL CUENTA</b></td>
+<td style="background:#00c853 !important; text-align:center !important;"><b>{{ number_format($totalCuentaBs,2) }}</b></td>
+<td style="background:#00c853 !important; text-align:center !important;"><b>{{ number_format($totalCuentaSus,2) }}</b></td>
+</tr>
+@endif
+
+<tr class="fila-cuenta">
+<td colspan="7" style="text-align:center !important;">
+{{ $cuentaux->getCuenta($asi->cuenta) }}
+</td>
+</tr>
+
+@php
+$cuentaActual = $asi->cuenta;
+$subcuentaActual = null;
+$subtotalBs = 0;
+$subtotalSus = 0;
+$totalCuentaBs = 0;
+$totalCuentaSus = 0;
+@endphp
+@endif
+
+@if ($subcuentaActual !== $asi->sub_cuenta)
+<tr class="fila-subcuenta">
+<td colspan="7" style="text-align:center !important;">
+{{ $subcuentaux->getSubcuenta($asi->sub_cuenta) }}
+</td>
+</tr>
+
+@php
+$subcuentaActual = $asi->sub_cuenta;
+@endphp
+@endif
+
+<tr>
+<td style="text-align:center !important;">{{ ++$cont }}</td>
+<td style="text-align:center !important;">{{ $asi->id }}</td>
+<td style="text-align:center !important;">{{ \Carbon\Carbon::parse($asi->fec_asiento)->format('d-m-Y') }}</td>
+<td style="text-align:center !important;">{{ $asi->factura }}</td>
+<td style="text-align:center !important;">{{ $asi->recibo }}</td>
+<td style="text-align:center !important;">{{ $asi->monto_bs }}</td>
+<td style="text-align:center !important;">{{ $asi->monto_sus }}</td>
+</tr>
+
+@php
+$subtotalBs += $asi->monto_bs;
+$subtotalSus += $asi->monto_sus;
+$totalCuentaBs += $asi->monto_bs;
+$totalCuentaSus += $asi->monto_sus;
+$totalGeneralBs += $asi->monto_bs;
+$totalGeneralSus += $asi->monto_sus;
+@endphp
+
+@endforeach
+
+<tr>
+<td colspan="5" style="background:#ff9800 !important; text-align:center !important;"><b>SUBTOTAL</b></td>
+<td style="background:#ff9800 !important; text-align:center !important;"><b>{{ number_format($subtotalBs,2) }}</b></td>
+<td style="background:#ff9800 !important; text-align:center !important;"><b>{{ number_format($subtotalSus,2) }}</b></td>
+</tr>
+
+<tr>
+<td colspan="5" style="background:#00c853 !important; text-align:center !important;"><b>TOTAL CUENTA</b></td>
+<td style="background:#00c853 !important; text-align:center !important;"><b>{{ number_format($totalCuentaBs,2) }}</b></td>
+<td style="background:#00c853 !important; text-align:center !important;"><b>{{ number_format($totalCuentaSus,2) }}</b></td>
+</tr>
+
+<tr>
+<td colspan="5" style="background:#ff1744 !important; color:#fff; text-align:center !important;"><b>TOTAL GENERAL</b></td>
+<td style="background:#ff1744 !important; color:#fff; text-align:center !important;"><b>{{ number_format($totalGeneralBs,2) }}</b></td>
+<td style="background:#ff1744 !important; color:#fff; text-align:center !important;"><b>{{ number_format($totalGeneralSus,2) }}</b></td>
+</tr>
+
+</tbody>
+</table>
+
+</div>
+</div>
+
 @endsection

@@ -47,7 +47,7 @@ class AsientoController extends Controller
             $tipomovimiento = TipoMovimiento::all();
             $origenfondos = OrigenFondos::all();
             $cuentas = Cuenta::all();
-            $asientos = Asiento::orderBy('id', 'desc')->paginate(5);
+            $asientos = Asiento::orderBy('id', 'desc')->paginate(10);
             $asiento = new Asiento();
             $cuentasaux = new Cuenta();
             $subcuentasaux = new SubCuenta();
@@ -128,7 +128,7 @@ class AsientoController extends Controller
             $tipomovimiento = TipoMovimiento::all();
             $origenfondos = OrigenFondos::all();
             $cuentas = Cuenta::all();
-            $asientos = Asiento::paginate(10);
+            $asientos = Asiento::orderBy('id','desc')->paginate(10);
             $asiento = new Asiento();
             $cuentasaux = new Cuenta();
             $subcuentasaux = new SubCuenta();
