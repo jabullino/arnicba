@@ -23,6 +23,7 @@ use App\Http\Controllers\EntregasCajaChicaController;
 use App\Http\Controllers\ObtenCuentasController;
 use App\Http\Controllers\GestionController;
 use App\Http\Controllers\CierreGestionController;
+use App\Http\Controllers\IncrementoSalarioController;
 
 Route::middleware(['auth', 'IsAdminSis'])->group(function () {
 
@@ -92,6 +93,8 @@ Route::middleware(['auth', 'IsAdminSis'])->group(function () {
      Route::post('reabreGestion',[CierreGestionController::class,'reabreGestion'])->name('reabreGestion');
      Route::get('FormReabreGestion',[CierreGestionController::class,'index'])->name('FormReabreGestion');
 
+      //Incremento de Salarios
 
+   Route::resource('incrementosalarial', IncrementoSalarioController::class)->names('incrementosalarial');   
 
 });

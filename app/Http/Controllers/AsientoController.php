@@ -242,7 +242,7 @@ class AsientoController extends Controller
             $asiento = new Asiento();
             $cuentasaux = new Cuenta;
             $subcuentasaux = new SubCuenta();
-            $asientos = Asiento::paginate(10);
+            $asientos = Asiento::orderBy('id','desc')->paginate(10);
             session()->flash('success', '¡Asiento Editado exitosamente!');
             return view('Administrador.FormAsientos')->with(['numinterno' => $numasiento + 1, 'tc' => $tipocambiocompra, 'tv' => $tipocambioventa, 'tipomovimiento' => $tipomovimiento, 'cuentas' => $cuentas, 'cuentasaux' => $cuentasaux, 'subcuentasaux' => $subcuentasaux, 'origenfondos' => $origenfondos, 'asientos' => $asientos, 'asiento' => $asiento]);
         } catch (QueryException $e) {
@@ -255,7 +255,7 @@ class AsientoController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
-    {
+    { 
         try {
             DB::beginTransaction();
             $asiento = Asiento::find($id);

@@ -41,7 +41,17 @@
 
                             <div class="text-bold small-meta">
                                 <div>Gestión: <span>{{ $gestion }}</span></div>
-                                <div>Mes: <span>{{ $mes }}</span></div>
+                                <div style="display:flex; width:100%;">
+                                    <div>
+                                         Sueldo correspondiente al mes de:
+                                         <span class='text-bold'>{{ $mesTexto }}</span>
+                                    </div>
+
+                                    <div style="margin-left:auto; text-align:right;">
+                                          Fecha de Pago:
+                                          <span class='text-bold'>{{ now()->format('d/m/Y') }}</span>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="text-bold mt-1 empleado-info">

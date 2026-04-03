@@ -374,6 +374,11 @@ return [
                     ],
                 ],
                 [
+                    'text' => 'Incremento Salarial',
+                    'url' => '/AdminSis/incrementosalarial',
+                    'icon' => 'fas fa-dollar-sign',
+                ],
+                [
                     'text' => 'Caja Chica',
                     'icon' => 'fas fa-cash-register',
                     'submenu' => [

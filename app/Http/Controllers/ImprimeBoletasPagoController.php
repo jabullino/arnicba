@@ -18,8 +18,9 @@ class ImprimeBoletasPagoController extends Controller
 
 public function extraeBoletas(Request $request)
 {
+    
     $gestion_id = $request->gestion;
-    $mesId = $this->devuelveMes($request->mes);
+    $mesId = $this->devuelveMesId($request->mes);
     $gestion_nombre = Gestion::where('id', $gestion_id)->value('nombre');
     $mes = $request->input('mes');
      
@@ -59,7 +60,7 @@ public function extraeBoletas(Request $request)
 
 
     $userIds = $usuarios->keys();
-
+    
     // 2️⃣ Bonos
     $bonos = DB::table('sueldos')
         ->leftJoin('bono_sueldo', 'sueldos.id', '=', 'bono_sueldo.sueldo_id')
@@ -94,36 +95,22 @@ public function extraeBoletas(Request $request)
         )
         ->where('users.cargo_id', 4)
         ->first();
+$mesNumero = (int) $request->mes;
 
+if ($mesNumero < 1 || $mesNumero > 12) {
+    $mesNumero = 1;
+}
+$mesTexto = $this->mesAnteriorNombre($mesNumero);
     return view('Administrador.FormImprimeBoletasPago', [
         'usuarios'   => $usuarios,
         'bonos'      => $bonos,
         'descuentos' => $descuentos,
         'gestion'    => $gestion_nombre,
         'mes'        => $mes,
+        'mesTexto'   => $mesTexto,
         'administrador' => $administrador,
     ]);
 }
-    public function devuelveMes($mes)
-    {
-        $meses = [
-            'ENERO' => 1,
-            'FEBRERO' => 2,
-            'MARZO' => 3,
-            'ABRIL' => 4,
-            'MAYO' => 5,
-            'JUNIO' => 6,
-            'JULIO' => 7,
-            'AGOSTO' => 8,
-            'SEPTIEMBRE' => 9,
-            'OCTUBRE' => 10,
-            'NOVIEMBRE' => 11,
-            'DICIEMBRE' => 12,
-        ];
-
-        return $meses[$mes] ?? 1;
-    }
-
     // 🔹 Nuevo método para devolver nombre del mes
     public function nombreMes($numero)
     {
@@ -144,4 +131,56 @@ public function extraeBoletas(Request $request)
 
         return $meses[$numero] ?? 'ENERO';
     }
+
+public function devuelveMesId($numero)
+{
+    $meses = [
+        1 => 1,
+        2 => 2,
+        3 => 3,
+        4 => 4,
+        5 => 5,
+        6 => 6,
+        7 => 7,
+        8 => 8,
+        9 => 9,
+        10 => 10,
+        11 => 11,
+        12 => 12,
+    ];
+
+    return $meses[$numero] ?? 1;
+}
+
+public function mesAnteriorNombre($mesNumero)
+{
+    $mesNumero = (int) $mesNumero;
+
+    $meses = [
+        1 => 'ENERO',
+        2 => 'FEBRERO',
+        3 => 'MARZO',
+        4 => 'ABRIL',
+        5 => 'MAYO',
+        6 => 'JUNIO',
+        7 => 'JULIO',
+        8 => 'AGOSTO',
+        9 => 'SEPTIEMBRE',
+        10 => 'OCTUBRE',
+        11 => 'NOVIEMBRE',
+        12 => 'DICIEMBRE',
+    ];
+
+    // 🔥 VALIDACIÓN CLAVE
+    if ($mesNumero < 1 || $mesNumero > 12) {
+        return 'ENERO'; // valor por defecto seguro
+    }
+
+    // Enero → Diciembre
+    if ($mesNumero == 1) {
+        return $meses[12];
+    }
+
+    return $meses[$mesNumero - 1];
+}
 }

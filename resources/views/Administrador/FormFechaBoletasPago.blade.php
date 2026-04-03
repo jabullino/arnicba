@@ -53,24 +53,21 @@
                     @endforeach
                 </select>
                 <br>
-                <select name="mes" id="mes" class='form-control w-[425px]'>
-                    <option value="default">Escoge un mes</option>
-                    <option value="ENERO">ENERO</option>
-                    <option value="FEBRERO">FEBRERO</option>
-                    <option value="MARZO">MARZO</option>
-                    <option value="ABRIL">ABRIL</option>
-                    <option value="MAYO">MAYO</option>
-                    <option value="JUNIO">JUNIO</option>
-                    <option value="JULIO">JULIO</option>
-                    <option value="AGOSTO">AGOSTO</option>
-                    <option value="SEPTIEMBRE">SEPTIEMBRE</option>
-                    <option value="OCTUBRE">OCTUBRE</option>
-                    <option value="NOVIEMBRE">NOVIEMBRE</option>
-                    <option value="DICIEMBRE">DICIEMBRE</option>
-                </select>
-
+                <select name="mes" required class='form-control'>
+                    <option value="1">ENERO</option>
+                    <option value="2">FEBRERO</option>
+                    <option value="3">MARZO</option>
+                    <option value="4">ABRIL</option>
+                    <option value="5">MAYO</option>
+                    <option value="6">JUNIO</option>
+                    <option value="7">JULIO</option>
+                    <option value="8">AGOSTO</option>
+                    <option value="9">SEPTIEMBRE</option>
+                    <option value="10">OCTUBRE</option>
+                    <option value="11">NOVIEMBRE</option>
+                    <option value="12">DICIEMBRE</option>
+                 </select>
                 <button type="submit"
-                    class='bg-sky-900 h8 text-white bold text-center mt-2 rounded-md'
                     style='width:425px'>Consultar</button>
             </div><!---fin div card-body--->
         </div><!--fin div card ---->

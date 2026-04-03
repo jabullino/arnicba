@@ -39,10 +39,11 @@
             </div>
         @endif
 
-```
+
     <div class='card-header text-center bold bg-sky-900 text-white'>
         <h1>FORMULARIO PARA LA CREACIÓN DE ASIENTOS DE DIARIO</h1>
     </div>
+
 
     <form action="{{ route('Asientos.store') }}" method='post'>
         @csrf
@@ -51,31 +52,49 @@
             <div class='mb-2 form-group'>
                 <label>Num. Interno</label>
                 <input type="text" name='numinterno' readonly value='{{ $numinterno }}' class='form-control text-center'>
+                @error('numinterno')
+                  <small class="text-danger">{{ $message }}</small>
+                @enderror 
             </div>
 
             <div class='mb-2 form-group'>
                 <label>Fecha</label>
                 <input type="date" name='fecha' value='{{ old('fecha') }}' class='form-control'>
+                 @error('fecha')
+                  <small class="text-danger">{{ $message }}</small>
+                @enderror
             </div>
 
             <div class='mb-2 form-group'>
                 <label>Tipo Cambio Compra</label>
                 <input type="text" name='tc' id='tc' value={{ $tc }} class='form-control text-center'>
+                 @error('tc')
+                  <small class="text-danger">{{ $message }}</small>
+                @enderror
             </div>
 
             <div class='mb-2 form-group'>
                 <label>Tipo Cambio Venta</label>
                 <input type="text" name='tv' id='tv' value={{ $tv }} class='form-control text-center'>
+                  @error('tv')
+                  <small class="text-danger">{{ $message }}</small>
+                @enderror
             </div>
 
             <div class='mb-2 form-group'>
                 <label>Factura</label>
                 <input type="text" name='factura' id='factura' value="{{ old('factura') }}" class='form-control'>
+                 @error('factura')
+                  <small class="text-danger">{{ $message }}</small>
+                @enderror 
             </div>
 
             <div class='mb-2 form-group'>
                 <label>Recibo</label>
                 <input type="text" name='recibo' id='recibo' value="{{ old('recibo') }}" class='form-control'>
+                 @error('recibo')
+                  <small class="text-danger">{{ $message }}</small>
+                @enderror
             </div>
 
             <div class='mb-2 w-full block col-span-2'>
@@ -90,6 +109,9 @@
                         <option value="{{ $cue->id }}">{{ $cue->nombre }}</option>
                     @endforeach
                 </select>
+                 @error('cuenta')
+                  <small class="text-danger">{{ $message }}</small>
+                @enderror
             </div>
 
             <div class='mb-2 form-group'>
@@ -97,17 +119,26 @@
                 <select id="subcuenta" name="subcuenta" class='form-control' disabled>
                     <option value="">Seleccionar subcuenta</option>
                 </select>
+               @error('subcuenta')
+                  <small class="text-danger">{{ $message }}</small>
+                @enderror   
             </div>
 
             <div class='mb-2 form-group'>
                 <label>Importe Bs.</label>
                 <input type="text" name='importebs' id='importebs' value="{{ old('importebs') }}" class='form-control'>
-            </div>
+               @error('importebs')
+                  <small class="text-danger">{{ $message }}</small>
+                @enderror
+             </div>
 
             <div class='mb-2 form-group'>
                 <label>Importe $us.</label>
                 <input type="text" name='importesus' id='importesus' value="{{ old('importesus') }}" class='form-control'>
-            </div>
+                 @error('importesus')
+                  <small class="text-danger">{{ $message }}</small>
+                @enderror 
+             </div>
 
             <div class='mb-2 form-group'>
                 <label>Origen de Fondos</label>
@@ -117,6 +148,9 @@
                         <option value="{{ $origen->id }}">{{ $origen->nombre }}</option>
                     @endforeach
                 </select>
+                 @error('origenfondos')
+                  <small class="text-danger">{{ $message }}</small>
+                @enderror
             </div>
 
             <div class='mb-2 form-group'>
@@ -127,6 +161,9 @@
                         <option value="{{ $tipo->id }}">{{ $tipo->nombre }}</option>
                     @endforeach
                 </select>
+                 @error('tipomovimiento')
+                  <small class="text-danger">{{ $message }}</small>
+                @enderror   
             </div>
 
             <div class='mb-2 w-full col-span-2'>
