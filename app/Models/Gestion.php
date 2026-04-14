@@ -145,13 +145,13 @@ class Gestion extends Model
             $gestion_id = $gestion->id - 1;
 
 
-            $cargoIds = Cargo::where('id', '!=', 1)->pluck('id')->toArray();
-            $haberes = DB::table('haber_basicos')
-                ->where('gestion_id', $gestion_id)
-                ->whereIn('cargo_id', $cargoIds)
-                ->orderBy('created_at', 'desc')
-                ->pluck('monto')
-                ->toArray();
+             $cargoIds = Cargo::where('id', '!=', 1)->pluck('id')->toArray();
+             $haberes = DB::table('haber_basicos')
+                      ->where('gestion_id', $gestion_id)
+                      ->orderBy('id', 'desc')
+                      ->get()
+                      ->unique('cargo_id')
+                      ->keyBy('cargo_id');
 
 
 
@@ -159,7 +159,7 @@ class Gestion extends Model
                 HaberBasico::create([
                     'gestion_id' => $gestion->id,
                     'cargo_id'   => $cargoId,
-                    'monto'      => $haberes[$index],
+                    'monto' => $haberes[$cargoId]->monto ?? 0,
                 ]);
             }
 

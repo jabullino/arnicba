@@ -74,13 +74,13 @@
 
                                 </div>
                             </tr>
-                            <tr class='bg-sky-900 text-black bold'>
-                                <th scope="col" class='text-center w-8 text-black'>Item #</th>
-                                <th scope="col" class='text-center w-8 text-black'>Num. Asiento</th>
-                                <th scope="col" class='text-center w-24 text-black'>Fecha</th>
-                                <th scope="col" class='text-center w-24 text-black'>Factura</th>
-                                <th scope="col" class='text-center w-24 text-black'>Recibo</th>
-                                <th scope="col" class='text-center w-48 text-black'>Importe Bs.</th>
+                            <tr class='!bg-sky-900 text-black bold' style='background-color:white'>
+                                <th scope="col" class='text-center w-8 text-black  bg-white'>Item #</th>
+                                <th scope="col" class='text-center w-8 text-black  bg-white'>Num. Asiento</th>
+                                <th scope="col" class='text-center w-24 text-black bg-white'>Fecha</th>
+                                <th scope="col" class='text-center w-24 text-black bg-white'>Factura</th>
+                                <th scope="col" class='text-center w-24 text-black bg-white'>Recibo</th>
+                                <th scope="col" class='text-center w-48 text-black bg-white'>Importe Bs.</th>
 
                             </tr>
                         </thead>
@@ -94,11 +94,11 @@
                                     $contadorcuentas = $contadorcuentas + 1;
                                 @endphp
                                 <tr>
-                                    <td colspan="7" class='text-black text-lg bold text-center bg-neutral-700'>
+                                    <td colspan="7" class='!bg-white text-black text-lg bold text-center' style='background-color:#E3B562 !important'>
                                         {{ $nombrecuenta }}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="7" class='text-black text-lg bold text-center bg-teal-800'>
+                                    <td colspan="7" class='!bg-teal-800 text-black text-lg bold text-center'>
                                         {{ $nombresubcuenta }}</td>
                                 </tr>
                                 <tr>
@@ -125,17 +125,17 @@
                                 @endphp
                                 @if ($loop->last)
                                     <tr>
-                                        <td colspan="5" class='bg-red-700 text-black text-right text-lg bold'>TOTAL
+                                        <td colspan="5" class='!bg-red-700 text-black text-right text-lg bold'>TOTAL
                                             SUBCUENTA</td>
-                                        <td colspan="1" class=' bg-red-700 text-black text-lg bold text-center'>
+                                        <td colspan="1" class='!bg-red-700 text-black text-lg bold text-center'>
                                             {{ number_format($sumasubcuentabs, 2) }}</td>
 
 
                                     </tr>
                                     <tr>
-                                        <td colspan="4" class='bg-sky-900'></td>
-                                        <td colspan="1" class='bg-sky-900 text-black text-right text-lg bold'>TOTAL</td>
-                                        <td colspan="1" class='bg-sky-900 text-black text-lg bold text-center'>
+                                        <td colspan="4" style='background-color:#381E03 !important'></td>
+                                        <td colspan="1" class='text-white text-bold text-right text-lg bold' style='background-color:#381E03 !important'>TOTAL</td>
+                                        <td colspan="1" class='text-white text-lg bold text-center' style='background-color:#381E03 !important'>
                                             {{ number_format($montobs, 2) }}</td>
                         
                                     </tr>
@@ -165,25 +165,25 @@
                                 @endphp
                                 @if ($loop->last)
                                     <tr>
-                                        <td colspan="5" class='bg-red-700 text-black text-right text-lg bold'>TOTAL
+                                        <td colspan="5" class='!bg-red-700 text-black text-right text-lg bold'>TOTAL
                                             SUBCUENTA</td>
-                                        <td colspan="1" class=' bg-red-700 text-black text-lg bold text-center'>
+                                        <td colspan="1" class='!bg-red-700 text-black text-lg bold text-center'>
                                             {{ number_format($sumasubcuentabs, 2) }}</td>
 
                                     </tr>
                                     <tr>
-                                        <td colspan="4" class='bg-sky-900'></td>
-                                        <td colspan="1" class='bg-sky-900 text-black text-right text-lg bold'>TOTAL</td>
-                                        <td colspan="1" class='bg-sky-900 text-black text-lg bold text-center'>
+                                        <td colspan="4" style='background-color:#381E03 !important'></td>
+                                        <td colspan="1" class='text-white text-right text-lg bold' style='background-color:#381E03 !important'>TOTAL</td>
+                                        <td colspan="1" class='text-white text-lg bold text-center' style='background-color:#381E03 !important'>
                                             {{ number_format($montobs, 2) }}</td>
                                        
                                     </tr>
                                 @endif
                             @elseif($cuentaidactual == $asi->cuenta && $subcuentaidactual !== $asi->sub_cuenta)
                                 <tr>
-                                    <td colspan="5" class='bg-red-700 text-black text-right text-lg bold'>TOTAL
+                                    <td colspan="5" class='!bg-red-700 text-black text-right text-lg bold'>TOTAL
                                         SUBCUENTA</td>
-                                    <td colspan="1" class=' bg-red-700 text-black text-lg bold text-center'>
+                                    <td colspan="1" class='!bg-red-700 text-black text-lg bold text-center'>
                                         {{ number_format($sumasubcuentabs, 2) }}</td>
 
                                 </tr>
@@ -198,7 +198,7 @@
                                     $nombresubcuenta = $subcuentaux->getSubcuenta($asi->sub_cuenta);
                                 @endphp
                                 <tr>
-                                    <td colspan="7" class='text-black text-lg bold text-center bg-teal-800'>
+                                    <td colspan="7" class='!bg-teal-800 text-black text-lg bold text-center'>
                                         {{ $nombresubcuenta }}</td>
                                 </tr>
 
@@ -227,35 +227,35 @@
                                 @endphp
                                 @if ($loop->last)
                                     <tr>
-                                        <td colspan="5" class='bg-red-700 text-black text-right text-lg bold'>TOTAL
+                                        <td colspan="5" class='!bg-red-700 text-black text-right text-lg bold'>TOTAL
                                             SUBCUENTA</td>
-                                        <td colspan="1" class=' bg-red-700 text-black text-lg bold text-center'>
+                                        <td colspan="1" class='!bg-red-700 text-black text-lg bold text-center'>
                                             {{ number_format($sumasubcuentabs, 2) }}</td>
 
 
                                     </tr>
                                     <tr>
-                                        <td colspan="4" class='bg-sky-900'></td>
-                                        <td colspan="1" class='bg-sky-900 text-black text-right text-lg bold'>TOTAL
+                                        <td colspan="4" style='background-color:#381E03 !important'></td>
+                                        <td colspan="1" class='text-white text-right text-lg bold' style='background-color: #381E03 !important'>TOTAL
                                         </td>
-                                        <td colspan="1" class='bg-sky-900 text-black text-lg bold text-center'>
+                                        <td colspan="1" class='text-white text-lg bold text-center' style='background-color:#381E03 !important'>
                                             {{ number_format($montobs, 2) }}</td>
                                         
                                     </tr>
                                 @endif
                             @elseif($cuentaidactual !== $asi->cuenta)
                                 <tr>
-                                    <td colspan="5" class='bg-red-700 text-black text-right text-lg bold'>TOTAL
+                                    <td colspan="5" class='!bg-red-700 text-black text-right text-lg bold'>TOTAL
                                         SUBCUENTA</td>
-                                    <td colspan="1" class=' bg-red-700 text-black text-lg bold text-center'>
+                                    <td colspan="1" class='!bg-red-700 text-black text-lg bold text-center'>
                                         {{ number_format($sumasubcuentabs, 2) }}</td>
 
 
                                 </tr>
                                 <tr>
-                                    <td colspan="4" class='bg-sky-900'></td>
-                                    <td colspan="1" class='bg-sky-900 text-black text-right text-lg bold'>TOTAL</td>
-                                    <td colspan="1" class='bg-sky-900 text-black text-lg bold text-center'>
+                                    <td colspan="4" style='background-color:#381E03 !important'></td>
+                                    <td colspan="1" class='text-white text-right text-lg bold' style='background-color:#381E03 !important'>TOTAL</td>
+                                    <td colspan="1" class='text-white text-lg bold text-center' style='background-color:#381E03 !important'>
                                         {{ number_format($montobs, 2) }}</td>
                             
                                 </tr>
@@ -273,11 +273,11 @@
                                     $contadorcuentas = $contadorcuentas + 1;
                                 @endphp
                                 <tr>
-                                    <td colspan="7" class='text-black text-lg bold text-center bg-neutral-700'>
+                                    <td colspan="7" class='text-black text-lg bold text-center !bg-neutral-700' style='background-color:#E3B562 !important'>
                                         {{ $nombrecuenta }}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="7" class='text-black text-lg bold text-center bg-teal-800'>
+                                    <td colspan="7" class='text-black text-lg bold text-center !bg-teal-800'>
                                         {{ $nombresubcuenta }}</td>
                                 </tr>
 
@@ -307,17 +307,17 @@
                                 @endphp
                                 @if ($loop->last)
                                     <tr>
-                                        <td colspan="5" class='bg-red-700 text-black text-right text-lg bold'>TOTAL
+                                        <td colspan="5" class='!bg-red-700 text-black text-right text-lg bold'>TOTAL
                                             SUBCUENTA</td>
-                                        <td colspan="1" class=' bg-red-700 text-black text-lg bold text-center'>
+                                        <td colspan="1" class='!bg-red-700 text-black text-lg bold text-center'>
                                             {{ number_format($sumasubcuentabs, 2) }}</td>
 
                                     </tr>
                                     <tr>
-                                        <td colspan="4" class='bg-sky-900'></td>
-                                        <td colspan="1" class='bg-sky-900 text-black text-right text-lg bold'>TOTAL
+                                        <td colspan="4" style='background-color:#381E03 !important'></td>
+                                        <td colspan="1" class='text-white text-right text-lg bold' style='background-color:#381E03 !important'>TOTAL
                                         </td>
-                                        <td colspan="1" class='bg-sky-900 text-black text-lg bold text-center'>
+                                        <td colspan="1" class='text-white text-lg bold text-center' style='background-color:#381E03 !important'>
                                             {{ number_format($montobs, 2) }}</td>
                                     
                                     </tr>
@@ -325,10 +325,10 @@
                             @endif
                         @endforeach|
                         <tr>
-                            <td colspan="3" class='bg-green-700'></td>
-                            <td colspan="2" class='bg-green-700 text-black text-right text-lg bold'>TOTAL GASTOS EN EL
+                            <td colspan="3" class='!bg-sky-900' style='background-color:#030F38 !important'></td>
+                            <td colspan="2" class='!bg-sky-900 text-white text-right text-lg bold' style='background-color:#030F38 !important'>TOTAL GASTOS EN EL
                                 PERÍODO</td>
-                            <td colspan="1" class='bg-green-700 text-black text-lg bold text-center'>
+                            <td colspan="1" class='!bg-green-700 text-white text-lg bold text-center' style='background-color:#030F38 !important'>
                                 {{ number_format($sumatotalbs, 2) }}</td>
                         </tr>
                         @php
@@ -349,15 +349,14 @@
 
     </div><!---fin div principal---->
 
-    <div id='secundario' class='bg-yellow-100 w-[720px] h-[820px]'>
-
-        <table class='table table-borderless border-none border-collapse w-[720px] bg-yellow-100 space-y-*'>
+    <div id='secundario' class='!bg-yellow-100 w-[720px] h-[820px]'>
+    
+        <table class='table table-borderless border-none border-collapse w-[720px] !bg-yellow-100 space-y-*'>
             <thead class='border-none'>
                 <tr>
                     <td class='col-span-4 text-center border-none font-bold'>HOJA DE PRESENTACIÓN DE ESTADO DE RESULTADOS
                     </td>
-                </tr>
-
+                </tr
                 <tr>
                     <td class='col-span-4 text-center font-bold bg-amber-200'>FUNDACIÓN ARCA DE RESCATE DE LOS NIÑOS</td>
                 </tr>
@@ -380,16 +379,16 @@
             <tbody>
                 <tr>
                     <td class='font-bold underlined col-span-2' style='text-decoration:underline'>INGRESOS</td>
-                    <td class='bg-red-700 w-64 text-bold text-right' style='border:solid 2px'>
-                        {{ number_format($sumacreditos + $interescredito, 2, '.', ',') }}</td>
-                    <td class='w-64 text-bold text-right bg-neutral-500'>
-                        {{ number_format($sumacreditos + $interescredito, 2, '.', ',') }}</td>
+                    <td class='w-64 text-bold text-right' style='border:solid 2px'>
+                        </td>
+                    <td class='w-64 text-bold text-right !bg-red-700'>
+                        {{ number_format($sumacreditos+$interescredito+$saldo, 2, '.', ',') }}</td>
                 </tr>
                 <tr>
                     <td class='col-span-2 text-center font-bold' style='text-decoration:underline'>Ingresos del mes de
                         {{ $nombremes }} del {{ $anio }}</td>
-                    <td class='bg-amber-300 w-64 text-bold text-right ' style='border:solid 2px'>
-                        {{ number_format($sumacreditos, 2, '.', ',') }}</td>
+                    <td class='!bg-red-700 w-64 text-bold text-right ' style='border:solid 2px'>
+                        {{ number_format($sumacreditos+$saldo, 2, '.', ',') }}</td>
                     <td class='w-64'></td>
 
                 </tr>
@@ -421,16 +420,16 @@
                 
                 <tr>
                     <td class='font-bold underlined col-span-2' style='text-decoration:underline'>EGRESOS</td>
-                    <td class='bg-red-700 w-64 text-bold text-right' style='border:solid 2px'>
-                        {{ number_format($sumacreditos + $interescredito, 2, '.', ',') }}</td>
-                    <td class='w-64 text-bold text-right bg-neutral-500'>
-                        {{ number_format($sumacreditos + $interescredito, 2, '.', ',') }}</td>
+                    <td class='w-64 text-bold text-right' style='border:solid 2px'>
+                        </td>
+                    <td class='w-64 text-bold text-right !bg-red-700'>
+                        {{ number_format($gastosoperativos, 2, '.', ',') }}</td>
                 </tr>
 
                 <tr>
                     <td class='col-span-2 text-center font-bold' style='text-decoration:underline'>Gastos operativos
                         &nbsp; {{ $nombremes }} del {{ $anio }}</td>
-                    <td class='bg-amber-300 w-64 text-bold text-right ' style='border:solid 2px'>
+                    <td class='!bg-red-700 w-64 text-bold text-right ' style='border:solid 2px'>
                         {{ number_format($gastosoperativos, 2, '.', ',') }}</td>
                     <td class='w-64'></td>
 
@@ -447,21 +446,23 @@
                     <td class='font-bold underlined col-span-2' style='text-decoration:underline'>SALDO ESTADO DE INGRESOS
                         Y SALDOS</td>
                     <td class=' text-bold text-right'></td>
-                    <td class='w-64 text-bold text-right bg-neutral-500'>
-                        {{ number_format($sumacreditos - $sumadebitostotales, 2, '.', ',') }}</td>
+                     
+                    <td class='w-64 text-bold text-right !bg-red-700'>
+                        {{ number_format($sumacreditos+$interescredito+$saldo-$gastosoperativos, 2, '.', ',') }}</td>
                 </tr>
                 <tr>
                     <td class='font-bold text-sm text-center font-small underlined col-span-2'
                         style='text-decoration:underline'>VARIACION</td>
                     <td class=' text-bold text-right'></td>
                     <td class='w-64 text-bold text-sm text-right bg-neutral-500'>
-                        {{ number_format($sumacreditos - $sumadebitostotales - $saldofinal, 2, '.', ',') }}</td>
+                      {{ number_format($sumacreditos+$interescredito+$saldo-$gastosoperativos-$saldofinal, 2, '.', ',') }}</td>
                 </tr>
                 <tr>
+               
                     <td class='font-bold underlined col-span-2' style='text-decoration:underline'>SALDO SEGÚN EXTRACTO
                         BANCARIO</td>
                     <td class=' text-bold text-right'></td>
-                    <td class='w-64 text-bold text-right bg-neutral-500'>{{ number_format($saldofinal, 2, '.', ',') }}
+                    <td class='w-64 text-bold text-right !bg-red-700'>{{ number_format($saldofinal, 2, '.', ',') }}
                     </td>
                 </tr>
             </tbody>

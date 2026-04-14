@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Reporte</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 10px;
+    }
+
+    @page {
+        size: letter;
+        margin: 10mm;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #000;
+        padding: 5px;
+        font-size: 12px;
+    }
+    td:last-child {
+    border: none !important;
+    }
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+
+    .bg-azul { background:#1e3a8a; color:#fff; }
+    .bg-verde { background:#065f46; color:#fff; }
+    .bg-rojo { background:#b91c1c; color:#fff; }
+    .bg-gris { background:#374151; color:#fff; }
+    .bg-amarillo { background:#fef08a; }
+
+    .sin-borde td {
+        border: none !important;
+    }
+
+    @media print {
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+    }
+/* SOLO afecta al div secundario */
+.div-secundario table {
+    width: 95% !important;
+    margin: auto;
+    border: solid 2px !important;
+}
+
+.div-secundario td:last-child {
+    border: 1px solid #000 !important;
+}
+
+.div-secundario .bg-rojo td {
+    background:#b91c1c !important;
+    color:#fff !important;
+}
+
+.div-secundario .bg-gris td {
+    background:#374151 !important;
+    color:#fff !important;
+}
+
+.div-secundario .bg-verde td {
+    background:#065f46 !important;
+    color:#fff !important;
+}
+</style>
+</head>
+
+<body>
+
+{{-- ===================== TABLA PRINCIPAL ===================== --}}
+<table>
+<thead>
+<tr>
+    <th colspan="6" class="bg-azul text-center">
+        REPORTE GENERAL DE GASTOS POR CUENTA Y SUBCUENTA
+        {{ \Carbon\Carbon::parse($fecinicio)->format('d-m-Y') }} -
+        {{ \Carbon\Carbon::parse($fecfin)->format('d-m-Y') }}
+    </th>
+</tr>
+
+<tr class="bg-azul">
+    <th>Item</th>
+    <th>Asiento</th>
+    <th>Fecha</th>
+    <th>Factura</th>
+    <th>Recibo</th>
+    <th>Importe Bs.</th>
+</tr>
+</thead>
+
+<tbody>
+@php
+    $cont = 0;
+    $sumatotalbs = 0;
+    $montobs = 0;
+    $sumasubcuentabs = 0;
+    $cuentaidactual = null;
+    $subcuentaidactual = null;
+@endphp
+
+@foreach ($asientos as $asi)
+@php
+    $nombrecuenta = $cuentaux->getCuenta($asi->cuenta);
+    $nombresubcuenta = $subcuentaux->getSubcuenta($asi->sub_cuenta);
+@endphp
+
+@if ($cuentaidactual !== $asi->cuenta)
+    @if ($cuentaidactual !== null)
+        <tr class="bg-rojo">
+            <td colspan="5" class="text-right">TOTAL CUENTA</td>
+            <td class="text-center">{{ number_format($montobs,2) }}</td>
+        </tr>
+    @endif
+
+    @php
+        $montobs = 0;
+        $cuentaidactual = $asi->cuenta;
+    @endphp
+
+    <tr class="bg-gris">
+        <td colspan="6" class="text-center"><strong>{{ $nombrecuenta }}</strong></td>
+    </tr>
+@endif
+
+@if ($subcuentaidactual !== $asi->sub_cuenta)
+    @if ($subcuentaidactual !== null)
+        <tr class="bg-rojo">
+            <td colspan="5" class="text-right">TOTAL SUBCUENTA</td>
+            <td class="text-center">{{ number_format($sumasubcuentabs,2) }}</td>
+        </tr>
+    @endif
+
+    @php
+        $sumasubcuentabs = 0;
+        $subcuentaidactual = $asi->sub_cuenta;
+    @endphp
+
+    <tr class="bg-verde">
+        <td colspan="6" class="text-center"><strong>{{ $nombresubcuenta }}</strong></td>
+    </tr>
+@endif
+
+<tr>
+    <td class="text-center">{{ ++$cont }}</td>
+    <td class="text-center">{{ $asi->id }}</td>
+    <td class="text-center">{{ \Carbon\Carbon::parse($asi->fec_asiento)->format('d-m-Y') }}</td>
+    <td class="text-center">{{ $asi->factura }}</td>
+    <td class="text-center">{{ $asi->recibo }}</td>
+    <td class="text-center">{{ number_format($asi->monto_bs,2) }}</td>
+</tr>
+
+@php
+    $sumatotalbs += $asi->monto_bs;
+    $montobs += $asi->monto_bs;
+    $sumasubcuentabs += $asi->monto_bs;
+@endphp
+@endforeach
+
+<tr class="bg-rojo">
+    <td colspan="5" class="text-right"><strong>TOTAL GENERAL</strong></td>
+    <td class="text-center"><strong>{{ number_format($sumatotalbs,2) }}</strong></td>
+</tr>
+</tbody>
+</table>
+
+<div class="page-break"></div>
+{{-- ===================== DIV SECUNDARIO ===================== --}}
+
+
+<div class="bg-amarillo div-secundario" style="padding:20px; border:2px solid #000; box-sizing:border-box;margin-top:10px">
+
+<table style="width:98%; margin:auto;margin-top:20px">
+<tr>
+    <td colspan="3" class="text-center" style='border:none'><strong>HOJA DE PRESENTACIÓN DE ESTADO DE RESULTADOS</strong></td>
+</tr>
+<tr>
+    <td colspan="3" class="text-center" style='border:none'><strong>FUNDACIÓN ARCA DE RESCATE DE LOS NIÑOS</strong></td>
+</tr>
+<tr>
+    <td colspan="3" class="text-center" style='border:none'><strong>{{ $nombremes }} {{ $anio }}</strong></td>
+</tr>
+<tr>
+    <td colspan="3" class="text-center" style='border:none'><strong>HOJA DE TRABAJO AUDITADO</strong></td>
+</tr>
+<tr>
+    <td colspan="3" class="text-center" style='border:none'>
+        Del {{ \Carbon\Carbon::parse($fecinicio)->format('d-m-Y') }}
+        al {{ \Carbon\Carbon::parse($fecfin)->format('d-m-Y') }}
+    </td>
+</tr>
+<tr>
+    <td colspan="3" class="text-center" style='border:none'><strong>Expresado en Bolivianos</strong></td>
+</tr>
+</table>
+
+<table style="margin-top:10px;">
+
+<tr class="bg-rojo">
+<td><strong>TOTAL INGRESOS</strong></td>
+<td></td>
+<td class="text-right bg-rojo" style="border:1px solid #000 !important;">
+<strong>{{ number_format($sumacreditos+$interescredito+$saldo,2) }}</strong>
+</td>
+</tr>
+
+<tr class="bg-gris">
+<td colspan="3"><strong>INGRESOS</strong></td>
+</tr>
+
+<tr>
+<td><strong>Ingresos del mes</strong></td>
+<td class="text-right">{{ number_format($sumacreditos,2) }}</td>
+<td style="border:none;"></td>
+</tr>
+
+<tr>
+<td>Saldo inicial</td>
+<td class="text-right">{{ number_format($saldo,2) }}</td>
+<td style="border:none;"></td>
+</tr>
+
+@foreach ($detallecreditos as $detalle)
+<tr>
+<td>Depósito {{ \Carbon\Carbon::parse($detalle->fecha)->format('d-m-Y') }}</td>
+<td class="text-right">{{ number_format($detalle->credito,2) }}</td>
+<td style="border:none;"></td>
+</tr>
+@endforeach
+
+<tr>
+<td>OTROS INGRESOS</td>
+<td class="text-right">{{ number_format($interescredito,2) }}</td>
+<td style="border:none;"></td>
+</tr>
+
+<tr>
+<td>Interés ganado</td>
+<td class="text-right">{{ number_format($interescredito,2) }}</td>
+<td style="border:none;"></td>
+</tr>
+
+<tr class="bg-rojo">
+<td><strong>TOTAL EGRESOS</strong></td>
+<td></td>
+<td class="text-right bg-rojo" style="border:1px solid #000 !important;">
+<strong>{{ number_format($gastosoperativos,2) }}</strong>
+</td>
+</tr>
+
+<tr class="bg-gris">
+<td colspan="3"><strong>EGRESOS</strong></td>
+</tr>
+
+@foreach ($resultados as $fila)
+<tr>
+<td>{{ $fila->cuenta_nombre }}</td>
+<td class="text-right">{{ number_format($fila->total,2) }}</td>
+<td style="border:none;"></td>
+</tr>
+@endforeach
+
+<tr class="bg-gris">
+<td><strong>SALDO FINAL</strong></td>
+<td></td>
+<td class="text-right bg-gris" style="border:1px solid #000 !important;">
+<strong>{{ number_format(($sumacreditos + $saldo + $interescredito - $gastosoperativos),2) }}</strong>
+</td>
+</tr>
+
+<tr class="bg-verde">
+<td><strong>VARIACIÓN</strong></td>
+<td></td>
+<td class="text-right bg-verde">
+<strong>{{ number_format(($sumacreditos + $saldo + $interescredito - $gastosoperativos - $saldofinal),2) }}</strong>
+</td>
+</tr>
+
+<tr class="bg-rojo">
+<td><strong>SALDO BANCARIO</strong></td>
+<td></td>
+<td class="text-right bg-rojo" style="border:1px solid #000 !important;">
+<strong>{{ number_format($saldofinal,2) }}</strong>
+</td>
+</tr>
+
+<tr>
+<td colspan="3" style="height:120px; border:none;"></td>
+</tr>
+
+<tr class="sin-borde">
+<td class="text-center">
+<div style="border-top:1px solid #000; width:80%; margin:auto;"></div>
+<strong>
+Lic. Aud. Silvia Aguilar García<br>
+CADB 19836<br>
+CDA-16-MM85
+</strong>
+</td>
+
+<td></td>
+
+<td class="text-center">
+<div style="border-top:1px solid #000; width:80%; margin:auto;"></div>
+<strong>
+Ing. Javier Fidel Guillén Escalera<br>
+C.I. 997213<br>
+Representante Legal
+</strong>
+</td>
+</tr>
+
+</table>
+
+</div>
+</body>
+</html>

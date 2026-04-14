@@ -61,13 +61,15 @@ class ReporteMensualController extends Controller
             $tc = TipoCambioCompra::latest()->value('tc');
             $tv = TipoCambioVenta::latest()->value('tv');
             $diftc=($tv-$tc)/$tv; 
-$asientos = DB::table('asientos')
-    ->whereBetween('fec_asiento', [$request->fecinicio, $request->fecfin])
-    ->whereNull('deleted_at')
-    ->orderBy('cuenta', 'ASC')        // 🔥 ESTE CAMBIO ARREGLA TODO
-    ->orderBy('sub_cuenta', 'ASC')
-    ->orderBy('id', 'ASC')
-    ->get();
+            
+            $asientos = DB::table('asientos')
+            ->whereBetween('fec_asiento', [$request->fecinicio, $request->fecfin])
+            ->whereNull('deleted_at')
+            ->orderBy('cuenta', 'ASC')        // 🔥 ESTE CAMBIO ARREGLA TODO
+            ->orderBy('sub_cuenta', 'ASC')
+            ->orderBy('id', 'ASC')
+            ->get();
+            
             $detallecreditos = MovimientoCuenta::whereBetween('fecha', [$request->fecinicio, $request->fecfin])
                 ->whereNotNull('credito')
                 ->where('credito', '>', 0)
@@ -99,26 +101,30 @@ $asientos = DB::table('asientos')
                 ->orderBy('fecha', 'asc')
                 ->orderBy('id', 'asc') // Agregado para asegurar el orden
                 ->first();
-            $saldoinicial = $primerRegistro->saldo + $primerRegistro->debito;
+            if ($primerRegistro) {
+               $saldoinicial = $primerRegistro->saldo + $primerRegistro->debito;
+            }else{
+                   $saldoinicial = 0;
+            }
 
 
             $saldofinal = DB::table('movimiento_cuentas')
-    ->where('fecha', '<=', $request->fecfin . ' 23:59:59')
-    ->latest('fecha')
-    ->latest('id')
-    ->value('saldo');
+                         ->where('fecha', '<=', $request->fecfin . ' 23:59:59')
+                         ->latest('fecha')
+                         ->latest('id')
+                         ->value('saldo');
 
 
              $resultados = DB::select("
-    SELECT 
-        c.nombre as cuenta_nombre,
-        SUM(a.monto_sus) as total
-    FROM asientos a
-    INNER JOIN cuentas c ON a.cuenta = c.id
-    WHERE a.deleted_at IS NULL
-      AND a.fec_asiento BETWEEN ? AND ?
-    GROUP BY a.cuenta, c.nombre
-", [$request->fecinicio, $request->fecfin]); 
+                         SELECT 
+                         c.nombre as cuenta_nombre,
+                         SUM(a.monto_sus) as total
+                         FROM asientos a
+                         INNER JOIN cuentas c ON a.cuenta = c.id
+                         WHERE a.deleted_at IS NULL
+                         AND a.fec_asiento BETWEEN ? AND ?
+                         GROUP BY a.cuenta, c.nombre
+                         ", [$request->fecinicio, $request->fecfin]); 
 
 
             $gastosoperativos = 0;
@@ -163,8 +169,20 @@ $asientos = DB::table('asientos')
                 'saldofinal' => $saldofinal,
             ]);
 
-            $cont = 0;
-            return view('Administrador.FormEstadoResultadosDolares')->with(['fecinicio' => $request->fecinicio, 'fecfin' => $request->fecfin, 'asientos' => $asientos, 'cont' => $cont, 'cuentaux' => $cuentaux, 'subcuentaux' => $subcuentaux, 'asientosaux' => $asientosaux, 'cont' => $cont, 'montobs' => $montobs, 'montosus' => $montosus, 'sumatotalbs' => $sumatotalbs, 'sumatotalsus' => $sumatotalsus, 'sumasubcuentabs' => $sumasubcuentabs, 'sumasubcuentasus' => $sumasubcuentasus, 'cuentaidactual' => $cuentaidactual, 'cuentaidanterior' => $cuentaidanterior, 'subcuentaidactual' => $subcuentaidactual, 'subcuentaidanterior' => $subcuentaidanterior, 'nombrescuentas' => $nombrescuentas, 'totalmontoscuentasdolares' => $totalmontoscuentasdolares, 'totalmontoscuentasbolivianos' => $totalmontoscuentasbolivianos, 'contadorcuentas' => $contadorcuentas, 'contadortotales' => $contadortotales, 'anio' => $anio, 'nombremes' => $nombremes, 'fecinicio' => $request->fecinicio, 'fecfin' => $request->fecfin, 'detallecreditos' => $detallecreditos, 'interescredito' => $interescredito, 'sumacreditos' => $sumacreditos, 'sumadebitos' => $sumadebitos, 'interesdebito' => $interesdebito, 'itf' => $itf, 'resultados' => $resultados, 'gastosoperativos' => $gastosoperativos, 'saldo' => $saldoinicial, 'sumadebitostotales' => $sumadebitostotales, 'saldofinal' => $saldofinal,'diftc'=>$diftc]);
+                  $collection = collect($resultados);
+
+                  $montoAjuste = $collection
+                               ->where('cuenta_nombre', 'ASIENTOS DE AJUSTE')
+                               ->sum('total');
+
+                  $inflacion = $montoAjuste * $diftc;
+                  
+                  if($inflacion>0){
+                      $gastosoperativos = $collection->sum('total') + $inflacion;
+                  }
+
+                  $cont = 0;
+                  return view('Administrador.FormEstadoResultadosDolares')->with(['fecinicio' => $request->fecinicio, 'fecfin' => $request->fecfin, 'asientos' => $asientos, 'cont' => $cont, 'cuentaux' => $cuentaux, 'subcuentaux' => $subcuentaux, 'asientosaux' => $asientosaux, 'cont' => $cont, 'montobs' => $montobs, 'montosus' => $montosus, 'sumatotalbs' => $sumatotalbs, 'sumatotalsus' => $sumatotalsus, 'sumasubcuentabs' => $sumasubcuentabs, 'sumasubcuentasus' => $sumasubcuentasus, 'cuentaidactual' => $cuentaidactual, 'cuentaidanterior' => $cuentaidanterior, 'subcuentaidactual' => $subcuentaidactual, 'subcuentaidanterior' => $subcuentaidanterior, 'nombrescuentas' => $nombrescuentas, 'totalmontoscuentasdolares' => $totalmontoscuentasdolares, 'totalmontoscuentasbolivianos' => $totalmontoscuentasbolivianos, 'contadorcuentas' => $contadorcuentas, 'contadortotales' => $contadortotales, 'anio' => $anio, 'nombremes' => $nombremes, 'fecinicio' => $request->fecinicio, 'fecfin' => $request->fecfin, 'detallecreditos' => $detallecreditos, 'interescredito' => $interescredito, 'sumacreditos' => $sumacreditos, 'sumadebitos' => $sumadebitos, 'interesdebito' => $interesdebito, 'itf' => $itf, 'resultados' => $resultados, 'gastosoperativos' => $gastosoperativos, 'saldo' => $saldoinicial, 'sumadebitostotales' => $sumadebitostotales, 'saldofinal' => $saldofinal,'diftc'=>$diftc]);
 
 
             /*---------------------------aqui termina el cuadro general -----------*/
@@ -211,7 +229,7 @@ $asientos = DB::table('asientos')
 $asientos = DB::table('asientos')
     ->whereBetween('fec_asiento', [$request->fecinicio, $request->fecfin])
     ->whereNull('deleted_at')
-    ->orderBy('cuenta', 'DESC')
+    ->orderBy('cuenta', 'ASC')   // 👈 CORREGIDO
     ->orderBy('sub_cuenta', 'ASC')
     ->orderBy('id', 'ASC')
     ->get();
@@ -246,21 +264,22 @@ $asientos = DB::table('asientos')
 
 
             $saldofinal = DB::table('movimiento_cuentas')
-                ->latest('fecha')   // Ordena por la columna que indiques
-                ->value('saldo');
+    ->whereDate('fecha', $request->fecfin)
+    ->orderByDesc('id') // o la columna que define el orden real
+    ->value('saldo');
 
-
-
-            $resultados = DB::table('asientos')
-                ->join('cuentas', 'asientos.cuenta', '=', 'cuentas.id')
-                ->select('cuentas.nombre as cuenta_nombre', DB::raw('SUM(asientos.monto_bs) as total'))
-                ->whereBetween('asientos.fec_asiento', [$request->fecinicio, $request->fecfin])
-                ->groupBy('asientos.cuenta', 'cuentas.nombre')
-                ->get();
+$resultados = DB::table('asientos')
+    ->join('cuentas', 'asientos.cuenta', '=', 'cuentas.id')
+    ->select('cuentas.nombre as cuenta_nombre', DB::raw('SUM(asientos.monto_bs) as total'))
+    ->whereNull('asientos.deleted_at') // 👈 IMPORTANTE
+    ->whereBetween('asientos.fec_asiento', [$request->fecinicio, $request->fecfin])
+    ->groupBy('asientos.cuenta', 'cuentas.nombre')
+    ->orderBy('asientos.cuenta', 'asc')
+    ->get();
             $gastosoperativos = 0;
             foreach ($resultados as $go) {
                 $gastosoperativos = $gastosoperativos + $go->total;
-            }
+            }  
             session([
                 'fecinicio' => $request->fecinicio,
                 'fecfin' => $request->fecfin,
@@ -268,8 +287,6 @@ $asientos = DB::table('asientos')
                 'cont' => $cont,
                 'cuentaux' => $cuentaux,
                 'subcuentaux' => $subcuentaux,
-                'asientosaux' => $asientosaux,
-                'montobs' => $montobs,
                 'montosus' => $montosus,
                 'sumatotalbs' => $sumatotalbs,
                 'sumatotalsus' => $sumatotalsus,

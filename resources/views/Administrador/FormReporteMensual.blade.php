@@ -12,68 +12,52 @@
             </div>
         @endif
 
-        <div class='card w-[350px] mx-auto'>
-            <div class='card-header text-center text-white bold w-[350px] mt-4 bold text-center bg-slate-700'>
-                FORMULARIO RESUMEN DE GASTO MENSUAL
+        <div class="card max-w-sm w-full mx-auto">
+    <div class="card-header text-center text-white font-bold mt-4 bg-slate-700">
+        FORMULARIO RESUMEN DE GASTO MENSUAL
+    </div>
+
+    <div class="card-body bg-slate-700 p-4">
+        <form action="{{ route('muestrareportemensual') }}" method="POST">
+            @csrf
+
+            <div class="bg-gray-500 p-4 rounded">
+
+                <!-- FECHA INICIO -->
+                <label class="block text-white text-center mb-1">
+                    FECHA DE INICIO
+                </label>
+                <input type="date" name="fecinicio"
+                    class="w-full rounded text-sky-900 mb-3">
+
+                <!-- FECHA FIN -->
+                <label class="block text-white text-center mb-1">
+                    FECHA FIN
+                </label>
+                <input type="date" name="fecfin"
+                    class="w-full rounded text-sky-900 mb-3">
+
+                <!-- MONEDA -->
+                <label class="block text-white text-center mb-1">
+                    MONEDA
+                </label>
+                <select name="moneda"
+                    class="w-full rounded text-lg mb-4">
+                    <option value="default">Escoge Moneda</option>
+                    <option value="bolivianos">Bolivianos</option>
+                    <option value="dolares">Dólares</option>
+                </select>
+
+                <!-- BOTÓN -->
+                <button type="submit"
+                    class="w-full bg-sky-900 text-white py-2 rounded">
+                    Consultar
+                </button>
+
             </div>
-
-            <div class='card-body bg-slate-700'>
-                <form action="{{ route('muestrareportemensual') }}" method='POST'>
-                    @csrf
-                    <div class='bg-gray-500 h-[270px] w-[325px] mx-auto'>
-                        <div class='mb-2 h-3'></div>
-                        <div class='block w-64 h-14 mx-16 mb-8'>
-                            <div class='text-white bold-md text-lg w-[250px] text-center bg-slate-700'>
-                                FECHA DE INICIO
-                            </div>
-                            <div class='text-white bold-md text-lg w-[250px] text-center bg-slate-700'>
-                                <input type="date" id="fecinicio" name="fecinicio"
-                                    class='rounded w-[250px] text-sky-900 text-lg rounded form-control'>
-                            </div>
-                            @if ($errors->has('fecinicio'))
-                                <div style="color: red;" class='bg-red-500 text-white text-lg w-[250px]'>
-                                    {{ $errors->first('fecinicio') }}
-                                </div>
-                            @endif
-
-                            <div class='text-white bold-md text-lg w-[250px] mt-4 text-center bg-slate-700'>
-                                FECHA FIN
-                            </div>
-                            <div>
-                                <input type="date" id="fecfin" name="fecfin"
-                                    class='rounded text-sky-900 text-lg rounded w-[250px] form-control'>
-                            </div>
-                            @if ($errors->has('fecfin'))
-                                <div style="color: red;" class='bg-red-500 text-white text-lg w-[250px]'>
-                                    {{ $errors->first('fecfin') }}
-                                </div>
-                            @endif
-
-                            <div class='text-white bold-md text-lg w-[250px] mt-4 text-center bg-slate-700'>
-                                MONEDA
-                            </div>
-                            <div class='w-[250px]'>
-                                <select name="moneda" id="moneda" class='form-control w-[250px] text-lg'>
-                                    <option value="default">Escoge Moneda</option>
-                                    <option value="bolivianos">Bolivianos</option>
-                                    <option value="dolares">Dólares</option>
-                                </select>
-                            </div>
-                            @if ($errors->has('moneda'))
-                                <div style="color: red;" class='bg-red-500 text-white text-lg w-[250px]'>
-                                    {{ $errors->first('moneda') }}
-                                </div>
-                            @endif
-                        </div>
-
-                        <div class='w-full mt-64'>
-                            <button type='submit'
-                                class='bg-sky-900 text-white bold w-[250px] form-control mx-[38px]'>Consultar</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+        </form>
+    </div>
+</div>
     </div>
 
     <style>
