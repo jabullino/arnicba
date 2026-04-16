@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Models\Residente;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class DerivacionController extends Controller
 {
@@ -33,41 +34,59 @@ class DerivacionController extends Controller
         return view('TSocial.Derivacion.create', compact('residentes'));
     }
 
+
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'residente_id' => 'required|exists:users,id',
-            'fecha' => 'required|date',
-            'numjuzgado' => 'required|string|max:50',
-            'numdoc' => 'required|string|max:50',
-            'nomjuez' => 'required|string|max:100',
+   public function store(Request $request)
+{
+    // VALIDACIÓN
+    $validator = Validator::make($request->all(), [
+        'residente_id' => 'required|exists:residentes,id',
+        'fecha' => 'required|date',
+        'numjuzgado' => 'required|string|max:50',
+        'numdoc' => 'required|string|max:50',
+        'nomjuez' => 'required|string|max:255',
+    ]);
+
+    if ($validator->fails()) {
+    return redirect()
+        ->back()
+        ->withErrors($validator)
+        ->withInput();
+}
+
+    // 👇 AQUÍ VA (esto faltaba)
+    $validated = $validator->validated();
+
+    try {
+        DB::beginTransaction();
+
+        Derivacion::create([
+            'residente_id' => $validated['residente_id'],
+            'fecha' => Carbon::parse($validated['fecha'])->format('Y-m-d'),
+            'numjuzgado' => $validated['numjuzgado'],
+            'numdoc' => $validated['numdoc'],
+            'nomjuez' => $validated['nomjuez'],
         ]);
 
-        try {
-            DB::beginTransaction();
-            Derivacion::create([
-                'residente_id' => $request->residente_id,
-                'fecha' => Carbon::parse($request->fecha)->format('Y-m-d'),
-                'numjuzgado' => $request->numjuzgado,
-                'numdoc' => $request->numdoc,
-                'nomjuez' => $request->nomjuez,
-            ]);
-            DB::commit();
+        DB::commit();
 
-            return redirect()->route('derivaciones.index')->with('success', 'Derivación creada correctamente.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error al crear derivación: ' . $e->getMessage());
-
-            return redirect()->back()->withInput()->with('error', 'Ocurrió un error al crear la derivación.');
-        }
-
-        return redirect()->route('derivaciones.index')
+        return redirect()
+            ->route('derivaciones.index')
             ->with('success', 'Derivación creada correctamente.');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+
+        Log::error('Error al crear derivación: ' . $e->getMessage());
+
+        return redirect()
+            ->back()
+            ->withInput()
+            ->with('error', 'Ocurrió un error al crear la derivación.');
     }
+}
 
     /**
      * Display the specified resource.
@@ -94,34 +113,37 @@ class DerivacionController extends Controller
      */
    public function update(Request $request, Derivacion $derivacion)
 {
-    $request->validate([
-        'residente_id' => 'required|exists:users,id',
+    $validated = $request->validate([
+        'residente_id' => 'required|exists:residentes,id',
         'fecha' => 'required|date',
         'numjuzgado' => 'required|string|max:50',
         'numdoc' => 'required|string|max:50',
-        'nomjuez' => 'required|string|max:100',
+        'nomjuez' => 'required|string|max:255',
     ]);
 
     try {
-        DB::beginTransaction();
         $derivacion->update([
-            'residente_id' => $request->residente_id,
-            'fecha' => Carbon::parse($request->fecha)->format('Y-m-d'),
-            'numjuzgado' => $request->numjuzgado,
-            'numdoc' => $request->numdoc,
-            'nomjuez' => $request->nomjuez,
+            'residente_id' => $validated['residente_id'],
+            'fecha' => $validated['fecha'], // si viene en formato correcto
+            'numjuzgado' => $validated['numjuzgado'],
+            'numdoc' => $validated['numdoc'],
+            'nomjuez' => $validated['nomjuez'],
         ]);
-        DB::commit();
 
-        return redirect()->route('derivaciones.index')->with('success', 'Derivación actualizada correctamente.');
+        return redirect()
+            ->route('derivaciones.index')
+            ->with('success', 'Derivación actualizada correctamente.');
+
     } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error('Error al actualizar derivación: '.$e->getMessage());
 
-        return redirect()->back()->withInput()->with('error', 'Ocurrió un error al actualizar la derivación.');
+        Log::error('Error al actualizar derivación: ' . $e->getMessage());
+
+        return redirect()
+            ->back()
+            ->withInput()
+            ->with('error', 'Ocurrió un error al actualizar la derivación.');
     }
 }
-
 
     /**
      * Remove the specified resource from storage.

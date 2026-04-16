@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('fecha');
             $table->tinyInteger('numjuzgado');
             $table->string('numdoc',20);
-            $table->string('nomjuez',30);
+            $table->string('nomjuez',255);
             $table->softDeletes();
             $table->timestamps();
         });

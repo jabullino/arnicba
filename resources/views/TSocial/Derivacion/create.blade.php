@@ -3,6 +3,21 @@
 @section('content')
 <div class="container mt-4">
     <div class="card shadow-lg rounded-3" style="background-color:#454d55; color:#f8f9fa;">
+      @if ($errors->any())
+<script>
+    let errores = `
+        @foreach ($errors->all() as $error)
+            • {{ $error }}<br>
+        @endforeach
+    `;
+
+    Swal.fire({
+        icon: 'error',
+        title: 'Errores',
+        html: errores
+    });
+</script>
+@endif
         <div class="card-body p-4 ">
             <h4 class="text-center mb-4">Nueva Derivación</h4>
             <form action="{{ route('derivaciones.store') }}" method="POST" id="formDerivacion">
@@ -42,7 +57,46 @@
     </div>
 </div>
 @endsection
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+@if(session('success'))
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: 'Éxito',
+        text: "{{ session('success') }}",
+        confirmButtonColor: '#3085d6'
+    });
+</script>
+@endif
+
+@if(session('error'))
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: "{{ session('error') }}",
+        confirmButtonColor: '#d33'
+    });
+</script>
+@endif
+
+@if ($errors->any())
+<script>
+    let errores = `
+        @foreach ($errors->all() as $error)
+            • {{ $error }}<br>
+        @endforeach
+    `;
+
+    Swal.fire({
+        icon: 'warning',
+        title: 'Errores de validación',
+        html: errores,
+        confirmButtonColor: '#f0ad4e'
+    });
+</script>
+@endif
 @section('js')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
