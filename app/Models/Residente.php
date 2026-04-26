@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Extension;
+use App\Models\EgresoResidente;
 use Carbon\Carbon;
 
 
@@ -50,6 +51,16 @@ class Residente extends Model
     {
         return $this->hasOne(Historial::class);
     }
+
+    public function derivacionResidente()
+    {
+      return $this->hasOne(Derivacion::class, 'residente_id');
+    }
+
+   public function egreso(): HasOne
+    {
+        return $this->hasOne(EgresoResidente::class);
+    }   
 
     
 }

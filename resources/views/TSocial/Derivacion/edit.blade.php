@@ -22,16 +22,47 @@
                             @endforeach
                         </select>
                     </div>
+                    @php
+                        $gest=$gestion->devuelveNombre($derivacion->gestion_id);
+                    @endphp
+                    <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                        <label class="form-label">Gestión</label>
+                        <select name="gestion_id" class="form-select bg-dark text-light border-secondary w-100" required>
+                            <option value="">Seleccione...</option>
+                            @foreach($gestiones as $g)
+                                <option value="{{ $g->id }}"
+                                    {{ $g->id == $derivacion->gestion_id ? 'selected' : '' }}>
+                                    {{ $g->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>   
 
                     <div class="col-md-6 col-12">
                         <label class="form-label">Fecha</label>
                         <input type="date" name="fecha" class="form-control bg-dark text-light border-secondary" value="{{ $derivacion->fecha }}" required>
+                    </div>
+                    @php
+                        $mun=$municipio->devuelveNombre($derivacion->municipio_id);
+                    @endphp
+                    <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                        <label class="form-label">Municipio</label>
+                        <select name="municipio_id" class="form-select bg-dark text-light border-secondary w-100" required>
+                            <option value="">Seleccione...</option>
+                            @foreach($municipios as $municipio)
+                                <option value="{{ $municipio->id }}"
+                                    {{ $municipio->id == $derivacion->municipio_id ? 'selected' : '' }}>
+                                    {{ $municipio->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
 
                     <div class="col-md-6 col-12">
                         <label class="form-label">N° Juzgado</label>
                         <input type="text" name="numjuzgado" id="numjuzgado" class="form-control bg-dark text-light border-secondary" value="{{ $derivacion->numjuzgado }}" required>
                     </div>
+                    
 
                     <div class="col-md-6 col-12">
                         <label class="form-label">N° Documento</label>

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('fecha');
             $table->string('numdoc',15);
             $table->string('ciudad',20);
-            $table->string('municipio',30);
+            $table->foreignId('municipio')->constrained('municipios')->onDelete('cascade');
             $table->string('tipologia',30);
             $table->string('firmante',50);
             $table->softDeletes();

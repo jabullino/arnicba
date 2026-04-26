@@ -15,13 +15,23 @@ class Municipio extends Model
     protected $fillable=['ciudad_id','nombre'];
     public $timestamps=false;
 
-    function ciudad(): BelongsTo
+    public function ciudad(): BelongsTo
     {
         return $this->belongsTo(Ciudad::class);
     }
 
-    function acogidas(): HasMany
+    public function acogidas(): HasMany
     {
         return $this->hasMany(AcogidaCircunstancial::class);
     }
+
+    public function derivaciones(): HasMany
+    {
+        return $this->hasMany(Derivacion::class);
+    }
+
+    public function devuelveNombre($id){
+        $nombre=Municipio::where('id',$id)->value('nombre');
+        return $nombre;
+    } 
 }

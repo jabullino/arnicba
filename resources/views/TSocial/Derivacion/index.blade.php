@@ -21,7 +21,9 @@
             <tr class="text-center">
                 <th>#</th>
                 <th>Residente</th>
+                <th>Gestión</th>
                 <th>Fecha</th>
+                <th>N° Municipio</th>
                 <th>N° Juzgado</th>
                 <th>N° Documento</th>
                 <th>Nombre del Juez</th>
@@ -34,7 +36,15 @@
                 <tr class="text-center">
                     <td>{{ $num++ }}</td>
                     <td>{{ $derivacion->residente->nombre }} {{ $derivacion->residente->apellido }}</td>
+                    @php
+                        $gest=$gestion->devuelveNombre($derivacion->gestion_id);
+                    @endphp
+                    <td>{{ $gest }}</td>
                     <td>{{ \Carbon\Carbon::parse($derivacion->fecha)->format('d-m-Y') }}</td>
+                    @php
+                        $mun=$municipio->devuelveNombre($derivacion->municipio_id);
+                    @endphp
+                    <td>{{ $mun }}</td>
                     <td>{{ $derivacion->numjuzgado }}</td>
                     <td>{{ $derivacion->numdoc }}</td>
                     <td>{{ $derivacion->nomjuez }}</td>

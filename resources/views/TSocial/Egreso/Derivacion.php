@@ -11,21 +11,11 @@ class Derivacion extends Model
 {
     use SoftDeletes;
 
-    protected $fillable=['residente_id','gestion_id','municipio_id','fecha','numjuzgado','numdoc','nomjuez'];
+    protected $fillable=['residente_id','fecha','numjuzgado','numdoc','nomjuez'];
     protected $table='derivaciones';
 
     public function residente(): BelongsTo
     {
         return $this->belongsTo(Residente::class);
-    }
-
-    public function gestion(): BelongsTo
-    {
-        return $this->belongsTo(Gestion::class);
-    }
-
-    public function municipio(): BelongsTo
-    {
-        return $this->belongsTo(Municipio::class);
     }
 }

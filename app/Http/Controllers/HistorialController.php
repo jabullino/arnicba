@@ -98,10 +98,63 @@ public function create()
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
+public function show(string $id)
+{
+    $residenteId = request('residente_id');
+
+    $historial = Historial::findOrFail($id);
+
+    // 🔥 SOLUCIÓN REAL
+    if ($residenteId && $residenteId != $historial->residente_id) {
+
+        $nuevoHistorial = Historial::where('residente_id', $residenteId)->first();
+
+        if ($nuevoHistorial) {
+            $historial = $nuevoHistorial;
+        }
     }
+
+    $residentes = Residente::with([
+        'acogida.tipologiaRel',
+        'acogida.ciudadRel',
+        'acogida.municipioRel'
+    ])
+        ->orderBy('apellido')
+        ->get()
+        ->map(function ($residente) {
+
+            $edad = $residente->fecnac ? $residente->fecnac->age : null;
+
+            $fechaIngresoRaw = $residente->acogida?->fecha;
+
+            $fechaIngresoFormateada = $fechaIngresoRaw
+                ? \Carbon\Carbon::parse($fechaIngresoRaw)->format('d-m-Y')
+                : null;
+
+            $estadia = null;
+
+            if ($fechaIngresoRaw) {
+                $fechaIngreso = \Carbon\Carbon::parse($fechaIngresoRaw);
+                $diff = $fechaIngreso->diff(\Carbon\Carbon::now());
+                $estadia = "{$diff->y} años, {$diff->m} meses y {$diff->d} días";
+            }
+
+            return [
+                'id' => $residente->id,
+                'nombre' => $residente->nombre,
+                'apellido' => $residente->apellido,
+                'fecnac' => optional($residente->fecnac)->format('d-m-Y'),
+                'edad' => $edad,
+                'fecha_ingreso' => $fechaIngresoFormateada,
+                'estadia' => $estadia,
+                'tipologia' => $residente->acogida?->tipologiaRel?->nombre,
+                'ciudad' => $residente->acogida?->ciudadRel?->nombre,
+                'municipio' => $residente->acogida?->municipioRel?->nombre,
+            ];
+       });
+
+    return view('TSocial.Historiales.MuestraHistorial', compact('historial', 'residentes'));
+}
 
     /**
      * Show the form for editing the specified resource.

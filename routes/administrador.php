@@ -33,6 +33,7 @@ use App\Http\Controllers\ProductoEscolarController;
 use App\Http\Controllers\IngresoEscolarController;
 use App\Http\Controllers\EgresosEscolarController;
 use App\Http\Controllers\ImpresionIngresosEgresosEscolarController;
+use App\Http\Controllers\BalanceCajaChicaController;
 
 
 
@@ -97,5 +98,7 @@ Route::middleware(['auth', 'IsAdministrador'])->group(function () {
    
     Route::get('ListaIngresos', [IngresoEscolarController::class, 'listarIngresos'])->name('ListaIngresos');
     Route::get('ListaEgresos', [EgresosEscolarController::class, 'listarEgresos'])->name('ListaEgresos');
+    Route::get('balancecajachica',[BalanceCajaChicaController::class,'resumen'])
+    ->name('balancecajachica');
     
 });

@@ -60,7 +60,8 @@
                                class="checkItem" 
                                value="{{ $item->cargo_id }}">
                     </td>
-                    <td>{{ $item->cargo_nombre }}</td>
+                    <!-- 🔹 AQUÍ SOLO SE AÑADIÓ class="cargo" -->
+                    <td class="cargo">{{ $item->cargo_nombre }}</td>
                     <td class="salario-actual">{{ $item->monto }}</td>
                     <td class="nuevo-salario">-</td>
                 </tr>
@@ -140,9 +141,13 @@ function calcularPreview() {
         let salarioActual = parseFloat(row.querySelector('.salario-actual').innerText);
         let nuevo = salarioActual + (salarioActual * (incremento / 100));
 
-        // aplicar salario mínimo
-        if (nuevo < salarioMin) {
-            nuevo = salarioMin;
+        let cargo = row.querySelector('.cargo').innerText.trim();
+
+        // 🔹 aplicar salario mínimo SOLO si NO es Sub Director(a)
+        if (cargo.toLowerCase() !== 'sub director(a)') {
+            if (nuevo < salarioMin) {
+                nuevo = salarioMin;
+            }
         }
 
         row.querySelector('.nuevo-salario').innerText = nuevo.toFixed(2);

@@ -11,6 +11,8 @@ use App\Models\Residente;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Gestion;
+use App\Models\Municipio;
 
 class DerivacionController extends Controller
 {
@@ -21,7 +23,9 @@ class DerivacionController extends Controller
     {
         // Cargar todas las derivaciones con el residente
         $derivaciones = Derivacion::with('residente')->orderBy('fecha', 'desc')->get();
-        return view('TSocial.Derivacion.index', compact('derivaciones'));
+        $gestion=new Gestion();
+        $municipio=new Municipio();
+        return view('TSocial.Derivacion.index', compact('derivaciones','gestion','municipio'));
     }
 
     /**
@@ -31,7 +35,9 @@ class DerivacionController extends Controller
     {
         // Obtener todos los residentes para el select
           $residentes = Residente::whereDoesntHave('derivacion')->get();
-        return view('TSocial.Derivacion.create', compact('residentes'));
+          $gestiones=Gestion::all();
+          $municipios=Municipio::all();
+        return view('TSocial.Derivacion.create', compact('residentes','gestiones','municipios'));
     }
 
 
@@ -42,6 +48,8 @@ class DerivacionController extends Controller
 {
     // VALIDACIÓN
     $validator = Validator::make($request->all(), [
+        'gestion_id' =>'required',
+        'municipio_id' =>'required',
         'residente_id' => 'required|exists:residentes,id',
         'fecha' => 'required|date',
         'numjuzgado' => 'required|string|max:50',
@@ -63,6 +71,8 @@ class DerivacionController extends Controller
         DB::beginTransaction();
 
         Derivacion::create([
+            'gestion_id' => $validated['gestion_id'],
+            'municipio_id' => $validated['municipio_id'],
             'residente_id' => $validated['residente_id'],
             'fecha' => Carbon::parse($validated['fecha'])->format('Y-m-d'),
             'numjuzgado' => $validated['numjuzgado'],
@@ -94,8 +104,13 @@ class DerivacionController extends Controller
     public function show(Derivacion $derivacion)
     {
         // Cargar el residente relacionado
-        $derivacion->load('residente');
-        return view('TSocial.Derivacion.show', compact('derivacion'));
+        $derivacion->load('residente'); // Carga explícita de la relación
+        $residentes = Residente::orderBy('nombre')->get();
+        $gestiones=Gestion::all();
+        $municipios = Municipio::orderBy('nombre','ASC')->get();
+        $gestion=new Gestion();
+        $municipio=new Municipio();
+        return view('TSocial.Derivacion.show', compact('derivacion', 'residentes','gestiones','municipios','gestion','municipio'));
     }
 
     /**
@@ -105,7 +120,11 @@ class DerivacionController extends Controller
     {
         $derivacion->load('residente'); // Carga explícita de la relación
         $residentes = Residente::orderBy('nombre')->get();
-        return view('TSocial.Derivacion.edit', compact('derivacion', 'residentes'));
+        $gestiones=Gestion::all();
+        $municipios = Municipio::orderBy('nombre','ASC')->get();
+        $gestion=new Gestion();
+        $municipio=new Municipio();
+        return view('TSocial.Derivacion.edit', compact('derivacion', 'residentes','gestiones','municipios','gestion','municipio'));
     }
 
     /**
@@ -114,6 +133,8 @@ class DerivacionController extends Controller
    public function update(Request $request, Derivacion $derivacion)
 {
     $validated = $request->validate([
+        'gestion_id' => 'required',
+        'municipio_id' => 'required',
         'residente_id' => 'required|exists:residentes,id',
         'fecha' => 'required|date',
         'numjuzgado' => 'required|string|max:50',

@@ -32,18 +32,43 @@
                             @endforeach
                         </select>
                     </div>
+                    <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                        <label class="form-label">Gestión</label>
+                        <select name="gestion_id" class="form-select bg-dark text-light border-secondary w-100" required>
+                            <option value="">Seleccione una gestión</option>
+                            @foreach($gestiones as $gestion)
+                                <option value="{{ $gestion->id }}">
+                                    {{ $gestion->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>   
+
                     <div class="col-md-6 col-12">
                         <label class="form-label">Fecha</label>
                         <input type="date" name="fecha" class="form-control bg-dark text-light border-secondary" required>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                        <label class="form-label">Municipio</label>
+                        <select name="municipio_id" class="form-select bg-dark text-light border-secondary w-100" required>
+                            <option value="">Seleccione un municipio</option>
+                            @foreach($municipios as $municipio)
+                                <option value="{{ $municipio->id }}">
+                                    {{ $municipio->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="col-md-6 col-12">
                         <label class="form-label">N° Juzgado</label>
                         <input type="text" name="numjuzgado" id="numjuzgado" class="form-control bg-dark text-light border-secondary" required>
                     </div>
+                    
                     <div class="col-md-6 col-12">
                         <label class="form-label">N° Documento</label>
                         <input type="text" name="numdoc" id="numdoc" class="form-control bg-dark text-light border-secondary" required>
                     </div>
+                    
                     <div class="col-md-6 col-12">
                         <label class="form-label">Nombre del Juez</label>
                         <input type="text" name="nomjuez" id="nomjuez" class="form-control bg-dark text-light border-secondary" required>

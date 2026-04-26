@@ -60,6 +60,15 @@ class Gestion extends Model
         return $this->hasMany(CajaChica::class);
     }
 
+    public function egresoresidentes(): HasMany
+    {
+        return $this->hasMany(EgresoResidente::class);
+    }
+
+    public function derivaciones(): HasMany
+    {
+        return $this->hasMany(Derivacion::class);
+    }
     protected static function boot()
     {
 
@@ -291,6 +300,11 @@ class Gestion extends Model
                 }
             }
         }
+    }
+
+    public function devuelveNombre($id){
+        $nombre=Gestion::where('id',$id)->value('nombre');
+        return $nombre;
     }
 
     protected static function booted()

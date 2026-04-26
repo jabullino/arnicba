@@ -42,166 +42,185 @@ class ResidenteController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-     public function store(Request $request)
-    {
-        // Validación de los campos
-        $validator = Validator::make($request->all(), [
-            'nombre' => 'required|string|max:100',
-            'apellido' => 'required|string|max:100',
-            'fecnac' => 'nullable|date',
-            'ci' => 'nullable|string|max:20|unique:residentes,ci',
-            'extension' => 'nullable|string|max:10',
-            'ciudad' => 'nullable|integer|exists:ciudades,id',
-            'provincia' => 'nullable|integer|exists:provincias,id',
-            'fec_ingreso' => 'required|date',
-            'fec_egreso' => 'nullable|date|after_or_equal:fec_ingreso',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:25480',
-            'fechadoc' => 'required|date|after_or_equal:fec_ingreso',
-            'numdoc' => 'required',
-            'tipologia' => 'required',
-            'ciudad_acogida' => 'required',
-            'municipios_acogida' => 'required',
-            'firma' => 'required',
-        ]);
+public function store(Request $request)
+{
+    // Validación de los campos
+    $rules = [
+        'nombre' => 'required|string|max:100',
+        'apellido' => 'required|string|max:100',
+        'fecnac' => 'nullable|date',
+        'ci' => 'nullable|string|max:20|unique:residentes,ci',
+        'extension' => 'nullable|string|max:10',
+        'ciudad' => 'nullable|integer|exists:ciudades,id',
+        'provincia' => 'nullable|integer|exists:provincias,id',
+        'fec_ingreso' => 'required|date',
+        'fec_egreso' => 'nullable|date|after_or_equal:fec_ingreso',
+        'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // 🔥 2MB
+        'fechadoc' => 'required|date',
+        'numdoc' => 'required',
+        'tipologia' => 'required',
+        'ciudad_acogida' => 'required',
+        'municipios_acogida' => 'required',
+        'firma' => 'required',
+    ];
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
+    if (!$request->boolean('transferencia')) {
+        $rules['fechadoc'] .= '|after_or_equal:fec_ingreso';
+    }
 
-        try {
-            $fotoPath = null;
+    $validator = Validator::make($request->all(), $rules);
 
-            if ($request->hasFile('foto')) {
-                $file = $request->file('foto');
-                $ext = strtolower($file->getClientOriginalExtension());
-                $nombreArchivo = time() . '_' . $file->getClientOriginalName();
-                $carpetaDestino = storage_path('app/public/fotos_residentes');
+    if ($validator->fails()) {
+        return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
+    }
 
-                if (!file_exists($carpetaDestino)) {
-                    mkdir($carpetaDestino, 0755, true);
-                }
+    try {
+        $fotoPath = null;
 
-                $rutaDestino = $carpetaDestino . '/' . $nombreArchivo;
+        if ($request->hasFile('foto')) {
+            $file = $request->file('foto');
+            $ext = strtolower($file->getClientOriginalExtension());
+            $nombreArchivo = time() . '_' . $file->getClientOriginalName();
+            $carpetaDestino = storage_path('app/public/fotos_residentes');
 
-                // Crear imagen según el tipo
-                switch ($ext) {
-                    case 'jpg':
-                    case 'jpeg':
-                        $src = imagecreatefromjpeg($file->getRealPath());
-
-                        // Corrige orientación usando EXIF (solo JPG/JPEG)
-                        if (function_exists('exif_read_data')) {
-                            $exif = @exif_read_data($file->getRealPath());
-                            if (!empty($exif['Orientation'])) {
-                                switch ($exif['Orientation']) {
-                                    case 3:
-                                        $src = imagerotate($src, 180, 0);
-                                        break;
-                                    case 6:
-                                        $src = imagerotate($src, -90, 0);
-                                        break;
-                                    case 8:
-                                        $src = imagerotate($src, 90, 0);
-                                        break;
-                                }
-                            }
-                        }
-                        break;
-
-                    case 'png':
-                        $src = imagecreatefrompng($file->getRealPath());
-                        break;
-
-                    default:
-                        throw new \Exception('Formato de imagen no soportado.');
-                }
-
-                // Obtener tamaño original
-                [$width, $height] = getimagesize($file->getRealPath());
-                $maxDim = 150;
-
-                // Calcular nueva proporción
-                $ratio = $width / $height;
-                if ($width > $maxDim || $height > $maxDim) {
-                    if ($ratio > 1) {
-                        $newWidth = $maxDim;
-                        $newHeight = $maxDim / $ratio;
-                    } else {
-                        $newHeight = $maxDim;
-                        $newWidth = $maxDim * $ratio;
-                    }
-                } else {
-                    $newWidth = $width;
-                    $newHeight = $height;
-                }
-
-                // Crear nueva imagen redimensionada
-                $dst = imagecreatetruecolor($newWidth, $newHeight);
-
-                // Mantener transparencia PNG
-                if ($ext == 'png') {
-                    imagealphablending($dst, false);
-                    imagesavealpha($dst, true);
-                }
-
-                imagecopyresampled($dst, $src, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-
-                // Guardar la imagen final
-                switch ($ext) {
-                    case 'jpg':
-                    case 'jpeg':
-                        imagejpeg($dst, $rutaDestino, 85);
-                        break;
-                    case 'png':
-                        imagepng($dst, $rutaDestino);
-                        break;
-                }
-
-                imagedestroy($src);
-                imagedestroy($dst);
-
-                $fotoPath = 'fotos_residentes/' . $nombreArchivo;
+            if (!file_exists($carpetaDestino)) {
+                mkdir($carpetaDestino, 0755, true);
             }
 
-            // Crear residente
-            DB::beginTransaction();
-            $residente = new Residente();
-            $residente->nombre = strtoupper($request->nombre);
-            $residente->apellido = strtoupper($request->apellido);
-            $residente->fecnac = $request->fecnac;
-            $residente->ci = $request->ci;
-            $residente->ext = $request->extension;
-            $residente->ciudad = $request->ciudad;
-            $residente->provincia = $request->provincia;
-            $residente->fec_ingreso = $request->fec_ingreso;
-            $residente->fec_egreso = $request->fec_egreso;
-            $residente->foto = $fotoPath;
-            $residente->created_at = null;
-            $residente->updated_at = null;
-            $residente->deleted_at = null;
+            $rutaDestino = $carpetaDestino . '/' . $nombreArchivo;
 
-            $residente->save();
-            $residente_id = Residente::latest('id')->first()->id;
+            // Crear imagen según el tipo
+            switch ($ext) {
+                case 'jpg':
+                case 'jpeg':
+                    $src = imagecreatefromjpeg($file->getRealPath());
 
-            AcogidaCircunstancial::create([
-                'residente_id' => $residente_id,
-                'fecha' => $request->fechadoc,
-                'numdoc' => $request->numdoc,
-                'tipologia' => $request->tipologia,
-                'ciudad' => $request->ciudad_acogida,
-                'municipio' => $request->municipios_acogida,
-                'firmante' => $request->firma,
-            ]);
+                    if (function_exists('exif_read_data')) {
+                        $exif = @exif_read_data($file->getRealPath());
+                        if (!empty($exif['Orientation'])) {
+                            switch ($exif['Orientation']) {
+                                case 3:
+                                    $src = imagerotate($src, 180, 0);
+                                    break;
+                                case 6:
+                                    $src = imagerotate($src, -90, 0);
+                                    break;
+                                case 8:
+                                    $src = imagerotate($src, 90, 0);
+                                    break;
+                            }
+                        }
+                    }
+                    break;
 
-            DB::commit();
-            return redirect()->back()->with('success', 'Residente registrado exitosamente.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()
-                ->back()
-                ->with('error', 'Error al registrar el residente: ' . $e->getMessage());
+                case 'png':
+                    $src = imagecreatefrompng($file->getRealPath());
+                    break;
+
+                default:
+                    throw new \Exception('Formato de imagen no soportado.');
+            }
+
+            // Obtener tamaño original
+            [$width, $height] = getimagesize($file->getRealPath());
+
+            // 🔥 CAMBIO: mejor resolución
+            $maxDim = 1200;
+
+            $ratio = $width / $height;
+            if ($width > $maxDim || $height > $maxDim) {
+                if ($ratio > 1) {
+                    $newWidth = $maxDim;
+                    $newHeight = $maxDim / $ratio;
+                } else {
+                    $newHeight = $maxDim;
+                    $newWidth = $maxDim * $ratio;
+                }
+            } else {
+                $newWidth = $width;
+                $newHeight = $height;
+            }
+
+            $dst = imagecreatetruecolor($newWidth, $newHeight);
+
+            if ($ext == 'png') {
+                imagealphablending($dst, false);
+                imagesavealpha($dst, true);
+            }
+
+            imagecopyresampled($dst, $src, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+            // 🔥 CAMBIO IMPORTANTE: compresión dinámica SOLO para JPG
+            if ($ext === 'jpg' || $ext === 'jpeg') {
+
+                $quality = 85;
+
+                do {
+                    ob_start();
+                    imagejpeg($dst, null, $quality);
+                    $data = ob_get_clean();
+
+                    $size = strlen($data);
+                    $quality -= 5;
+
+                } while ($size > 2 * 1024 * 1024 && $quality > 10);
+
+                file_put_contents($rutaDestino, $data);
+
+            } else {
+                // PNG se mantiene igual
+                imagepng($dst, $rutaDestino);
+            }
+
+            imagedestroy($src);
+            imagedestroy($dst);
+
+            $fotoPath = 'fotos_residentes/' . $nombreArchivo;
         }
+
+        DB::beginTransaction();
+
+        $residente = new Residente();
+        $residente->nombre = strtoupper($request->nombre);
+        $residente->apellido = strtoupper($request->apellido);
+        $residente->fecnac = $request->fecnac;
+        $residente->ci = $request->ci;
+        $residente->ext = $request->extension;
+        $residente->ciudad = $request->ciudad;
+        $residente->provincia = $request->provincia;
+        $residente->fec_ingreso = $request->fec_ingreso;
+        $residente->fec_egreso = $request->fec_egreso;
+        $residente->foto = $fotoPath;
+        $residente->created_at = null;
+        $residente->updated_at = null;
+        $residente->deleted_at = null;
+
+        $residente->save();
+        $residente_id = Residente::latest('id')->first()->id;
+
+        AcogidaCircunstancial::create([
+            'residente_id' => $residente_id,
+            'fecha' => $request->fechadoc,
+            'numdoc' => $request->numdoc,
+            'tipologia' => $request->tipologia,
+            'ciudad' => $request->ciudad_acogida,
+            'municipio' => $request->municipios_acogida,
+            'firmante' => $request->firma,
+        ]);
+
+        DB::commit();
+
+        return redirect()->back()->with('success', 'Residente registrado exitosamente.');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()
+            ->back()
+            ->with('error', 'Error al registrar el residente: ' . $e->getMessage());
     }
+}
 
     /**
      * Display the specified resource.
@@ -306,167 +325,188 @@ class ResidenteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
-    {
-        $residente = Residente::findOrFail($id);
+ public function update(Request $request, $id)
+{
+    $residente = Residente::findOrFail($id);
 
-        // Validación de campos
-        $request->validate([
-            'nombre' => 'required|string|max:100',
-            'apellido' => 'required|string|max:100',
-            'fecnac' => 'nullable|date',
-            'ci' => 'nullable|string|max:20|unique:residentes,ci,' . $residente->id,
-            'extension' => 'nullable|string|max:50',
-            'ciudad' => 'nullable|integer',
-            'provincia' => 'nullable|integer',
-            'fec_ingreso' => 'nullable|date',
-            'fec_egreso' => 'nullable|date',
-            'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:25480',
-            // Acogida Circunstancial
-            'fechadoc' => 'required|date',
-            'numdoc' => 'required|string|max:50',
-            'ciudad_acogida' => 'required|integer',
-            'municipios_acogida' => 'required|integer',
-            'tipologia' => 'required|integer',
-            'firma' => 'required|string|max:100',
-        ]);
+    // Validación de los campos
+    $rules = [
+        'nombre' => 'required|string|max:100',
+        'apellido' => 'required|string|max:100',
+        'fecnac' => 'nullable|date',
+        'ci' => 'nullable|string|max:20|unique:residentes,ci,' . $id,
+        'extension' => 'nullable|string|max:10',
+        'ciudad' => 'nullable|integer|exists:ciudades,id',
+        'provincia' => 'nullable|integer|exists:provincias,id',
+        'fec_ingreso' => 'required|date',
+        'fec_egreso' => 'nullable|date|after_or_equal:fec_ingreso',
+        'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // 🔥 2MB
+        'fechadoc' => 'required|date',
+        'numdoc' => 'required',
+        'tipologia' => 'required',
+        'ciudad_acogida' => 'required',
+        'municipios_acogida' => 'required',
+        'firma' => 'required',
+    ];
 
-        try {
-            DB::beginTransaction();
+    if (!$request->boolean('transferencia')) {
+        $rules['fechadoc'] .= '|after_or_equal:fec_ingreso';
+    }
 
-            // Actualizar datos del residente
-            $residente->nombre = strtoupper($request->nombre);
-            $residente->apellido = strtoupper($request->apellido);
-            $residente->fecnac = $request->fecnac;
-            $residente->ci = $request->ci;
-            $residente->ext = $request->extension;
-            $residente->ciudad = $request->ciudad;
-            $residente->provincia = $request->provincia;
-            $residente->fec_ingreso = $request->fec_ingreso;
-            $residente->fec_egreso = $request->fec_egreso;
+    $validator = Validator::make($request->all(), $rules);
 
-            // Manejo de foto (si se sube una nueva)
-            if ($request->hasFile('foto')) {
-                // Eliminar foto anterior si existe
-                if ($residente->foto && file_exists(storage_path('app/public/' . $residente->foto))) {
-                    unlink(storage_path('app/public/' . $residente->foto));
-                }
+    if ($validator->fails()) {
+        return redirect()->back()
+            ->withErrors($validator)
+            ->withInput();
+    }
 
-                $file = $request->file('foto');
-                $ext = strtolower($file->getClientOriginalExtension());
-                $nombreArchivo = time() . '_' . $file->getClientOriginalName();
-                $carpetaDestino = storage_path('app/public/fotos_residentes');
+    try {
+        DB::beginTransaction();
 
-                if (!file_exists($carpetaDestino)) {
-                    mkdir($carpetaDestino, 0755, true);
-                }
+        // Actualizar datos
+        $residente->nombre = strtoupper($request->nombre);
+        $residente->apellido = strtoupper($request->apellido);
+        $residente->fecnac = $request->fecnac;
+        $residente->ci = $request->ci;
+        $residente->ext = $request->extension;
+        $residente->ciudad = $request->ciudad;
+        $residente->provincia = $request->provincia;
+        $residente->fec_ingreso = $request->fec_ingreso;
+        $residente->fec_egreso = $request->fec_egreso;
 
-                $rutaDestino = $carpetaDestino . '/' . $nombreArchivo;
+        // FOTO
+        if ($request->hasFile('foto')) {
 
-                // Crear imagen según tipo
-                switch ($ext) {
-                    case 'jpg':
-                    case 'jpeg':
-                        $src = imagecreatefromjpeg($file->getRealPath());
-
-                        // Corrige orientación EXIF
-                        if (function_exists('exif_read_data')) {
-                            $exif = @exif_read_data($file->getRealPath());
-                            if (!empty($exif['Orientation'])) {
-                                switch ($exif['Orientation']) {
-                                    case 3:
-                                        $src = imagerotate($src, 180, 0);
-                                        break;
-                                    case 6:
-                                        $src = imagerotate($src, -90, 0);
-                                        break;
-                                    case 8:
-                                        $src = imagerotate($src, 90, 0);
-                                        break;
-                                }
-                            }
-                        }
-                        break;
-
-                    case 'png':
-                        $src = imagecreatefrompng($file->getRealPath());
-                        break;
-
-                    default:
-                        throw new \Exception('Formato de imagen no soportado.');
-                }
-
-                // Redimensionar
-                [$width, $height] = getimagesize($file->getRealPath());
-                $maxDim = 150;
-                $ratio = $width / $height;
-
-                if ($width > $maxDim || $height > $maxDim) {
-                    if ($ratio > 1) {
-                        $newWidth = $maxDim;
-                        $newHeight = $maxDim / $ratio;
-                    } else {
-                        $newHeight = $maxDim;
-                        $newWidth = $maxDim * $ratio;
-                    }
-                } else {
-                    $newWidth = $width;
-                    $newHeight = $height;
-                }
-
-                $dst = imagecreatetruecolor($newWidth, $newHeight);
-
-                // Mantener transparencia PNG
-                if ($ext == 'png') {
-                    imagealphablending($dst, false);
-                    imagesavealpha($dst, true);
-                }
-
-                imagecopyresampled($dst, $src, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
-
-                // Guardar imagen procesada
-                switch ($ext) {
-                    case 'jpg':
-                    case 'jpeg':
-                        imagejpeg($dst, $rutaDestino, 85);
-                        break;
-                    case 'png':
-                        imagepng($dst, $rutaDestino);
-                        break;
-                }
-
-                imagedestroy($src);
-                imagedestroy($dst);
-
-                $residente->foto = 'fotos_residentes/' . $nombreArchivo;
+            // Eliminar anterior
+            if ($residente->foto && file_exists(storage_path('app/public/' . $residente->foto))) {
+                unlink(storage_path('app/public/' . $residente->foto));
             }
 
-            $residente->save();
+            $file = $request->file('foto');
+            $ext = strtolower($file->getClientOriginalExtension());
+            $nombreArchivo = time() . '_' . $file->getClientOriginalName();
+            $carpetaDestino = storage_path('app/public/fotos_residentes');
 
-            // Actualizar o crear AcogidaCircunstancial
-            AcogidaCircunstancial::updateOrCreate(
-                ['residente_id' => $residente->id],
-                [
-                    'fecha' => $request->fechadoc,
-                    'numdoc' => $request->numdoc,
-                    'ciudad' => $request->ciudad_acogida,
-                    'municipio' => $request->municipios_acogida,
-                    'tipologia' => $request->tipologia,
-                    'firmante' => $request->firma,
-                ]
-            );
+            if (!file_exists($carpetaDestino)) {
+                mkdir($carpetaDestino, 0755, true);
+            }
 
-            DB::commit();
+            $rutaDestino = $carpetaDestino . '/' . $nombreArchivo;
 
-            return redirect()->route('residentes.index')
-                ->with('success', 'Residente actualizado correctamente.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()
-                ->back()
-                ->with('error', 'Error al actualizar el residente: ' . $e->getMessage());
+            // Crear imagen
+            switch ($ext) {
+                case 'jpg':
+                case 'jpeg':
+                    $src = imagecreatefromjpeg($file->getRealPath());
+
+                    if (function_exists('exif_read_data')) {
+                        $exif = @exif_read_data($file->getRealPath());
+                        if (!empty($exif['Orientation'])) {
+                            switch ($exif['Orientation']) {
+                                case 3:
+                                    $src = imagerotate($src, 180, 0);
+                                    break;
+                                case 6:
+                                    $src = imagerotate($src, -90, 0);
+                                    break;
+                                case 8:
+                                    $src = imagerotate($src, 90, 0);
+                                    break;
+                            }
+                        }
+                    }
+                    break;
+
+                case 'png':
+                    $src = imagecreatefrompng($file->getRealPath());
+                    break;
+
+                default:
+                    throw new \Exception('Formato de imagen no soportado.');
+            }
+
+            // 🔥 CAMBIO: mejor resolución
+            [$width, $height] = getimagesize($file->getRealPath());
+            $maxDim = 1200;
+
+            $ratio = $width / $height;
+
+            if ($width > $maxDim || $height > $maxDim) {
+                if ($ratio > 1) {
+                    $newWidth = $maxDim;
+                    $newHeight = $maxDim / $ratio;
+                } else {
+                    $newHeight = $maxDim;
+                    $newWidth = $maxDim * $ratio;
+                }
+            } else {
+                $newWidth = $width;
+                $newHeight = $height;
+            }
+
+            $dst = imagecreatetruecolor($newWidth, $newHeight);
+
+            if ($ext == 'png') {
+                imagealphablending($dst, false);
+                imagesavealpha($dst, true);
+            }
+
+            imagecopyresampled($dst, $src, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+            // 🔥 CAMBIO: compresión inteligente
+            if ($ext === 'jpg' || $ext === 'jpeg') {
+
+                $quality = 85;
+
+                do {
+                    ob_start();
+                    imagejpeg($dst, null, $quality);
+                    $data = ob_get_clean();
+
+                    $size = strlen($data);
+                    $quality -= 5;
+
+                } while ($size > 2 * 1024 * 1024 && $quality > 10);
+
+                file_put_contents($rutaDestino, $data);
+
+            } else {
+                imagepng($dst, $rutaDestino);
+            }
+
+            imagedestroy($src);
+            imagedestroy($dst);
+
+            $residente->foto = 'fotos_residentes/' . $nombreArchivo;
         }
+
+        $residente->save();
+
+        AcogidaCircunstancial::updateOrCreate(
+            ['residente_id' => $residente->id],
+            [
+                'fecha' => $request->fechadoc,
+                'numdoc' => $request->numdoc,
+                'ciudad' => $request->ciudad_acogida,
+                'municipio' => $request->municipios_acogida,
+                'tipologia' => $request->tipologia,
+                'firmante' => $request->firma,
+            ]
+        );
+
+        DB::commit();
+
+        return redirect()->route('residentes.index')
+            ->with('success', 'Residente actualizado correctamente.');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()
+            ->back()
+            ->with('error', 'Error al actualizar el residente: ' . $e->getMessage());
     }
+}
 
     /**
      * Remove the specified resource from storage.

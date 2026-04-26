@@ -32,7 +32,7 @@
                             </thead>
 
                             <tbody>
-                                @forelse($historiales as $historial)
+                               @forelse($historiales as $historial)
                                     <tr>
                                         <td>
                                             {{ $historial->residente->nombre ?? '' }}
@@ -53,8 +53,17 @@
                                                 <i class="fa fa-edit"></i> Editar
                                             </a>
                                         </td>
-                                    </tr>
-                                @empty
+                                        
+                                       <td class="text-center">
+                                            <a href="{{ route('historiales.show', $historial->id) }}"
+                                               class="btn btn-sm btn-warning">
+                                                <i class="fa fa-edit"></i> Ver
+                                            </a>
+                                        </td>                                          
+
+                                    </tr>                               
+
+ @empty
                                     <tr>
                                         <td colspan="4" class="text-center">
                                             No hay historiales registrados.

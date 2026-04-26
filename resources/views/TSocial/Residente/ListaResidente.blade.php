@@ -36,21 +36,22 @@
             </tr>
         </thead>
         <tbody>
-            @php $num = 1; @endphp
+            
             @forelse ($residentes as $residente)
                 <tr class="text-center">
-                    <td>{{ $num++ }}</td>
+                    <td>{{ $loop->iteration }}</td>
                     <td>{{ $residente->id }}</td>
                     <td>{{ $residente->nombre }}</td>
                     <td>{{ $residente->apellido }}</td>
                     <td>
-                        @if($residente->foto)
-                            <img src="{{ asset('storage/fotos_residentes/' . basename($residente->foto)) }}" 
-                                 alt="Foto de {{ $residente->nombre }}" 
-                                 class="img-thumbnail" 
-                                 style="width: 60px; height: 60px; object-fit: cover;">
-                        @endif
-                    </td>
+    @if($residente->foto)
+        <img src="{{ asset('storage/fotos_residentes/' . basename($residente->foto)) }}" 
+             alt="Foto de {{ $residente->nombre }}" 
+             class="img-thumbnail"
+             style="width: 60px; height: 60px; object-fit: cover; cursor:pointer;"
+             onclick="mostrarImagen(this.src)">
+    @endif
+</td>
                     <td>
                         <a href="{{ route('residentes.show', $residente->id) }}" class="btn btn-info btn-sm">
                             <i class="fas fa-eye"></i>
@@ -74,6 +75,11 @@
             @endforelse
         </tbody>
     </table>
+<div id="modalImagen" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+     background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:9999;">
+    
+    <img id="imagenGrande" style="max-width:90%; max-height:90%; border-radius:10px;">
+</div>
 </div>
 
 <!-- SweetAlert2 -->
@@ -102,6 +108,16 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
+});
+</script>
+<script>
+function mostrarImagen(src) {
+    document.getElementById('imagenGrande').src = src;
+    document.getElementById('modalImagen').style.display = 'flex';
+}
+
+document.getElementById('modalImagen').addEventListener('click', function() {
+    this.style.display = 'none';
 });
 </script>
 @endsection

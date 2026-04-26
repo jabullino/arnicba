@@ -97,7 +97,20 @@
                         <label for="fec_egreso" class="form-label">Fecha de Egreso</label>
                         <input type="date" id="fec_egreso" name="fec_egreso" value="{{ old('fec_egreso', $residente->fec_egreso) }}" class="form-control bg-dark border-secondary text-light">
                     </div>
+                    
+                    <!---En caso de que sea transferencia -->
 
+                   <div class="col-md-6 col-12" style="margin-top:20px">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <label for="transferencia" class="text-light mb-0">
+                            Transferencia
+                        </label>
+                        <input type="checkbox" name="transferencia" id="transferencia"
+                          class="form-check-input bg-dark border-secondary"
+                            style="margin-left: 100px;">
+                   </div>
+</div>                    
+    
                     <!-- Foto -->
                     <div class="col-12">
                         <label for="foto" class="form-label">Foto</label>

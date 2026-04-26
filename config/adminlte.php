@@ -456,6 +456,12 @@ return [
                                     'icon' => 'fas fa-list-alt',
                                     'url'  => 'Administrador/listaEntregascajachica', // corregido
                                 ],
+                                [
+                                    'text' => 'Balance Caja Chica',
+                                    'icon' => 'fas fa-list-alt',
+                                    'url'  => 'Administrador/balancecajachica', // corregido
+                                ],
+
                             ],
                         ],
 
@@ -593,9 +599,6 @@ return [
                                     'url' => 'Administrador/EgresosEscolar/create', // corregido
                                 ],
                                  
-
-
-
                             ],
                         ],
                         [
@@ -703,6 +706,25 @@ return [
                             'text' => 'Registrar Derivacion',
                             'icon' => 'fa fa-registered',
                             'url'  => 'TSocial/derivaciones/create', // corregido
+                        ],
+
+
+                    ],
+                ],
+                 [
+                    'text' => 'Egreso Residentes',
+                    'icon' => 'fas fa-walking',
+                    'url' => '',
+                    'submenu' => [
+                        [
+                            'text' => 'Lista Egresos',
+                            'icon' => 'fas fa-list',
+                            'url'  => 'TSocial/egresoresidente', // corregido
+                        ],
+                        [
+                            'text' => 'Registrar Egreso',
+                            'icon' => 'fa fa-registered',
+                            'url'  => 'TSocial/egresoresidente/create', // corregido
                         ],
 
 
