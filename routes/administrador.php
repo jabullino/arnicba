@@ -77,6 +77,8 @@ Route::middleware(['auth', 'IsAdministrador'])->group(function () {
         ->name('listaEntregascajachica');
      Route::get('listaEntregascajachica.lista', [AdministradorEntregasController::class, 'ajaxTotales'])
         ->name('listaEntregascajachica.lista');
+    Route::get('balancecajachica',[BalanceCajaChicaController::class,'resumen'])
+    ->name('balancecajachica');  
 
         //=====RUTAS MATERIAL ESCOLAR =====
 
@@ -98,7 +100,6 @@ Route::middleware(['auth', 'IsAdministrador'])->group(function () {
    
     Route::get('ListaIngresos', [IngresoEscolarController::class, 'listarIngresos'])->name('ListaIngresos');
     Route::get('ListaEgresos', [EgresosEscolarController::class, 'listarEgresos'])->name('ListaEgresos');
-    Route::get('balancecajachica',[BalanceCajaChicaController::class,'resumen'])
-    ->name('balancecajachica');
+   
     
 });
