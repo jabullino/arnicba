@@ -26,7 +26,9 @@ class EntregasCajaChica extends Model
         return $this->belongsTo(CajaChica::class);
     }
 
-    
+    protected $casts = [
+    'fecha_entrega' => 'date',
+    ];    
 
     protected static function booted()
     {
@@ -36,3 +38,4 @@ class EntregasCajaChica extends Model
         });
     }
 }
+

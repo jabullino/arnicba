@@ -34,7 +34,7 @@ use App\Http\Controllers\IngresoEscolarController;
 use App\Http\Controllers\EgresosEscolarController;
 use App\Http\Controllers\ImpresionIngresosEgresosEscolarController;
 use App\Http\Controllers\BalanceCajaChicaController;
-
+use App\Http\Controllers\PermisoSalidaController;
 
 
 
@@ -100,6 +100,24 @@ Route::middleware(['auth', 'IsAdministrador'])->group(function () {
    
     Route::get('ListaIngresos', [IngresoEscolarController::class, 'listarIngresos'])->name('ListaIngresos');
     Route::get('ListaEgresos', [EgresosEscolarController::class, 'listarEgresos'])->name('ListaEgresos');
-   
+    Route::Resource('PermisoSalida', PermisoSalidaController::class)->names('PermisoSalida');
+    Route::get('/usuarios/{cargo_id}', function ($cargo_id) {
+
+        return \App\Models\User::with('cargo')
+            ->where('cargo_id', $cargo_id)
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'nombre' => $user->nombre,
+                    'apellido' => $user->apellido,
+                    'cargo_nombre' => $user->cargo->nombre ?? ''
+                ];
+            });
+    
+    });
+
+    Route::get('/permisos/{id}/imprimir', [PermisoSalidaController::class, 'imprimirPDF'])
+    ->name('permisos.imprimir');   
     
 });

@@ -197,6 +197,12 @@ public function bonos()
         ->first();
     }
 
+    
+    public function cargo()
+{
+    return $this->belongsTo(\App\Models\Cargo::class);
+}
+
     protected static function booted()
     {
         // Siempre excluir registros eliminados (deleted_at no nulo)

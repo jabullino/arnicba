@@ -69,6 +69,12 @@ class Gestion extends Model
     {
         return $this->hasMany(Derivacion::class);
     }
+
+     public function permisosalidas(): HasMany
+    {
+        return $this->hasMany(PermisoSalida::class);
+    }
+
     protected static function boot()
     {
 

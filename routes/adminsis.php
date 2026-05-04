@@ -24,6 +24,7 @@ use App\Http\Controllers\ObtenCuentasController;
 use App\Http\Controllers\GestionController;
 use App\Http\Controllers\CierreGestionController;
 use App\Http\Controllers\IncrementoSalarioController;
+use App\Http\Controllers\PermisoSalidaController;
 
 Route::middleware(['auth', 'IsAdminSis'])->group(function () {
 
@@ -96,5 +97,7 @@ Route::middleware(['auth', 'IsAdminSis'])->group(function () {
       //Incremento de Salarios
 
    Route::resource('incrementosalarial', IncrementoSalarioController::class)->names('incrementosalarial');   
-
+  
+         //Permisos de salida en comisión
+   Route::Resource('PermisoSalida', PermisoSalidaController::class)->names('AdminSis.PermisoSalida'); 
 });

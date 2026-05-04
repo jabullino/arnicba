@@ -133,23 +133,17 @@ class DerivacionController extends Controller
    public function update(Request $request, Derivacion $derivacion)
 {
     $validated = $request->validate([
-        'gestion_id' => 'required',
-        'municipio_id' => 'required',
-        'residente_id' => 'required|exists:residentes,id',
-        'fecha' => 'required|date',
-        'numjuzgado' => 'required|string|max:50',
-        'numdoc' => 'required|string|max:50',
-        'nomjuez' => 'required|string|max:255',
-    ]);
+    'gestion_id' => 'sometimes|required',
+    'municipio_id' => 'sometimes|required',
+    'residente_id' => 'sometimes|required|exists:residentes,id',
+    'fecha' => 'sometimes|required|date',
+    'numjuzgado' => 'sometimes|required|integer',
+    'numdoc' => 'sometimes|required|string|max:50',
+    'nomjuez' => 'sometimes|required|string|max:255',
+]);
 
     try {
-        $derivacion->update([
-            'residente_id' => $validated['residente_id'],
-            'fecha' => $validated['fecha'], // si viene en formato correcto
-            'numjuzgado' => $validated['numjuzgado'],
-            'numdoc' => $validated['numdoc'],
-            'nomjuez' => $validated['nomjuez'],
-        ]);
+        $derivacion->update($validated);
 
         return redirect()
             ->route('derivaciones.index')

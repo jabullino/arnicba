@@ -8,7 +8,7 @@
 
             <form action="{{ route('derivaciones.update', $derivacion->id) }}" method="POST">
                 @csrf
-                @method('PUT')
+                @method('PATCH')
 
                 <div class="row g-3">
                     <div class="col-md-6 col-12">

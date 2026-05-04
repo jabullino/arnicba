@@ -416,7 +416,20 @@ return [
                     'text' => 'Enviar Correos',
                     'url'  => 'AdminSis/enviar-correos',
                     'icon' => 'fas fa-envelope',
-                    'can'  => 'is_adminSis',
+                ],
+                [
+                    'text' => 'Permisos de Salida',
+                    'url' => '/AdminSis/Bancos ',
+                    'icon' => 'fas fa-walking',
+
+                    'submenu' => [
+                       
+                        [
+                            'text' => 'Lista de Permisos',
+                            'icon' => 'fas fa-file-invoice-dollar',
+                            'url' => 'AdminSis/PermisoSalida',
+                        ],
+                    ],
                 ],
 
             ],
@@ -620,9 +633,27 @@ return [
 
                             ],
                         ],
-
+                       
                     ],
                 ],
+                 [
+                            'text' => 'Permisos de Salida',
+                            'url' => ' ',
+                            'icon' => 'fas fa-walking',
+        
+                            'submenu' => [
+                                [
+                                    'text' => 'Solicitar Permiso',
+                                    'icon' => 'fas fa-user-check',
+                                    'url' => 'Administrador/PermisoSalida/create',
+                                ],
+                                [
+                                    'text' => 'Lista de Permisos',
+                                    'icon' => 'fas fa-file-invoice-dollar',
+                                    'url' => 'Administrador/PermisoSalida',
+                                ],
+                            ],
+                        ],  
             ],
         ],
         [

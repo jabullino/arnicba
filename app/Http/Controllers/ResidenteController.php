@@ -55,7 +55,7 @@ public function store(Request $request)
         'provincia' => 'nullable|integer|exists:provincias,id',
         'fec_ingreso' => 'required|date',
         'fec_egreso' => 'nullable|date|after_or_equal:fec_ingreso',
-        'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // 🔥 2MB
+        'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:15000', // 🔥 2MB
         'fechadoc' => 'required|date',
         'numdoc' => 'required',
         'tipologia' => 'required',
@@ -340,7 +340,7 @@ public function store(Request $request)
         'provincia' => 'nullable|integer|exists:provincias,id',
         'fec_ingreso' => 'required|date',
         'fec_egreso' => 'nullable|date|after_or_equal:fec_ingreso',
-        'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // 🔥 2MB
+        'foto' => 'nullable|image|mimes:jpg,jpeg,png|max:15000', // 🔥 2MB
         'fechadoc' => 'required|date',
         'numdoc' => 'required',
         'tipologia' => 'required',
