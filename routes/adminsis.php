@@ -25,6 +25,7 @@ use App\Http\Controllers\GestionController;
 use App\Http\Controllers\CierreGestionController;
 use App\Http\Controllers\IncrementoSalarioController;
 use App\Http\Controllers\PermisoSalidaController;
+use App\Http\Controllers\SolicitudCajaChicaController;
 
 Route::middleware(['auth', 'IsAdminSis'])->group(function () {
 
@@ -100,4 +101,11 @@ Route::middleware(['auth', 'IsAdminSis'])->group(function () {
   
          //Permisos de salida en comisión
    Route::Resource('PermisoSalida', PermisoSalidaController::class)->names('AdminSis.PermisoSalida'); 
+    Route::prefix('AdminSis')
+    ->name('adminsis.')
+    ->group(function () {
+        Route::resource('solicitudes', SolicitudCajaChicaController::class);
+    });
+
+
 });

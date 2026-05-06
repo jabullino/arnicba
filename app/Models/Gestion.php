@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
+use App\Models\SolicitudCajaChica;
 
 class Gestion extends Model
 {
@@ -73,6 +74,10 @@ class Gestion extends Model
      public function permisosalidas(): HasMany
     {
         return $this->hasMany(PermisoSalida::class);
+    }
+    public function solicitudes(): HasMany
+    {
+        return $this->hasMany(SolicitudCajaChica::class);
     }
 
     protected static function boot()

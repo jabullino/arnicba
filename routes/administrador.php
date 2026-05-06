@@ -35,6 +35,7 @@ use App\Http\Controllers\EgresosEscolarController;
 use App\Http\Controllers\ImpresionIngresosEgresosEscolarController;
 use App\Http\Controllers\BalanceCajaChicaController;
 use App\Http\Controllers\PermisoSalidaController;
+use App\Http\Controllers\SolicitudCajaChicaController;
 
 
 
@@ -119,5 +120,14 @@ Route::middleware(['auth', 'IsAdministrador'])->group(function () {
 
     Route::get('/permisos/{id}/imprimir', [PermisoSalidaController::class, 'imprimirPDF'])
     ->name('permisos.imprimir');   
-    
+
+      
+    Route::get('Administrador/solicitudes/{id}/imprimir', 
+    [SolicitudCajaChicaController::class, 'imprimir']);
+
+  Route::prefix('Administrador')
+    ->name('administrador.')
+    ->group(function () {
+        Route::resource('solicitudes', SolicitudCajaChicaController::class);
+    });    
 });

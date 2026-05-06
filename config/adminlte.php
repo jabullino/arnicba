@@ -402,6 +402,20 @@ return [
                             'icon' => 'fas fa-plus-circle',
                             'url'  => 'AdminSis/consolidarcajachica',
                         ],
+                        [
+                            'text' => 'Solicitud Caja Chica',
+                            'icon' => 'fas fa-file-invoice-dollar',
+                            'url' => '',
+        
+                            'submenu' => [
+                                [
+                                    'text' => 'Lista de Solicitudes',
+                                    'icon' => 'fas fa-list-ol',
+                                    'url' => 'AdminSis/AdminSis/solicitudes',
+                                ],
+                               
+                            ],
+                        ],
                     ],
                 ],
 
@@ -478,7 +492,7 @@ return [
                             ],
                         ],
 
-
+                        
 
                         [
                             'text' => 'Pagos Rápidos',
@@ -486,7 +500,7 @@ return [
                             'url' => '',
 
                             'submenu' => [
-                                [
+                                                          [
                                     'text' => 'Pago de Servicios',
                                     'icon' => 'fas fa-file-invoice-dollar',
                                     'url' => 'Administrador/FormPagaServicios',
@@ -503,6 +517,24 @@ return [
                                 ],
                             ],
                         ],
+                        [
+                            'text' => 'Solicitud Caja Chica',
+                            'icon' => 'fas fa-file-invoice-dollar',
+                            'url' => '',
+        
+                            'submenu' => [
+                                [
+                                    'text' => 'Lista de Solicitudes',
+                                    'icon' => 'fas fa-list-ol',
+                                    'url' => 'Administrador/Administrador/solicitudes',
+                                ],
+                                [
+                                    'text' => 'Registro de Solicitud',
+                                    'icon' => 'fas fa-file-invoice-dollar',
+                                    'url' => 'Administrador/Administrador/solicitudes/create',
+                                ],
+                            ],
+                        ], 
 
                         [
                             'text' => 'Consultas',
