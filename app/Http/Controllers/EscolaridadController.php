@@ -83,7 +83,7 @@ class EscolaridadController extends Controller
         'ueducativa' => 'required',
         'grado' => 'required',
         'curso' => 'required',
-        'rude' => 'nullable|string|max:70|regex:/^[0-9]+$/',
+        'rude' => 'nullable|string|max:70|regex:/^[a-zA-Z0-9]+$/',
     ]);
 
     DB::beginTransaction();
@@ -164,7 +164,7 @@ class EscolaridadController extends Controller
         'ue_id' => 'required|exists:unidad_educativas,id',
         'curso_id' => 'required|exists:cursos,id',
         'grado_id' => 'required|exists:grados,id',
-        'rude' => 'nullable|string|max:30|regex:/^[0-9]+$/',
+        'rude' => 'nullable|string|max:70|regex:/^[a-zA-Z0-9]+$/',
     ]);
 
     $registro = DB::table('grado_residente_unidad_educativa')

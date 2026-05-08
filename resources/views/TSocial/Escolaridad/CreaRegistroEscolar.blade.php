@@ -158,8 +158,14 @@
 
 {{-- Solo permitir dígitos en RUDE --}}
 <script>
-    document.getElementById('rude').addEventListener('input', function (e) {
-        this.value = this.value.replace(/[^0-9]/g, '');
+    document.getElementById('rude').addEventListener('input', function () {
+
+        this.value = this.value
+            // Convierte letras a mayúsculas
+            .toUpperCase()
+            // Permite solo letras y números del 1 al 9
+            .replace(/[^A-Z1-9]/g, '');
+
     });
 </script>
 @endsection

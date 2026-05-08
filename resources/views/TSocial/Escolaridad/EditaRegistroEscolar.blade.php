@@ -174,11 +174,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('formEditRegistro');
 
     // Solo permitir dígitos en RUDE
-    const rudeInput = document.getElementById('rude');
+    // Solo permitir letras y números del 1 al 9 en RUDE
+const rudeInput = document.getElementById('rude');
 
-    rudeInput.addEventListener('input', function () {
-        this.value = this.value.replace(/[^0-9]/g, '');
-    });
+rudeInput.addEventListener('input', function () {
+    this.value = this.value
+        // Convierte letras a mayúsculas
+        .toUpperCase()
+        // Permite solo letras A-Z y números 1-9
+        .replace(/[^A-Z1-9]/g, '');
+});
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
