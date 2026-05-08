@@ -44,6 +44,7 @@
                                 @endforeach
                             </select>
                         </div>
+
                          {{-- Select Curso --}}
                         <div class="col-12 col-md-6 form-group">
                             <label for="curso" class="form-label">Curso</label>
@@ -65,6 +66,18 @@
                                 @endforeach
                             </select>
                         </div>
+
+                        {{-- Datos RUDE --}}
+                        <div class="col-12 col-md-6 form-group">
+                            <label for="rude" class="form-label">RUDE</label>
+                            <input 
+                                type="text" 
+                                name="rude" 
+                                id="rude" 
+                                class="form-control"
+                                maxlength="70"
+                            />
+                        </div>    
                     </div>
 
                     {{-- Botón Registrar --}}
@@ -142,5 +155,11 @@
         });
     </script>
 @endif
-@endsection
 
+{{-- Solo permitir dígitos en RUDE --}}
+<script>
+    document.getElementById('rude').addEventListener('input', function (e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+</script>
+@endsection

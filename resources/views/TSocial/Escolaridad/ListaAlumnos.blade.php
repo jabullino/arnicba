@@ -32,8 +32,8 @@
                     </div>
 
                     <!-- Tabla -->
-                    <div class="table-responsive">
-                        <table id="tablaAlumnos" class="table table-dark table-striped table-bordered text-center">
+                    <div class="table-responsive w-100">
+                        <table id="tablaAlumnos" class="table table-dark table-striped table-bordered text-center align-middle w-100">
                             <thead class="table-secondary text-dark">
                                 <tr>
                                     <th>Nombre</th>
@@ -41,7 +41,7 @@
                                     <th>Unidad Educativa</th>
                                     <th>Curso</th>
                                     <th>Grado</th>
-                                    <th>Acciones</th>
+                                    <th class="col-acciones">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -73,6 +73,7 @@ body, .wrapper, .content-wrapper {
 .main-header {
     background-color: #212529 !important;
 }
+
 .main-header .nav-link {
     color: #fff !important;
 }
@@ -81,31 +82,90 @@ body, .wrapper, .content-wrapper {
 .card {
     background-color: #454d55 !important;
     color: #fff !important;
+    overflow: hidden;
 }
 
 /* 🔥 INPUTS */
-.form-control, .form-select {
+.form-control,
+.form-select {
     background-color: #3b4045 !important;
     color: #fff !important;
 }
 
+/* 🔥 CONTENEDOR TABLA */
+.table-responsive {
+    width: 100% !important;
+    overflow-x: auto !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* 🔥 TABLA */
+#tablaAlumnos {
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+/* 🔥 DATATABLE WRAPPER */
+.dataTables_wrapper {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* 🔥 EVITA DESPLAZAMIENTO EXTRA */
+.dataTables_scrollHeadInner,
+.dataTables_scrollHeadInner table,
+table.dataTable {
+    width: 100% !important;
+}
+
+/* 🔥 CELDAS */
+#tablaAlumnos th,
+#tablaAlumnos td {
+    vertical-align: middle !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+
+/* 🔥 COLUMNA ACCIONES */
+.col-acciones {
+    width: 210px !important;
+    min-width: 210px !important;
+}
+
 /* 🔥 BOTONES */
 #tablaAlumnos .btn {
-    width: auto !important;
     display: inline-block !important;
-    margin: 2px;
+    margin: 2px !important;
+    white-space: nowrap !important;
 }
 
-/* 🔥 EVITA SALTO */
-#tablaAlumnos td {
-    white-space: nowrap;
+/* 🔥 EVITA QUE RESPONSIVE OCULTE COLUMNAS */
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
+table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
+    display: none !important;
 }
 
-/* 🔥 ⭐ SOLUCIÓN REAL DATATABLES ⭐ */
-table.dataTable {
-    width: auto !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
+/* 🔥 BUSCADOR Y SELECT DATATABLE */
+.dataTables_filter input,
+.dataTables_length select {
+    background-color: #3b4045 !important;
+    color: #fff !important;
+    border: 1px solid #555 !important;
+}
+
+/* 🔥 TEXTOS DATATABLE */
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_paginate {
+    color: #fff !important;
+}
+
+/* 🔥 PAGINACIÓN */
+.dataTables_wrapper .paginate_button {
+    color: #fff !important;
 }
 
 /* 🔥 SWEET ALERT */
@@ -135,9 +195,32 @@ table.dataTable {
 document.addEventListener('DOMContentLoaded', () => {
 
     const tabla = $('#tablaAlumnos').DataTable({
-        responsive: true,
+        responsive: false,
         autoWidth: false,
-        language: { url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json' }
+        scrollX: false,
+        language: {
+            lengthMenu: "Mostrar _MENU_ registros",
+            zeroRecords: "No se encontraron resultados",
+            info: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            infoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+            infoFiltered: "(filtrado de un total de _MAX_ registros)",
+            search: "Buscar:",
+            paginate: {
+                first: "Primero",
+                last: "Último",
+                next: "Siguiente",
+                previous: "Anterior"
+            },
+            processing: "Procesando..."
+        },
+        columnDefs: [
+            {
+                targets: 5,
+                orderable: false,
+                searchable: false,
+                width: "210px"
+            }
+        ]
     });
 
     document.getElementById('gestionSelect').addEventListener('change', async function () {
@@ -165,6 +248,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
 
         tabla.clear().rows.add(filas).draw();
+
+        tabla.columns.adjust().draw();
     });
 
     window.editarAlumno = id => {
@@ -172,16 +257,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.eliminarAlumno = async id => {
+
         const confirm = await Swal.fire({
             title: '¿Eliminar?',
-            showCancelButton: true
+            text: 'Esta acción no se puede deshacer',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
         });
 
         if (!confirm.isConfirmed) return;
 
         await fetch(`/TSocial/escolaridad/${id}`, {
             method: 'DELETE',
-            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
         });
 
         location.reload();

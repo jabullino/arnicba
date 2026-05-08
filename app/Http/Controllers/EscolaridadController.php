@@ -31,6 +31,7 @@ class EscolaridadController extends Controller
                 ->when($gestionId, fn($q) => $q->where('gru.gestion_id', $gestionId))
                 ->select(
                     'gru.id',
+                    'gru.rude',
                     'r.nombre',
                     'r.apellido',
                     'ue.nombre as unidad_educativa',
@@ -60,7 +61,10 @@ class EscolaridadController extends Controller
     public function create()
     {
         $gestiones=Gestion::all();
-        $residentes=Residente::all();
+        $residentes = Residente::whereNotIn('id', function ($query) {
+            $query->select('residente_id')
+                  ->from('grado_residente_unidad_educativa');
+        })->get();
         $ueducativas=UnidadEducativa::all();
         $cursos=Curso::all();
         $grados=Grado::all();
@@ -79,6 +83,7 @@ class EscolaridadController extends Controller
         'ueducativa' => 'required',
         'grado' => 'required',
         'curso' => 'required',
+        'rude' => 'nullable|string|max:70|regex:/^[0-9]+$/',
     ]);
 
     DB::beginTransaction();
@@ -101,6 +106,7 @@ class EscolaridadController extends Controller
             'ue_id'        => $request->ueducativa,
             'grado_id'     => $request->grado,
             'curso_id'     => $request->curso,
+            'rude'         => $request->rude, 
         ]);
 
         DB::commit();
@@ -132,7 +138,7 @@ class EscolaridadController extends Controller
 {
     // Registro a editar
     $registro = DB::table('grado_residente_unidad_educativa')->where('id', $id)->first();
-
+    
     if (!$registro) {
         abort(404, 'Registro no encontrado');
     }
@@ -158,6 +164,7 @@ class EscolaridadController extends Controller
         'ue_id' => 'required|exists:unidad_educativas,id',
         'curso_id' => 'required|exists:cursos,id',
         'grado_id' => 'required|exists:grados,id',
+        'rude' => 'nullable|string|max:30|regex:/^[0-9]+$/',
     ]);
 
     $registro = DB::table('grado_residente_unidad_educativa')
@@ -177,6 +184,7 @@ class EscolaridadController extends Controller
             'ue_id' => $request->ue_id,
             'curso_id' => $request->curso_id,
             'grado_id' => $request->grado_id,
+            'rude'     => $request->rude,
             'updated_at' => now()
         ]);
 

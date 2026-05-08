@@ -34,7 +34,8 @@ class ReporteResidentesController extends Controller
                 'r.id as residente_id',
                 'ue.nombre as unidad_educativa',
                 'g.nombre as grado',
-                'c.nombre as curso'
+                'c.nombre as curso',
+                'gru.rude as rude'
             )
             ->get()
             ->groupBy('residente_id');
@@ -93,7 +94,7 @@ class ReporteResidentesController extends Controller
             $unidadEducativa = $edu->unidad_educativa ?? '';
             $curso = $edu->curso ?? '';
             $grado = $edu->grado ?? '';
-
+            $rude  = $edu->rude  ?? '';
             return [
                 'nombre' => $residente->nombre,
                 'apellido' => $residente->apellido,
@@ -117,6 +118,7 @@ class ReporteResidentesController extends Controller
                 'unidad_educativa' => $unidadEducativa,
                 'curso' => $curso,
                 'grado' => $grado,
+                'rude'  => $rude, 
             ];
         });
 
@@ -156,6 +158,7 @@ class ReporteResidentesController extends Controller
                     <th>Unidad Educativa</th>
                     <th>Curso</th>
                     <th>Grado</th>
+                    <th>RUDE</th>
                 </tr>
             </thead>
             <tbody>';
@@ -179,6 +182,7 @@ class ReporteResidentesController extends Controller
     <td>' . e($r['unidad_educativa']) . '</td>
     <td class="text-center">' . e($r['curso']) . '</td>
     <td>' . e($r['grado']) . '</td>
+    <td>' . e($r['rude']) . '</td>
 </tr>';
         }
 

@@ -30,6 +30,13 @@
                             </div>
                         </div>
 
+                        <div class="row mb-3 justify-content-center">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">RUDE:</label>
+                                <input type="text" name="rude" id="rude" class="form-control" value="{{ $registro->rude }}">
+                            </div>
+                        </div>
+
                         <!-- Unidad Educativa -->
                         <div class="row mb-3 justify-content-center">
                             <div class="col-12 col-md-6">
@@ -165,6 +172,13 @@ label {
 document.addEventListener('DOMContentLoaded', () => {
 
     const form = document.getElementById('formEditRegistro');
+
+    // Solo permitir dígitos en RUDE
+    const rudeInput = document.getElementById('rude');
+
+    rudeInput.addEventListener('input', function () {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
