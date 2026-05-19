@@ -395,7 +395,11 @@
                 <tr>
                     <td class='col-span-2 text-center'>Saldo inicial al mes de {{ $nombremes }} del
                         {{ $anio }}</td>
-                    <td style="text-align: right;">{{ number_format($saldo, 2, '.', ',') }}</td>
+                     @php
+                          $saldoaux=$sumacreditos-$sumadebitos;
+                          $saldoinicial=$saldofinal-$saldoaux;   
+                     @endphp
+                    <td style="text-align: right;">{{ number_format($saldoinicial, 2, '.', ',') }}</td>
                 </tr>
                 @foreach ($detallecreditos as $detalle)
                     <tr class="hover:bg-gray-100">

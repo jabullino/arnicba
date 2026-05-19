@@ -254,22 +254,55 @@ class AsientoController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    { 
-        try {
-            DB::beginTransaction();
-            $asiento = Asiento::find($id);
-            $asiento->delete();
-            DB::commit();
-            $asientos = Asiento::all();
-            $cuentasaux = new Cuenta();
-            $subcuentasaux = new SubCuenta();
-            $asientos = Asiento::where('estado_id', 1)->get();
-             session()->flash('success', '¡Asiento eliminado exitosamente!');
-            return redirect()->route('Asientos.index')->with(['success', 'Asiento Eliminado Exitosamente', 'asientos', $asientos, 'cuentasaux' => $cuentasaux, 'subcuentasaux' => $subcuentasaux]);
-        } catch (QueryException $e) {
-            DB::rollBack();
-            return back()->with('error', 'No se pudo eliminar el asiento de diario' . $e->getMessage());
-        }
+   public function destroy(string $id)
+{
+    try {
+
+        DB::beginTransaction();
+
+        $asiento = Asiento::find($id);
+
+        // CAMBIAR ESTADO
+        $asiento->estado_id = 2;
+
+        // GUARDAR CAMBIO
+        $asiento->save();
+
+        // SOFT DELETE
+        $asiento->delete();
+
+        DB::commit();
+
+        $cuentasaux = new Cuenta();
+        $subcuentasaux = new SubCuenta();
+
+        $asientos = Asiento::where('estado_id', 1)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        session()->flash(
+            'success',
+            '¡Asiento eliminado exitosamente!'
+        );
+
+        return redirect()
+            ->route('Asientos.index')
+            ->with([
+                'success' => 'Asiento Eliminado Exitosamente',
+                'asientos' => $asientos,
+                'cuentasaux' => $cuentasaux,
+                'subcuentasaux' => $subcuentasaux
+            ]);
+
+    } catch (QueryException $e) {
+
+        DB::rollBack();
+
+        return back()->with(
+            'error',
+            'No se pudo eliminar el asiento de diario: '
+            . $e->getMessage()
+        );
     }
+}
 }

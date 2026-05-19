@@ -13,9 +13,9 @@
 
     <!-- Contenido -->
     <section class="content">
-        <div class="container-fluid py-3">
+        <div class="container-fluid py-3 w-full" style='margin-left:-200px !important'>
 
-            <div class="card shadow-lg rounded-3">
+            <div class="card shadow-lg rounded-3" style='width:920px !important'>
                 <div class="card-body">
 
                     <!-- Select -->
@@ -32,7 +32,7 @@
                     </div>
 
                     <!-- Tabla -->
-                    <div class="table-responsive w-100">
+                    <div class="table-responsive !w-full" >
                         <table id="tablaAlumnos" class="table table-dark table-striped table-bordered text-center align-middle w-100">
                             <thead class="table-secondary text-dark">
                                 <tr>

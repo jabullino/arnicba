@@ -182,7 +182,7 @@ rudeInput.addEventListener('input', function () {
         // Convierte letras a mayúsculas
         .toUpperCase()
         // Permite solo letras A-Z y números 1-9
-        .replace(/[^A-Z1-9]/g, '');
+        .replace(/[^A-Z0-9]/g, '');
 });
 
     form.addEventListener('submit', async (e) => {

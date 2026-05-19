@@ -126,12 +126,5 @@ class Asiento extends Model
     return session(['montosus' => session('montosus', 0) + $montosus]);
      
   }
-
-  protected static function booted()
-    {
-        // Siempre excluir registros eliminados (deleted_at no nulo)
-        static::addGlobalScope('not_deleted', function ($query) {
-            $query->whereNull('deleted_at');
-        });
-    }
+   
 }

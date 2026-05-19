@@ -164,7 +164,7 @@
             // Convierte letras a mayúsculas
             .toUpperCase()
             // Permite solo letras y números del 1 al 9
-            .replace(/[^A-Z1-9]/g, '');
+            .replace(/[^A-Z0-9]/g, '');
 
     });
 </script>

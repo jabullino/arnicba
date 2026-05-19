@@ -104,11 +104,11 @@ class PanelConsultasController extends Controller
             session(['cuentafinal' => false]);
 
 
-            $asientos1 = DB::table('asientos')
-                ->whereBetween('fec_asiento', [$request->fecinicio, $request->fecfin])
-                ->orderBy('cuenta', 'ASC')
-                ->get();
-            $asientos = $asientos1->sortBy('sub_cuenta');
+           $asientos1 = Asiento::whereBetween( 'fec_asiento', [$request->fecinicio, $request->fecfin])
+                        ->orderBy('cuenta', 'ASC')
+                        ->get();
+
+           $asientos = $asientos1->sortBy('sub_cuenta');
 
 
             /*$asientos=Asiento::groupBy('cuenta')->whereBetween('fec_asiento', [$request->fecinicio,$request->fecfin ]);*/

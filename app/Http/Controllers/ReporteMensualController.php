@@ -26,13 +26,13 @@ class ReporteMensualController extends Controller
 
     public function muestrareportemensual(Request $request)
     {
-
+       
         $fecha = Carbon::parse($request->fecinicio);
         $nombremes = $fecha->translatedFormat('F');
         $nombremes = strtoupper($nombremes);
         $anio = $fecha->year;
         if ($request->moneda == 'dolares') {
-
+             
             $totalmontosbs = array();
             $totalmontossus = array();
             $nombrescuentas = array();
@@ -79,54 +79,42 @@ class ReporteMensualController extends Controller
             $interescredito = MovimientoCuenta::whereBetween('fecha', [$request->fecinicio, $request->fecfin])
                 ->where('descripcion', 'NC PAGO DE INTERESES')
                 ->sum('credito');
-            $sumacreditos = MovimientoCuenta::whereBetween('fecha', [$request->fecinicio, $request->fecfin])
-                ->where('descripcion', 'not like', 'NC PAGO DE INTERESES')
-                ->sum('credito');
-            $sumadebitos = MovimientoCuenta::whereBetween('fecha', [$request->fecinicio, $request->fecfin])
-                ->where('descripcion', 'not like', 'NC PAGO DE INTERESES')
-                ->sum('debito');
+          
+
+$sumacreditos = MovimientoCuenta::whereBetween(
+        'fecha',
+        [$request->fecinicio, $request->fecfin]
+    )
+    ->whereNotNull('credito')
+    ->where('credito', '>', 0)
+    ->where('descripcion', '<>', 'NC PAGO DE INTERESES')
+    ->sum('credito');
+
+
+
+$sumadebitos = MovimientoCuenta::whereBetween('fecha', [$request->fecinicio, $request->fecfin])
+    ->where('descripcion', '<>', 'NC PAGO DE INTERESES')
+    ->sum('debito');
+
+           
             $sumadebitostotales = MovimientoCuenta::whereBetween('fecha', [$request->fecinicio, $request->fecfin])
                 ->sum('debito');
 
             $interesdebito = MovimientoCuenta::whereBetween('fecha', [$request->fecinicio, $request->fecfin])
                 ->where('descripcion', 'NC PAGO DE INTERESES')
                 ->sum('debito');
-            -$itf = MovimientoCuenta::whereBetween('fecha', [$request->fecinicio, $request->fecfin])
-                ->where('descripcion', 'ND ITF')
-                ->sum('debito');
+           
+$itf = MovimientoCuenta::whereBetween('fecha', [$request->fecinicio, $request->fecfin])
+    ->where('descripcion', 'ND ITF')
+    ->sum('debito');
 
 
-            $primerRegistro = DB::table('movimiento_cuentas')
-                ->whereBetween('fecha', [$request->fecinicio, $request->fecfin])
-                ->orderBy('fecha', 'asc')
-                ->orderBy('id', 'asc') // Agregado para asegurar el orden
-                ->first();
-            if ($primerRegistro) {
-               $saldoinicial = $primerRegistro->saldo + $primerRegistro->debito;
-            }else{
-                   $saldoinicial = 0;
-            }
+$saldofinal = DB::table('movimiento_cuentas') ->whereBetween('fecha', [$request->fecinicio, $request->fecfin]) ->orderByDesc('fecha') ->orderByRaw('(credito > 0) DESC') ->first() ->saldo;
+
+$saldoinicial =  $saldofinal + $sumadebitos - $sumacreditos - $interescredito;
 
 
-            $saldofinal = DB::table('movimiento_cuentas')
-                         ->where('fecha', '<=', $request->fecfin . ' 23:59:59')
-                         ->latest('fecha')
-                         ->latest('id')
-                         ->value('saldo');
-
-
-             $resultados = DB::select("
-                         SELECT 
-                         c.nombre as cuenta_nombre,
-                         SUM(a.monto_sus) as total
-                         FROM asientos a
-                         INNER JOIN cuentas c ON a.cuenta = c.id
-                         WHERE a.deleted_at IS NULL
-                         AND a.fec_asiento BETWEEN ? AND ?
-                         GROUP BY a.cuenta, c.nombre
-                         ", [$request->fecinicio, $request->fecfin]); 
-
-
+            $resultados = DB::select(" SELECT c.nombre as cuenta_nombre, SUM(a.monto_sus) as total, a.cuenta FROM asientos a INNER JOIN cuentas c ON a.cuenta = c.id WHERE a.deleted_at IS NULL AND a.fec_asiento BETWEEN ? AND ? GROUP BY a.cuenta, c.nombre ORDER BY a.cuenta ASC ", [$request->fecinicio, $request->fecfin]);
             $gastosoperativos = 0;
             foreach ($resultados as $go) {
                 $gastosoperativos = $gastosoperativos + $go->total;
@@ -180,6 +168,8 @@ class ReporteMensualController extends Controller
                   if($inflacion>0){
                       $gastosoperativos = $collection->sum('total') + $inflacion;
                   }
+                   
+
 
                   $cont = 0;
                   return view('Administrador.FormEstadoResultadosDolares')->with(['fecinicio' => $request->fecinicio, 'fecfin' => $request->fecfin, 'asientos' => $asientos, 'cont' => $cont, 'cuentaux' => $cuentaux, 'subcuentaux' => $subcuentaux, 'asientosaux' => $asientosaux, 'cont' => $cont, 'montobs' => $montobs, 'montosus' => $montosus, 'sumatotalbs' => $sumatotalbs, 'sumatotalsus' => $sumatotalsus, 'sumasubcuentabs' => $sumasubcuentabs, 'sumasubcuentasus' => $sumasubcuentasus, 'cuentaidactual' => $cuentaidactual, 'cuentaidanterior' => $cuentaidanterior, 'subcuentaidactual' => $subcuentaidactual, 'subcuentaidanterior' => $subcuentaidanterior, 'nombrescuentas' => $nombrescuentas, 'totalmontoscuentasdolares' => $totalmontoscuentasdolares, 'totalmontoscuentasbolivianos' => $totalmontoscuentasbolivianos, 'contadorcuentas' => $contadorcuentas, 'contadortotales' => $contadortotales, 'anio' => $anio, 'nombremes' => $nombremes, 'fecinicio' => $request->fecinicio, 'fecfin' => $request->fecfin, 'detallecreditos' => $detallecreditos, 'interescredito' => $interescredito, 'sumacreditos' => $sumacreditos, 'sumadebitos' => $sumadebitos, 'interesdebito' => $interesdebito, 'itf' => $itf, 'resultados' => $resultados, 'gastosoperativos' => $gastosoperativos, 'saldo' => $saldoinicial, 'sumadebitostotales' => $sumadebitostotales, 'saldofinal' => $saldofinal,'diftc'=>$diftc]);
