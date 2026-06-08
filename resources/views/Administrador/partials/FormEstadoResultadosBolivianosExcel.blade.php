@@ -486,7 +486,9 @@ $nombreSubcuentaAnterior = $subcuenta->nombre;
 
 @php
  $ingresosMes = $detallecreditos->sum('credito');
- $saldoInicial = $sumacreditos;
+ $saldoaux =($ingresosMes+$interescredito)-$sumadebitostotales;
+ $saldoInicial=$saldofinal-$saldoaux;
+
 @endphp
 
 <tr>
@@ -515,7 +517,8 @@ $nombreSubcuentaAnterior = $subcuenta->nombre;
         font-weight:bold;
     ">
 
-        {{ number_format($sumacreditos + $interescredito + $saldo, 2) }}
+
+        {{ number_format($ingresosMes + $interescredito+$saldoInicial, 2) }}
 
     </td>
 
@@ -566,8 +569,8 @@ $nombreSubcuentaAnterior = $subcuenta->nombre;
     ">
 
      @php
-                $saldoaux=$sumacreditos-$sumadebitos;
-                $saldoinicial=$saldofinal-$saldoaux;
+                $saldoaux=round($sumacreditos+$interescredito-$sumadebitostotales,2);
+                $saldoinicial=round($saldofinal-$saldoaux,2);
      @endphp
 
         {{ number_format($saldoinicial, 2) }}
@@ -733,8 +736,13 @@ $nombreSubcuentaAnterior = $subcuenta->nombre;
         text-align:right;
         font-weight:bold;
     ">
+        @php
+         $ingresostotales=round($ingresosMes+$interescredito+$saldoinicial,2);
+         $diferenciasaldos=round($ingresostotales-$gastosoperativos,2);
+       
+        @endphp
 
-        {{ number_format($sumacreditos + $interescredito + $saldo-$gastosoperativos, 2) }}
+        {{ number_format($diferenciasaldos, 2) }}
 
     </td>
 
@@ -752,9 +760,11 @@ $nombreSubcuentaAnterior = $subcuenta->nombre;
         VARIACIÓN
 
     </td>
-
+    @php
+    $diferencia=$saldofinal-(($sumacreditos+$interescredito+$saldoinicial)-$gastosoperativos);
+    @endphp
     <td style="border:1px solid black;"></td>
-    <td style="border:1px solid black;text-align:right"> {{ number_format($sumacreditos + $interescredito + $saldo-$gastosoperativos-$saldofinal, 2) }} </td>
+    <td style="border:1px solid black;text-align:right"> {{ number_format($diferencia, 2) }} </td>
 
 
 </tr>

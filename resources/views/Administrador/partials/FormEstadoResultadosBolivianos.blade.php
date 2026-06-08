@@ -213,8 +213,9 @@
 <tr class="bg-rojo">
 <td><strong>TOTAL INGRESOS</strong></td>
 <td></td>
+
 <td class="text-right bg-rojo" style="border:1px solid #000 !important;">
-<strong>{{ number_format($sumacreditos+$interescredito+$saldo,2) }}</strong>
+<strong>{{ number_format($sumacreditos+$interescredito+$saldofinal,2) }}</strong>
 </td>
 </tr>
 

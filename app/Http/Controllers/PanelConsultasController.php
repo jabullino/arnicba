@@ -21,8 +21,7 @@ class PanelConsultasController extends Controller
 
     public function verificaOpcion(Request $request)
     {
-
-
+     
 
         if ($request->has('consultacuentaysubcuenta')) {
             $request->validate(
@@ -104,9 +103,17 @@ class PanelConsultasController extends Controller
             session(['cuentafinal' => false]);
 
 
-           $asientos1 = Asiento::whereBetween( 'fec_asiento', [$request->fecinicio, $request->fecfin])
+        /*   $asientos1 = Asiento::whereBetween( 'fec_asiento', [$request->fecinicio, $request->fecfin])
                         ->orderBy('cuenta', 'ASC')
-                        ->get();
+                        ->get();*/
+           $asientos1 = Asiento::whereBetween('fec_asiento', [
+                    $request->fecinicio,
+                    $request->fecfin
+                ])
+                ->orderBy('cuenta', 'ASC')
+                 ->orderBy('fec_asiento', 'ASC')
+                ->orderBy('id','ASC')               
+                ->get();
 
            $asientos = $asientos1->sortBy('sub_cuenta');
 
@@ -117,7 +124,9 @@ class PanelConsultasController extends Controller
         } elseif ($request->consultas == 'particularcuenta') {
             $asientos1 = Asiento::whereBetween('fec_asiento', [$request->fecinicio, $request->fecfin])
                 ->where('cuenta', $request->cuenta)
-                ->where('estado_id', 1)
+                ->where('estado_id', 1)               
+                ->orderBy('fec_asiento','ASC')
+                ->orderBy('id','ASC') 
                 ->get();
             $asientos = $asientos1->sortBy('sub_cuenta');
 
@@ -141,6 +150,8 @@ class PanelConsultasController extends Controller
                 ->where('cuenta', $request->cuenta)
                 ->where('sub_cuenta', $request->subcuenta)
                 ->where('estado_id', 1)
+                ->orderBy('fec_asiento','ASC')
+                ->orderBy('id','ASC')
                 ->get();
             $cont = 0;
             $asientosaux = new Asiento();
@@ -165,7 +176,7 @@ class PanelConsultasController extends Controller
         $cont = 0;
         $nomcuentas = Cuenta::pluck('nombre');
         $nomsubcuentas = SubCuenta::pluck('nombre');
-        $asientos = Asiento::whereBetween('fec_asiento', [$fecinicio, $fecfin])->groupBy('cuenta');
+        $asientos = Asiento::whereBetween('fec_asiento', [$fecinicio, $fecfin])->orderBy('fec_asiento', 'ASC')->groupBy('cuenta');
         return view('Administrador.FormConsultaGeneralPeriodo')->with(['asientos' => $asientos, 'cuentasaux' => $cuentasaux, 'subcuentasaux' => $subcuentasaux, 'cont' => $cont, 'nomcuentas' => $nomcuentas, 'nomsubcuentas', $nomsubcuentas]);
     }
 
@@ -177,7 +188,7 @@ class PanelConsultasController extends Controller
         $cont = 0;
         $nomcuentas = Cuenta::pluck('nombre');
         $nomsubcuentas = SubCuenta::pluck('nombre');
-        $asientos = Asiento::whereBetween('fec_asiento', [$fecinicio, $fecfin])->groupBy('cuenta');
+        $asientos = Asiento::whereBetween('fec_asiento', [$fecinicio, $fecfin])->orderBy('fec_asiento', 'ASC')->groupBy('cuenta');
         return view('Administrador.FormConsultaParticularPeriodo')->with(['asientos' => $asientos, 'cuentasaux' => $cuentasaux, 'subcuentasaux' => $subcuentasaux, 'cont' => $cont, 'nomcuentas' => $nomcuentas, 'nomsubcuentas', $nomsubcuentas]);
     }
 }

@@ -34,11 +34,15 @@ class BalanceCajaChicaController extends Controller
             $ingresos = DB::table('entregas_caja_chicas')
     ->select('monto', 'fecha_entrega as fecha')
     ->whereBetween('fecha_entrega', [$inicio, $fin])
+    ->whereNull('deleted_at')
+    ->orderBy('fecha_entrega')
     ->get();
 
 $egresos = DB::table('gastos_caja_chicas')
     ->select('importe as monto', 'fecha_doc as fecha') // 🔥 clave
     ->whereBetween('fecha_doc', [$inicio, $fin])       // 🔥 NO uses "registro"
+    ->whereNull('deleted_at')
+   ->orderBy('fecha')
     ->get();
 
 $totalIngresos = $ingresos->sum('monto');

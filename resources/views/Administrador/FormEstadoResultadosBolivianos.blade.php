@@ -377,18 +377,24 @@
                 </tr>
             </thead>
             <tbody>
+
+                   @php
+                          $saldoaux=$sumacreditos-$sumadebitos;
+                          $saldoinicial=$saldofinal-$saldoaux;   
+                   @endphp
+
                 <tr>
                     <td class='font-bold underlined col-span-2' style='text-decoration:underline'>INGRESOS</td>
                     <td class='w-64 text-bold text-right' style='border:solid 2px'>
                         </td>
                     <td class='w-64 text-bold text-right !bg-red-700'>
-                        {{ number_format($sumacreditos+$interescredito+$saldo, 2, '.', ',') }}</td>
+                        {{ number_format($sumacreditos+$interescredito+$saldoinicial, 2, '.', ',') }}</td>
                 </tr>
                 <tr>
                     <td class='col-span-2 text-center font-bold' style='text-decoration:underline'>Ingresos del mes de
                         {{ $nombremes }} del {{ $anio }}</td>
                     <td class='!bg-red-700 w-64 text-bold text-right ' style='border:solid 2px'>
-                        {{ number_format($sumacreditos+$saldo, 2, '.', ',') }}</td>
+                        {{ number_format($sumacreditos+$interescredito, 2, '.', ',') }}</td>
                     <td class='w-64'></td>
 
                 </tr>
@@ -452,14 +458,18 @@
                     <td class=' text-bold text-right'></td>
                      
                     <td class='w-64 text-bold text-right !bg-red-700'>
-                        {{ number_format($sumacreditos+$interescredito+$saldo-$gastosoperativos, 2, '.', ',') }}</td>
+                        {{ number_format($sumacreditos+$interescredito+$saldoinicial-$gastosoperativos, 2, '.', ',') }}</td>
                 </tr>
                 <tr>
                     <td class='font-bold text-sm text-center font-small underlined col-span-2'
                         style='text-decoration:underline'>VARIACION</td>
                     <td class=' text-bold text-right'></td>
                     <td class='w-64 text-bold text-sm text-right bg-neutral-500'>
-                      {{ number_format($sumacreditos+$interescredito+$saldo-$gastosoperativos-$saldofinal, 2, '.', ',') }}</td>
+                       @php
+                          $saldoaux=($sumacreditos+$interescredito+$saldoinicial)-$gastosoperativos;
+                         $diferencia=$saldofinal-$saldoaux;
+                       @endphp
+                      {{ number_format($diferencia, 2, '.', ',') }}</td>
                 </tr>
                 <tr>
                

@@ -115,7 +115,7 @@ textarea {
 
 @section('js')
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
- @livewireScripts
+
 @if(session('success'))
 <script>
     Swal.fire({

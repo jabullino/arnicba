@@ -67,6 +67,7 @@ class ReporteMensualController extends Controller
             ->whereNull('deleted_at')
             ->orderBy('cuenta', 'ASC')        // 🔥 ESTE CAMBIO ARREGLA TODO
             ->orderBy('sub_cuenta', 'ASC')
+            ->orderBy('fec_asiento','ASC')
             ->orderBy('id', 'ASC')
             ->get();
             
@@ -221,6 +222,7 @@ $asientos = DB::table('asientos')
     ->whereNull('deleted_at')
     ->orderBy('cuenta', 'ASC')   // 👈 CORREGIDO
     ->orderBy('sub_cuenta', 'ASC')
+    ->orderBy('fec_asiento','ASC')
     ->orderBy('id', 'ASC')
     ->get();
             $detallecreditos = MovimientoCuenta::whereBetween('fecha', [$request->fecinicio, $request->fecfin])
