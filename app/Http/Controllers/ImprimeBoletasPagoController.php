@@ -89,6 +89,7 @@ $descuentos = DB::table('sueldos')
     ->leftJoin('descuentos', 'descuento_sueldo.descuento_id', '=', 'descuentos.id')
     ->leftJoin('personal', 'sueldos.user_id', '=', 'personal.user_id')
     ->whereIn('sueldos.user_id', $userIds)
+    ->whereNotIn('sueldos.user_id', [1, 4, 6])
     ->where('sueldos.gestion_id', $gestion_id)
     ->where('sueldos.mes', $mesId)
     ->where(function ($query) {
@@ -102,6 +103,7 @@ $descuentos = DB::table('sueldos')
     )
     ->get()
     ->groupBy('user_id');
+
 
     $administrador = DB::table('users')
         ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
@@ -122,6 +124,7 @@ if ($mesNumero < 1 || $mesNumero > 12) {
 }
 
 $mesTexto = $this->mesAnteriorNombre($mesNumero);
+
 
 
     return view('Administrador.FormImprimeBoletasPago', [

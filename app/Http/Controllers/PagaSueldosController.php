@@ -90,6 +90,7 @@ public function pagaSueldos(Request $request)
 
         $cargoIds = $request->input('cargos', []);
 
+
         // Tipos de cambio
         $valortipocambiocompra = (float) str_replace(',', '', TipoCambioCompra::latest('id')->value('tc'));
 
@@ -117,6 +118,7 @@ public function pagaSueldos(Request $request)
             if (!$cargoActivo) {
                 continue;
             }
+            
 
             // Calcular sueldos
             $sueldoBs = (float) str_replace(
@@ -128,7 +130,7 @@ public function pagaSueldos(Request $request)
                     $request->fechapago
                 )
             );
-
+          
             $sueldoSus = $sueldoBs / $valortipocambiocompra;
 
             // Subcuenta según cargo
@@ -297,12 +299,12 @@ public function pagaSueldos(Request $request)
          ->orderByDesc('id')
          ->value('monto');
 
-      $haberbasico = DB::table('haber_basicos as hb')
-         ->join('users as u', 'u.cargo_id', '=', 'hb.cargo_id')
-         ->where('u.id', $usr_id)
-         ->orderByDesc('hb.id')
-         ->limit(1)
-         ->value('hb.monto');
+
+     $haberbasico = DB::table('haber_basicos as hb')
+       ->join('users as u', 'u.cargo_id', '=', 'hb.cargo_id')
+       ->where('u.id', $usr_id)
+       ->latest('hb.created_at')
+       ->value('hb.monto');
 
       $fecha_ingreso = User::where('id', $usr_id)->value('fec_ingreso');
 
@@ -311,7 +313,7 @@ public function pagaSueldos(Request $request)
       if ($ant > 2 && $ant <= 5) {
          $bonoant = $smn * 0.05;
          $haberbasico += $bonoant;
-         if (($cargoId != 2) && ($cargoId=!7) && ($cargoId=!10)) {
+         if (($cargoId != 2) && ($cargoId!=7) && ($cargoId!=10)) {
             $descuento = $haberbasico * 0.1271;
             $haberbasico -= $descuento;
          }
@@ -319,7 +321,7 @@ public function pagaSueldos(Request $request)
       } elseif ($ant > 5 && $ant <= 8) {
          $bonoant = $smn * 0.11;
          $haberbasico += $bonoant;
-         if (($cargoId != 2) && ($cargoId=!7) && ($cargoId=!10)) {
+         if (($cargoId != 2) && ($cargoId!=7) && ($cargoId!=10)) {
             $descuento = $haberbasico * 0.1271;
             $haberbasico -= $descuento;
          }
@@ -327,7 +329,7 @@ public function pagaSueldos(Request $request)
       } elseif ($ant > 8 && $ant <= 11) {
          $bonoant = $smn * 0.18;
          $haberbasico += $bonoant;
-         if (($cargoId != 2) && ($cargoId=!7) && ($cargoId=!10)) {
+         if (($cargoId != 2) && ($cargoId!=7) && ($cargoId!=10)) {
             $descuento = $haberbasico * 0.1271;
             $haberbasico -= $descuento;
          }
@@ -336,7 +338,7 @@ public function pagaSueldos(Request $request)
 
          $bonoant = $smn * 0.26;
          $haberbasico += $bonoant;
-         if (($cargoId != 2) && ($cargoId=!7) && ($cargoId=!10)) {
+         if (($cargoId != 2) && ($cargoId!=7) && ($cargoId!=10)) {
             $descuento = $haberbasico * 0.1271;
             $haberbasico -= $descuento;
          }
@@ -344,7 +346,7 @@ public function pagaSueldos(Request $request)
       } elseif ($ant > 15 && $ant <= 20) {
          $bonoant = $smn * 0.34;
          $haberbasico += $bonoant;
-         if (($cargoId != 2) && ($cargoId=!7) && ($cargoId=!10)) {
+         if (($cargoId != 2) && ($cargoId!=7) && ($cargoId!=10)) {
             $descuento = $haberbasico * 0.1271;
             $haberbasico -= $descuento;
          }
@@ -352,7 +354,7 @@ public function pagaSueldos(Request $request)
       } elseif ($ant > 20 && $ant <= 25) {
          $bonoant = $smn * 0.42;
          $haberbasico += $bonoant;
-         if (($cargoId != 2) && ($cargoId=!7) && ($cargoId=!10) ) {
+         if (($cargoId != 2) && ($cargoId!=7) && ($cargoId!=10) ) {
             $descuento = $haberbasico * 0.1271;
             $haberbasico -= $descuento;
          }
@@ -360,13 +362,13 @@ public function pagaSueldos(Request $request)
       } elseif ($ant > 25) {
          $bonoant = $smn * 0.50;
          $haberbasico += $bonoant;
-         if (($cargoId != 2) && ($cargoId=!7) && ($cargoId=!10) ) {
+         if (($cargoId != 2) && ($cargoId!=7) && ($cargoId!=10) ) {
             $descuento = $haberbasico * 0.1271;
             $haberbasico -= $descuento;
          }
          $haberbasico = round($haberbasico, 2);
       } else {
-         if (($cargoId != 2) && ($cargoId=!7) && ($cargoId=!10) ) {
+         if (($cargoId != 2) && ($cargoId!=7) && ($cargoId!=10) ) {
             $descuento = $haberbasico * 0.1271;
             $haberbasico -= $descuento;
          }
