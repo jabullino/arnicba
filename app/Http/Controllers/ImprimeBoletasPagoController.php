@@ -20,9 +20,10 @@ public function extraeBoletas(Request $request)
 {
     
     $gestion_id = $request->gestion;
-    $mesId = $this->devuelveMesId($request->mes);
+    $mesId = $this->devuelveMesTrabajo($request->mes);
     $gestion_nombre = Gestion::where('id', $gestion_id)->value('nombre');
     $mes = $request->input('mes');
+
      
     // 1️⃣ Usuarios con haber básico + tipo_id
     $usuarios = DB::table('users')
@@ -73,7 +74,7 @@ public function extraeBoletas(Request $request)
         ->groupBy('user_id');
 
     // 3️⃣ Descuentos
-    $descuentos = DB::table('sueldos')
+/*    $descuentos = DB::table('sueldos')
         ->leftJoin('descuento_sueldo', 'sueldos.id', '=', 'descuento_sueldo.sueldo_id')
         ->leftJoin('descuentos', 'descuento_sueldo.descuento_id', '=', 'descuentos.id')
         ->whereIn('sueldos.user_id', $userIds)
@@ -81,7 +82,26 @@ public function extraeBoletas(Request $request)
         ->where('sueldos.mes', $mesId)
         ->select('sueldos.user_id', 'descuentos.nombre', 'descuento_sueldo.monto')
         ->get()
-        ->groupBy('user_id');
+        ->groupBy('user_id');*/
+
+$descuentos = DB::table('sueldos')
+    ->leftJoin('descuento_sueldo', 'sueldos.id', '=', 'descuento_sueldo.sueldo_id')
+    ->leftJoin('descuentos', 'descuento_sueldo.descuento_id', '=', 'descuentos.id')
+    ->leftJoin('personal', 'sueldos.user_id', '=', 'personal.user_id')
+    ->whereIn('sueldos.user_id', $userIds)
+    ->where('sueldos.gestion_id', $gestion_id)
+    ->where('sueldos.mes', $mesId)
+    ->where(function ($query) {
+        $query->whereNull('personal.tipo_id')
+              ->orWhere('personal.tipo_id', '!=', 2);
+    })
+    ->select(
+        'sueldos.user_id',
+        'descuentos.nombre',
+        'descuento_sueldo.monto'
+    )
+    ->get()
+    ->groupBy('user_id');
 
     $administrador = DB::table('users')
         ->join('cargos', 'users.cargo_id', '=', 'cargos.id')
@@ -100,7 +120,10 @@ $mesNumero = (int) $request->mes;
 if ($mesNumero < 1 || $mesNumero > 12) {
     $mesNumero = 1;
 }
+
 $mesTexto = $this->mesAnteriorNombre($mesNumero);
+
+
     return view('Administrador.FormImprimeBoletasPago', [
         'usuarios'   => $usuarios,
         'bonos'      => $bonos,
@@ -183,4 +206,13 @@ public function mesAnteriorNombre($mesNumero)
 
     return $meses[$mesNumero - 1];
 }
+
+public function devuelveMesTrabajo($mesPago)
+{
+    $mesPago = (int)$mesPago;
+
+    return $mesPago == 1 ? 12 : $mesPago - 1;
+}
+
+
 }

@@ -25,16 +25,21 @@
 
                     <div class="boleta @if($copy==1) original @else copia @endif">
                         <div class="boleta-content">
-                            <div class="text-right font-bold mb-1">
-                                {{ $copy == 1 ? 'ORIGINAL' : 'COPIA' }}
-                            </div>
+                           <div class="encabezado">
+    <div>
+        <div class="text-right font-bold mb-1">
+            {{ $copy == 1 ? 'ORIGINAL' : 'COPIA' }}
+        </div>
 
-                           <div class="text-left text-bold mb-1">
-                                FUNDACION ARCA DE RESCATE DE LOS NIÑOS<br>
-                                PERSONERÍA JURÍDICA 215532<br>
-                                NIT 1029939029
-                            </div>
+        <div class="text-left text-bold mb-1">
+            FUNDACION ARCA DE RESCATE DE LOS NIÑOS<br>
+            PERSONERÍA JURÍDICA 215532<br>
+            NIT 1029939029
+        </div>
+    </div>
 
+   
+</div>
                             <div class="text-center text-bold text-lg mb-1">
                                 BOLETA DE PAGO DE SUELDOS
                             </div>
@@ -164,6 +169,7 @@ body, html { margin:0; padding:0; background:#eee; height:100%; -webkit-print-co
     flex-direction:column;
     flex: 0 0 50%; /* 👈 evita que se rompa el layout */
     min-height: 13.5cm;
+    position:relative;
 }
 
 .boleta-content {
@@ -214,13 +220,51 @@ body, html { margin:0; padding:0; background:#eee; height:100%; -webkit-print-co
     margin:0.15cm 0;
 }
 
-@media print {
-    body { background:none !important; margin:0; padding:0; }
-    .page { padding:0; margin:0; height: 27.94cm; }
+.boleta::before{
+    content:"";
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:220px;
+    height:220px;
 
-    .firmas {
-        flex-direction: row !important;
-    }
+    background-image:url('{{ asset('imagenes/Logo.png') }}');
+    background-repeat:no-repeat;
+    background-position:center center;
+    background-size:contain;
+
+    opacity:0.50;
+    pointer-events:none;
+    z-index:0;
 }
+
+.boleta-content{
+    position:relative;
+    z-index:1;
+}
+
+@media print {
+
+body{
+  background:none !important; margin:0; padding:0;
+}
+.page{
+  padding-top:0.15cm; /* más margen arriba */
+  padding-right:0.4cm;
+  padding-bottom:0;
+  padding-left:0.4cm;
+  margin-top:2.5cm;
+  height:27.94cm;
+ } 
+
+.divisor{
+   margin:0.70cm 0; /* más separación entre ORIGINAL y COPIA */ 
+}
+ .firmas {
+   flex-direction: row !important;
+ }
+
+ }
 </style>
 @endsection

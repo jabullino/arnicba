@@ -15,7 +15,7 @@ class SolicitudCajaChicaController extends Controller
     public function index()
     {
         $solicitudes = SolicitudCajaChica::with('gestion', 'detalles')
-            ->whereNull('impreso')
+           // ->whereNull('impreso')
             ->latest()
             ->get();
 
