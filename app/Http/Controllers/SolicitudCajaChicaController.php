@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class SolicitudCajaChicaController extends Controller
 {
@@ -70,6 +72,37 @@ class SolicitudCajaChicaController extends Controller
             }
 
             DB::commit();
+
+            // ── Notificación por correo ──────────────────────────────────────────
+try {
+    $solicitud->load('gestion', 'detalles');
+    $total = $solicitud->detalles->sum('cantidad');
+
+    $cuerpo  = "Nueva Solicitud de Caja Chica Arca de Rescate de los Niños\n";
+    $cuerpo .= "==============================\n\n";
+    $cuerpo .= "Código  : {$solicitud->codigo}\n";
+    $cuerpo .= "Fecha   : " . Carbon::parse($solicitud->fecha)->format('d/m/Y') . "\n";
+    $cuerpo .= "Gestión : " . ($solicitud->gestion->nombre ?? '—') . "\n\n";
+    $cuerpo .= "DETALLE:\n";
+    $cuerpo .= "-----------------------------\n";
+
+    foreach ($solicitud->detalles as $i => $detalle) {
+        $num    = str_pad($i + 1, 2, '0', STR_PAD_LEFT);
+        $cuerpo .= "{$num}. {$detalle->descripcion} — Bs. " . number_format($detalle->cantidad, 2) . "\n";
+    }
+
+    $cuerpo .= "-----------------------------\n";
+    $cuerpo .= "TOTAL   : Bs. " . number_format($total, 2) . "\n";
+
+    Mail::raw($cuerpo, function ($message) use ($solicitud) {
+        $message->to('arnibolcba@gmail.com')
+                ->subject('Nueva Solicitud de Caja Chica – ' . $solicitud->codigo);
+    });
+
+} catch (\Exception $mailException) {
+    Log::error('Error al enviar correo de caja chica: ' . $mailException->getMessage());
+}
+// ────────────────────────────────────────────────────────────────────
 
             return redirect()->route('solicitudes.index')
                 ->with('success', 'Solicitud creada correctamente');
