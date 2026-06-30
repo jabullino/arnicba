@@ -89,7 +89,7 @@ $descuentos = DB::table('sueldos')
     ->leftJoin('descuentos', 'descuento_sueldo.descuento_id', '=', 'descuentos.id')
     ->leftJoin('personal', 'sueldos.user_id', '=', 'personal.user_id')
     ->whereIn('sueldos.user_id', $userIds)
-    ->whereNotIn('sueldos.user_id', [1, 4, 6])
+    ->whereNotIn('sueldos.user_id', [1, 4, 6,10,13])
     ->where('sueldos.gestion_id', $gestion_id)
     ->where('sueldos.mes', $mesId)
     ->where(function ($query) {

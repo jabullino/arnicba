@@ -73,8 +73,11 @@ class AdministradorEntregasController extends Controller
         $query->where('mes', $mes);
     }
 
-    $entregas = $query->get();
-    $total = $entregas->sum('monto'); // 👈 suma total de montos
+    $entregas = $query
+        ->orderBy('fecha_entrega', 'asc')
+        ->get();
+
+    $total = $entregas->sum('monto');
 
     return response()->json([
         'entregas' => $entregas,

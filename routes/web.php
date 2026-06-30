@@ -30,6 +30,8 @@ use App\Http\Controllers\ImpresionIngresosEgresosController;
 use App\Http\Controllers\ImpresionIngresosEgresosEscolarController;
 use App\Http\Controllers\MunicipiosController;
 
+
+
 Route::post('AdminSis.RegistraAdminSis',[UserAdminSisController::class,'saveadminsis'])->name('AdminSis.RegistraAdminSis');
 Route::get('/provincias/{ciudad_id}', function($ciudad_id) {
    $provincias = \App\Models\Provincia::where('ciudad_id', $ciudad_id)->get();
@@ -295,3 +297,4 @@ Route::get(
 '/escolar/impresion/egreso/imprimir/{id}/{indice}',
 [ImpresionIngresosEgresosEscolarController::class,'imprimirProductoEgreso']
 )->name('escolar.impresion.egreso.imprimir');
+

@@ -104,7 +104,7 @@ try {
 }
 // ────────────────────────────────────────────────────────────────────
 
-            return redirect()->route('solicitudes.index')
+            return redirect()->route('administrador.solicitudes.index')
                 ->with('success', 'Solicitud creada correctamente');
 
         } catch (\Exception $e) {

@@ -526,12 +526,12 @@ return [
                                 [
                                     'text' => 'Lista de Solicitudes',
                                     'icon' => 'fas fa-list-ol',
-                                    'url' => 'Administrador/Administrador/solicitudes',
+                                    'url' => 'Administrador/solicitudes',
                                 ],
                                 [
                                     'text' => 'Registro de Solicitud',
                                     'icon' => 'fas fa-file-invoice-dollar',
-                                    'url' => 'Administrador/Administrador/solicitudes/create',
+                                    'url' => 'Administrador/solicitudes/create',
                                 ],
                             ],
                         ], 

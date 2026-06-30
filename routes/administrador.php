@@ -125,9 +125,7 @@ Route::middleware(['auth', 'IsAdministrador'])->group(function () {
     Route::get('Administrador/solicitudes/{id}/imprimir', 
     [SolicitudCajaChicaController::class, 'imprimir']);
 
-  Route::prefix('Administrador')
-    ->name('administrador.')
-    ->group(function () {
+    Route::name('administrador.')->group(function () {
         Route::resource('solicitudes', SolicitudCajaChicaController::class);
-    });    
+    });   
 });
