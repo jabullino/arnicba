@@ -19,11 +19,26 @@ class ImprimeBoletasPagoController extends Controller
 public function extraeBoletas(Request $request)
 {
     
-    $gestion_id = $request->gestion;
-    $mesId = $this->devuelveMesTrabajo($request->mes);
-    $gestion_nombre = Gestion::where('id', $gestion_id)->value('nombre');
-    $mes = $request->input('mes');
+    $request->validate([
+    'gestion'  => 'required|exists:gestiones,id',
+    'mes'      => 'required',
+    'fechapago'=> 'required|date|before_or_equal:today',
+], [
+    'gestion.required' => 'Debe seleccionar una gestión.',
+    'gestion.exists'   => 'La gestión seleccionada no es válida.',
 
+    'mes.required'     => 'Debe seleccionar un mes.',
+
+    'fechapago.required'        => 'Debe ingresar la fecha de pago.',
+    'fechapago.date'            => 'La fecha de pago no es válida.',
+    'fechapago.before_or_equal' => 'La fecha de pago no puede ser posterior a la fecha actual.',
+]);
+
+$gestion_id = $request->gestion;
+$mesId = $this->devuelveMesTrabajo($request->mes);
+$gestion_nombre = Gestion::where('id', $gestion_id)->value('nombre');
+$mes = $request->input('mes');
+$fechapago = $request->input('fechapago');
      
     // 1️⃣ Usuarios con haber básico + tipo_id
     $usuarios = DB::table('users')
@@ -74,15 +89,6 @@ public function extraeBoletas(Request $request)
         ->groupBy('user_id');
 
     // 3️⃣ Descuentos
-/*    $descuentos = DB::table('sueldos')
-        ->leftJoin('descuento_sueldo', 'sueldos.id', '=', 'descuento_sueldo.sueldo_id')
-        ->leftJoin('descuentos', 'descuento_sueldo.descuento_id', '=', 'descuentos.id')
-        ->whereIn('sueldos.user_id', $userIds)
-        ->where('sueldos.gestion_id', $gestion_id)
-        ->where('sueldos.mes', $mesId)
-        ->select('sueldos.user_id', 'descuentos.nombre', 'descuento_sueldo.monto')
-        ->get()
-        ->groupBy('user_id');*/
 
 $descuentos = DB::table('sueldos')
     ->leftJoin('descuento_sueldo', 'sueldos.id', '=', 'descuento_sueldo.sueldo_id')
@@ -134,6 +140,7 @@ $mesTexto = $this->mesAnteriorNombre($mesNumero);
         'gestion'    => $gestion_nombre,
         'mes'        => $mes,
         'mesTexto'   => $mesTexto,
+        'fechapago'  => $fechapago,
         'administrador' => $administrador,
     ]);
 }

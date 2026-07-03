@@ -38,6 +38,16 @@
     <form action="creaboletas" method='post'>
         @csrf
         <div class='card mx-auto'>
+
+             @if ($errors->any())
+                 <div class="alert alert-danger">
+                    <ul class="mb-0">
+                       @foreach ($errors->all() as $error)
+                         <li>{{ $error }}</li>
+                       @endforeach
+                    </ul>
+                 </div>
+             @endif
             <div class="card-header text-center text-white font-bold bg-sky-900">
                 ESCOJA UNA FECHA PARA IMPRIMIR BOLETAS DE PAGO
             </div><!--fin div card-header--->
@@ -67,6 +77,9 @@
                     <option value="11">NOVIEMBRE</option>
                     <option value="12">DICIEMBRE</option>
                  </select>
+                 <br>
+                   <input type='date' name='fechapago' class='form-control'/>
+
                 <button type="submit"
                     style='width:425px'>Consultar</button>
             </div><!---fin div card-body--->
