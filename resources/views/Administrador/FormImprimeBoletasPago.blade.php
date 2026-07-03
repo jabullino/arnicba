@@ -54,7 +54,7 @@
 
                                     <div style="margin-left:auto; text-align:right;">
                                           Fecha de Pago:
-                                          <span class='text-bold'>{{ \Carbon\Carbon::parse($fechapago)->format('m-d-Y')  }}</span>
+                                          <span class='text-bold'>{{ \Carbon\Carbon::parse($fechapago)->format('d-m-Y')  }}</span>
                                     </div>
                                 </div>
                             </div>
