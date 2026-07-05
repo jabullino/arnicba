@@ -255,9 +255,10 @@ $asientos = DB::table('asientos')
             $saldoinicial = $primerRegistro->saldo + $primerRegistro->debito;
 
 
-            $saldofinal = DB::table('movimiento_cuentas')
-    ->whereDate('fecha', $request->fecfin)
-    ->orderByDesc('id') // o la columna que define el orden real
+$saldofinal = DB::table('movimiento_cuentas')
+    ->whereBetween('fecha', [$request->fecinicio, $request->fecfin])
+    ->orderBy('fecha', 'desc')
+    ->orderBy('id', 'desc')
     ->value('saldo');
 
 $resultados = DB::table('asientos')
